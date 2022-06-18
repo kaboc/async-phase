@@ -1,0 +1,23 @@
+name: async_phase_notifier_example
+description: A example app of AsyncPhaseNotifier.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  async_phase_notifier:
+    path: ..
+
+  grab: ^0.2.2
+  http: ^0.13.4
+
+dev_dependencies:
+  flutter_lints: ^2.0.1
+
+flutter:
+  uses-material-design: true
