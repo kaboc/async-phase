@@ -19,7 +19,7 @@ async operation, and notifies the listeners of those changes.
 
 ```dart
 final notifier = AsyncPhaseNotifier<int>();
-notifier.runAsync((value) => someAsyncOperation());
+notifier.runAsync((data) => someAsyncOperation());
 ```
 
 #### value
@@ -32,9 +32,9 @@ based on the phase, like returning an appropriate widget.
 
 ```dart
 child: phase.when(
-  waiting: (value) => Text('phase: AsyncWaiting'),
-  complete: (value) => Text('phase: AsyncComplete ($value)'),
-  error: (value, error, stackTrace) => Text('phase: AsyncError ($error)'),
+  waiting: (data) => Text('phase: AsyncWaiting'),
+  complete: (data) => Text('phase: AsyncComplete ($data)'),
+  error: (data, error, stackTrace) => Text('phase: AsyncError ($error)'),
 )
 ```
 
@@ -88,7 +88,7 @@ Widget build(BuildContext context) {
       // either the result or an error when finished.
       return phase.when(
         waiting: (_) => const CircularProgressIndicator(),
-        complete: (value) => Text('$value'),
+        complete: (data) => Text('$data'),
         error: (_, error, __) => Text('$error'),
       );
     },
@@ -124,7 +124,7 @@ Widget build(BuildContext context) {
 
   return phase.when(
     waiting: (_) => const CircularProgressIndicator(),
-    complete: (value) => Text('$value'),
+    complete: (data) => Text('$data'),
     error: (_, error, __) => Text('$error'),
   );
 }
@@ -146,7 +146,7 @@ Widget build(BuildContext context) {
 
   return phase.when(
     waiting: (_) => const CircularProgressIndicator(),
-    complete: (value) => Text('$value'),
+    complete: (data) => Text('$data'),
     error: (_, error, __) => Text('$error'),
   );
 }
@@ -159,8 +159,8 @@ and `AsyncError`, are used to represent each phase of an async operation.
 
 ### Properties
 
-- **value**
-    - Nullable, but always non-null if this is the value of `AsyncPhaseNotifier<T>`
+- **data**
+    - Nullable, but always non-null if this is set by `AsyncPhaseNotifier<T>`
       and the `T` is a non-nullable type.
 - **error**
     - Always `null` in `AsyncWaiting` and `AsyncComplete`.
@@ -178,7 +178,7 @@ either an `AsyncComplete` or an `AsyncError`.
 
 ```dart
 class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
-  WeatherNotifier() : super(const AsyncComplete(value: Weather()));
+  WeatherNotifier() : super(const AsyncComplete(data: Weather()));
 
   final repository = WeatherRepository();
 
@@ -193,15 +193,15 @@ class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
 ```
 
 Note that in this usage, unlike `AsyncWaiting` and `AsyncError` set by `AsyncPhaseNotifier`,
-the `value` is `null` unless you set a certain value manually 
+the `data` is `null` unless you put something in it manually.
 
-As for `AsyncError`, however, it is possible to set a value using the `fallbackValue`
-property of `AsyncPhase.from()`.
+As for `AsyncError`, however, it is possible to make sure some data is set using the
+`fallbackData` property of `AsyncPhase.from()`.
 
 ```dart
 value = await AsyncPhase.from(
   () => repository.fetchWeather(Cities.tokyo),
-  fallbackValue: const Weather(),
+  fallbackData: const Weather(),
 )
 ```
 

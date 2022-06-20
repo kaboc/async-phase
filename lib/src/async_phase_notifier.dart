@@ -3,30 +3,36 @@ import 'package:flutter/foundation.dart';
 import 'async_phase.dart';
 
 class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
-  AsyncPhaseNotifier(T value) : super(AsyncComplete(value: value));
+  AsyncPhaseNotifier(T value) : super(AsyncComplete(data: value));
 
   @override
   @protected
   set value(AsyncPhase<T> newValue) {
-    if (newValue.value != null || newValue is AsyncComplete) {
+    if (newValue.data != null || newValue is AsyncComplete) {
       super.value = newValue;
     }
     if (newValue.isWaiting) {
-      super.value = AsyncWaiting(value: value.value);
+      super.value = newValue.data == value.data
+          ? newValue
+          : AsyncWaiting(data: value.data);
     }
     if (newValue.isError) {
-      super.value = AsyncError(
-        value: value.value,
-        error: newValue.error,
-        stackTrace: newValue.stackTrace,
-      );
+      super.value = newValue.data == value.data
+          ? newValue
+          : AsyncError(
+              data: value.data,
+              error: newValue.error,
+              stackTrace: newValue.stackTrace,
+            );
     }
   }
 
   void runAsync(Future<T> Function(T?) func) {
-    value = AsyncWaiting(value: value.value);
+    value = AsyncWaiting(data: value.data);
 
-    AsyncPhase.from<T>(() => func(value.value))
-        .then((result) => value = result);
+    AsyncPhase.from<T>(
+      () => func(value.data),
+      fallbackData: value.data,
+    ).then((result) => value = result);
   }
 }

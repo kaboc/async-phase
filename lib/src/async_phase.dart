@@ -7,12 +7,12 @@ import 'package:meta/meta.dart';
 @sealed
 abstract class AsyncPhase<T> {
   const AsyncPhase(
-    this.value, {
+    this.data, {
     this.error,
     this.stackTrace,
   });
 
-  final T? value;
+  final T? data;
   final Object? error;
   final StackTrace? stackTrace;
 
@@ -24,12 +24,12 @@ abstract class AsyncPhase<T> {
           // AsyncWaiting and AsyncComplete will be considered identical
           // as all properties are equal.
           other.runtimeType == runtimeType &&
-          other.value == value &&
+          other.data == data &&
           other.error == error &&
           other.stackTrace == stackTrace;
 
   @override
-  int get hashCode => Object.hashAll([value, error, stackTrace]);
+  int get hashCode => Object.hashAll([data, error, stackTrace]);
 
   bool get isWaiting => this is AsyncWaiting;
 
@@ -39,7 +39,7 @@ abstract class AsyncPhase<T> {
 
   @override
   String toString() {
-    return '${describeIdentity(this)}(value: $value, error: $error)';
+    return '${describeIdentity(this)}(value: $data, error: $error)';
   }
 
   U when<U>({
@@ -48,38 +48,38 @@ abstract class AsyncPhase<T> {
     required U Function(T?, Object?, StackTrace?) error,
   }) {
     if (isWaiting) {
-      return waiting(value);
+      return waiting(data);
     }
     if (isComplete) {
-      return complete(value as T);
+      return complete(data as T);
     }
-    return error(value, this.error, stackTrace);
+    return error(data, this.error, stackTrace);
   }
 
   static Future<AsyncPhase<T>> from<T>(
     Future<T> Function() func, {
-    T? fallbackValue,
+    T? fallbackData,
   }) async {
     return func().then<AsyncPhase<T>>((v) {
-      return AsyncComplete(value: v);
+      return AsyncComplete(data: v);
     }).onError((e, s) {
-      return AsyncError<T>(value: fallbackValue, error: e, stackTrace: s);
+      return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
     });
   }
 }
 
 class AsyncWaiting<T> extends AsyncPhase<T> {
-  const AsyncWaiting({T? value}) : super(value);
+  const AsyncWaiting({T? data}) : super(data);
 }
 
 class AsyncComplete<T> extends AsyncPhase<T> {
-  const AsyncComplete({required T value}) : super(value);
+  const AsyncComplete({required T data}) : super(data);
 }
 
 class AsyncError<T> extends AsyncPhase<T> {
   const AsyncError({
     required Object? error,
-    T? value,
+    T? data,
     StackTrace? stackTrace,
-  }) : super(value, error: error, stackTrace: stackTrace);
+  }) : super(data, error: error, stackTrace: stackTrace);
 }
