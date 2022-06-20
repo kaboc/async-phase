@@ -22,13 +22,13 @@ final notifier = AsyncPhaseNotifier<int>();
 notifier.runAsync((data) => someAsyncOperation());
 ```
 
-#### value
+#### AsyncPhase
 
 The value of `AsyncPhaseNotifier` is either `AsyncWaiting`, `AsyncComplete` or
 `AsyncError`. They are subtypes of `AsyncPhase`.
 
-`AsyncPhase` provides the `when()` method, which is useful for performing something
-based on the phase, like returning an appropriate widget.
+`AsyncPhase` provides the `when()` method, which is useful for choosing an action
+based on the current phase, like returning an appropriate widget.
 
 ```dart
 child: phase.when(
@@ -38,8 +38,8 @@ child: phase.when(
 )
 ```
 
-For checking the current phase, you can use the `isWaiting`, `isComplete` and
-`isError` getters.
+For checking that the current phase matches one of the three phases, you can use
+a getter; `isWaiting`, `isComplete` or `isError`.
 
 ```dart
 if (phase.isError) {
@@ -177,8 +177,8 @@ Use `AsyncPhase.from()` to execute an async function and transform the result in
 either an `AsyncComplete` or an `AsyncError`.
 
 ```dart
-class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
-  WeatherNotifier() : super(const AsyncComplete(data: Weather()));
+class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
+  WeatherNotifier() : super(const AsyncComplete(data: null));
 
   final repository = WeatherRepository();
 
@@ -192,11 +192,11 @@ class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
 }
 ```
 
-Note that in this usage, unlike `AsyncWaiting` and `AsyncError` set by `AsyncPhaseNotifier`,
+Note that in this usage, unlike an `AsyncWaiting` / `AsyncError` set by `AsyncPhaseNotifier`,
 the `data` is `null` unless you put something in it manually.
 
-As for `AsyncError`, however, it is possible to make sure some data is set using the
-`fallbackData` property of `AsyncPhase.from()`.
+As for `AsyncError`, however, it is possible to make sure certain data is set on failure
+using the `fallbackData` property of `AsyncPhase.from()`.
 
 ```dart
 value = await AsyncPhase.from(
