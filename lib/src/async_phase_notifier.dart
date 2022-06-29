@@ -35,16 +35,18 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
     }
   }
 
-  void runAsync(Future<T> Function(T?) func) {
+  Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
     value = AsyncWaiting(data: value.data);
 
-    AsyncPhase.from<T>(
+    final result = await AsyncPhase.from<T>(
       () => func(value.data),
       fallbackData: value.data,
-    ).then((result) {
-      if (_active) {
-        value = result;
-      }
-    });
+    );
+
+    if (_active) {
+      value = result;
+    }
+
+    return result;
   }
 }
