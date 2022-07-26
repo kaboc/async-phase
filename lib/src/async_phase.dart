@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -39,7 +36,8 @@ abstract class AsyncPhase<T> {
 
   @override
   String toString() {
-    return '${describeIdentity(this)}(value: $data, error: $error)';
+    final shortHash = hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0');
+    return '$runtimeType#$shortHash(value: $data, error: $error)';
   }
 
   U when<U>({
