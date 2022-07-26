@@ -77,9 +77,6 @@ class AsyncComplete<T> extends AsyncPhase<T> {
 }
 
 class AsyncError<T> extends AsyncPhase<T> {
-  const AsyncError({
-    required Object? error,
-    T? data,
-    StackTrace? stackTrace,
-  }) : super(data, error: error, stackTrace: stackTrace);
+  const AsyncError({Object? error, T? data, StackTrace? stackTrace})
+      : super(data, error: error, stackTrace: stackTrace);
 }
