@@ -4,7 +4,10 @@ the waiting, complete or error phases in some async operation.
 ## Usage
 
 `AsyncPhaseNotifier` + `AsyncPhase` is similar to [StateNotifier][state_notifier] +
-[AsyncValue][async_value] of Riverpod, but easier to use.
+[AsyncValue][async_value] of Riverpod.
+
+Unlike AsyncValue, which is tied to Riverpod, `AsyncPhase` and `AsyncPhaseNotifier`
+have no such binding, and can be used more freely.
 
 [state_notifier]: https://pub.dev/packages/state_notifier
 [async_value]: https://pub.dev/documentation/riverpod/latest/riverpod/AsyncValue-class.html
@@ -164,19 +167,27 @@ and `AsyncError`, are used to represent each phase of an async operation.
       and the `T` is a non-nullable type.
 - **error**
     - Always `null` in `AsyncWaiting` and `AsyncComplete`.
-    - `AsyncError` has error information in this property.
+    - `AsyncError` has error information in this property if any.
 - **stackTrace**
     - Always `null` in `AsyncWaiting` and `AsyncComplete`.
     - `AsyncError` has stack trace information in this property if any.
 
 ### Usage
 
-You can use `AsyncPhase` alone, separately from `AsyncPhaseNotifier`.
+`AsyncPhase` is used in `AsyncPhaseNotifier` automatically, but it can also be
+used separately.
+
+It was already described above how `AsyncPhaseNotifier` is used, so below here is
+how `AsyncPhase` is used with a different type of notifier like `ValueNotifier`. 
+
+#### AsyncPhase.from()
 
 Use `AsyncPhase.from()` to execute an async function and transform the result into
 either an `AsyncComplete` or an `AsyncError`.
 
 ```dart
+import 'package:async_phase_notifier/async_phase.dart';
+
 class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
   WeatherNotifier() : super(const AsyncComplete(data: null));
 
