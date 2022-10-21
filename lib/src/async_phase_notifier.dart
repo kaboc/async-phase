@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'async_phase.dart';
 
 class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
-  AsyncPhaseNotifier(T value) : super(AsyncComplete(data: value));
+  AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data: data));
 
   @override
   @protected

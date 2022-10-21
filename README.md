@@ -59,7 +59,7 @@ phase of an async operation.
 
 ```dart
 class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
-  WeatherNotifier() : super(const Weather());
+  WeatherNotifier();
 
   final repository = WeatherRepository();
 

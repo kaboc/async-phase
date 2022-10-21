@@ -10,7 +10,7 @@ final _factNotifier = FactNotifier();
 final _switchNotifier = ValueNotifier(true);
 
 class FactNotifier extends AsyncPhaseNotifier<Fact> {
-  FactNotifier() : super(const Fact()) {
+  FactNotifier() {
     fetch();
   }
 
