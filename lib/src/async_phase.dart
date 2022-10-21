@@ -28,6 +28,8 @@ abstract class AsyncPhase<T> {
   @override
   int get hashCode => Object.hashAll([data, error, stackTrace]);
 
+  bool get isInitial => this is AsyncInitial;
+
   bool get isWaiting => this is AsyncWaiting;
 
   bool get isComplete => this is AsyncComplete;
@@ -44,7 +46,11 @@ abstract class AsyncPhase<T> {
     required U Function(T?) waiting,
     required U Function(T) complete,
     required U Function(T?, Object?, StackTrace?) error,
+    U Function(T?)? initial,
   }) {
+    if (isInitial) {
+      return initial == null ? waiting(data) : initial(data);
+    }
     if (isWaiting) {
       return waiting(data);
     }
@@ -64,6 +70,10 @@ abstract class AsyncPhase<T> {
       return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
     });
   }
+}
+
+class AsyncInitial<T> extends AsyncPhase<T> {
+  const AsyncInitial({T? data}) : super(data);
 }
 
 class AsyncWaiting<T> extends AsyncPhase<T> {

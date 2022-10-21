@@ -27,22 +27,23 @@ notifier.runAsync((data) => someAsyncOperation());
 
 #### AsyncPhase
 
-The value of `AsyncPhaseNotifier` is either `AsyncWaiting`, `AsyncComplete` or
-`AsyncError`. They are subtypes of `AsyncPhase`.
+The value of `AsyncPhaseNotifier` is either `AsyncInitial`, `AsyncWaiting`, `AsyncComplete`
+or `AsyncError`. They are subtypes of `AsyncPhase`.
 
 `AsyncPhase` provides the `when()` method, which is useful for choosing an action
 based on the current phase, like returning an appropriate widget.
 
 ```dart
 child: phase.when(
-  waiting: (data) => Text('phase: AsyncWaiting'),
+  initial: (data) => Text('phase: AsyncInitial ($data)'), // Optional
+  waiting: (data) => Text('phase: AsyncWaiting ($data)'),
   complete: (data) => Text('phase: AsyncComplete ($data)'),
   error: (data, error, stackTrace) => Text('phase: AsyncError ($error)'),
 )
 ```
 
-For checking that the current phase matches one of the three phases, you can use
-a getter; `isWaiting`, `isComplete` or `isError`.
+For checking that the current phase matches one of the four phases, you can use
+a getter; `isInitial`, `isWaiting`, `isComplete` or `isError`.
 
 ```dart
 if (phase.isError) {
@@ -157,8 +158,8 @@ Widget build(BuildContext context) {
 
 ## AsyncPhase
 
-`AsyncPhase` itself is an abstract class. Its three subtypes, `AsyncWaiting`, `AsyncComplete`
-and `AsyncError`, are used to represent each phase of an async operation.
+`AsyncPhase` itself is an abstract class. Its four subtypes, `AsyncInitial`, `AsyncWaiting`,
+`AsyncComplete` and `AsyncError`, are used to represent each phase of an async operation.
 
 ### Properties
 
@@ -166,10 +167,10 @@ and `AsyncError`, are used to represent each phase of an async operation.
     - Nullable, but always non-null if this is set by `AsyncPhaseNotifier<T>`
       and the `T` is a non-nullable type.
 - **error**
-    - Always `null` in `AsyncWaiting` and `AsyncComplete`.
+    - Always `null` in a phase other than `AsyncError`.
     - `AsyncError` has error information in this property if any.
 - **stackTrace**
-    - Always `null` in `AsyncWaiting` and `AsyncComplete`.
+    - Always `null` in a phase other than `AsyncError`.
     - `AsyncError` has stack trace information in this property if any.
 
 ### Usage
@@ -189,7 +190,7 @@ either an `AsyncComplete` or an `AsyncError`.
 import 'package:async_phase_notifier/async_phase.dart';
 
 class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
-  WeatherNotifier() : super(const AsyncComplete(data: null));
+  WeatherNotifier() : super(const AsyncInitial());
 
   final repository = WeatherRepository();
 
