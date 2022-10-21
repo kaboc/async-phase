@@ -5,14 +5,6 @@ import 'async_phase.dart';
 class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
   AsyncPhaseNotifier(T value) : super(AsyncComplete(data: value));
 
-  bool _active = true;
-
-  @override
-  void dispose() {
-    _active = false;
-    super.dispose();
-  }
-
   @override
   @protected
   set value(AsyncPhase<T> newValue) {
@@ -38,15 +30,11 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
   Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
     value = AsyncWaiting(data: value.data);
 
-    final result = await AsyncPhase.from<T>(
+    value = await AsyncPhase.from<T>(
       () => func(value.data),
       fallbackData: value.data,
     );
 
-    if (_active) {
-      value = result;
-    }
-
-    return result;
+    return value;
   }
 }
