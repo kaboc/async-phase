@@ -64,11 +64,12 @@ abstract class AsyncPhase<T> {
     Future<T> Function() func, {
     T? fallbackData,
   }) async {
-    return func().then<AsyncPhase<T>>((v) {
-      return AsyncComplete(data: v);
-    }).onError((e, s) {
+    try {
+      final data = await func();
+      return AsyncComplete(data: data);
+    } on Exception catch (e, s) {
       return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
-    });
+    }
   }
 }
 
