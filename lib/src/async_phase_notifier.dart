@@ -1,9 +1,22 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'async_phase.dart';
 
+typedef ErrorListener = void Function(Object?, StackTrace?);
+typedef RemoveErrorListener = void Function();
+
 class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
   AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data: data));
+
+  StreamController<AsyncError<T>>? _errorStreamController;
+  AsyncPhase<T>? _prevPhase;
+
+  @override
+  void dispose() {
+    _errorStreamController?.close();
+    super.dispose();
+  }
 
   @override
   @protected
@@ -25,16 +38,39 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
               stackTrace: newValue.stackTrace,
             );
     }
+
+    _notifyErrorListeners();
   }
 
   Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
     value = AsyncWaiting(data: value.data);
 
-    value = await AsyncPhase.from<T>(
+    final phase = await AsyncPhase.from<T>(
       () => func(value.data),
       fallbackData: value.data,
     );
+    value = phase;
 
-    return value;
+    return phase;
+  }
+
+  RemoveErrorListener listenError(ErrorListener listener) {
+    // ignore: prefer_asserts_with_message
+    assert(ChangeNotifier.debugAssertNotDisposed(this));
+
+    _errorStreamController ??= StreamController<AsyncError<T>>.broadcast();
+    final subscription = _errorStreamController?.stream.listen((event) {
+      listener(event.error, event.stackTrace);
+    });
+
+    return () => subscription?.cancel();
+  }
+
+  void _notifyErrorListeners() {
+    final phase = value;
+    if (phase != _prevPhase && phase is AsyncError<T>) {
+      _errorStreamController?.sink.add(phase);
+    }
+    _prevPhase = phase;
   }
 }
