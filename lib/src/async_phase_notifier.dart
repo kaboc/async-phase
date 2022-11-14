@@ -56,7 +56,8 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
 
   RemoveErrorListener listenError(ErrorListener listener) {
     // ignore: prefer_asserts_with_message
-    assert(ChangeNotifier.debugAssertNotDisposed(this));
+    // TODO: Commented out until min Flutter version is bumped to 3.3.
+    // assert(ChangeNotifier.debugAssertNotDisposed(this));
 
     _errorStreamController ??= StreamController<AsyncError<T>>.broadcast();
     final subscription = _errorStreamController?.stream.listen((event) {
