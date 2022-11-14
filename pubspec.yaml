@@ -1,11 +1,10 @@
 name: async_phase_notifier
-description: A new Flutter package project.
+description: A ValueNotifier that helps you better manage phases of async operations.
 version: 0.0.1
-homepage: https://github.com/kaboc/async-phase-notifier
+repository: https://github.com/kaboc/async-phase-notifier
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
-  flutter: ">=1.17.0"
 
 dependencies:
   flutter:

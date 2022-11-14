@@ -1,18 +1,26 @@
 A variant of `ValueNotifier` that has `AsyncPhase` as its value representing one of
 the waiting, complete or error phases in some async operation.
 
-## Usage
+## What is this?
 
-`AsyncPhaseNotifier` + `AsyncPhase` is similar to [StateNotifier][state_notifier] +
+`AsyncPhaseNotifier` + `AsyncPhase` is similar to [AsyncNotifier][async_notifier] +
 [AsyncValue][async_value] of Riverpod.
 
-Unlike AsyncValue, which is tied to Riverpod, `AsyncPhase` and `AsyncPhaseNotifier`
-have no such binding, and can be used more freely.
+Unlike AsyncValue and AsyncNotifier, which are tied to Riverpod, `AsyncPhase` and
+`AsyncPhaseNotifier` have no such binding. The notifier can be used as just a handy
+variant of `ValueNotifier` with `AsyncPhase` as its value.
 
-[state_notifier]: https://pub.dev/packages/state_notifier
+[async_notifier]: https://pub.dev/documentation/riverpod/latest/riverpod/AsyncNotifier-class.html
 [async_value]: https://pub.dev/documentation/riverpod/latest/riverpod/AsyncValue-class.html
 
-### Basics
+## Demo apps
+
+- [Useless Facts](https://github.com/kaboc/async-phase-notifier/tree/main/example)
+- [pub.dev explorer](https://github.com/kaboc/pubdev-explorer)
+
+## AsyncPhaseNotifier
+
+### Usage
 
 #### runAsync()
 
@@ -52,8 +60,23 @@ if (phase.isError) {
 }
 ```
 
-### Examples
+#### Error listener
 
+You can listen for errors to imperatively trigger some action when the phase is
+turned into `AsyncError` by `runAsync()`, like showing an AlertDialog or a SnackBar,
+or to just log them.
+
+```dart
+final notifier = AsyncPhaseNotifier<Auth>();
+final removeErrorListener = notifier.listenError((e, s) { ... });
+
+...
+
+// Remove the listener if it is no longer necessary.
+removeErrorListener();
+```
+
+### Examples
 The examples here illustrate how to show a particular UI component depending on the
 phase of an async operation. 
 
@@ -164,8 +187,8 @@ Widget build(BuildContext context) {
 ### Properties
 
 - **data**
-    - Nullable, but always non-null if this is set by `AsyncPhaseNotifier<T>`
-      and the `T` is a non-nullable type.
+    - Nullable, but always non-null once a value is set by `runAsync()` of `AsyncPhaseNotifier<T>`
+      where the `T` is a non-nullable type. 
 - **error**
     - Always `null` in a phase other than `AsyncError`.
     - `AsyncError` has error information in this property if any.
@@ -204,8 +227,8 @@ class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
 }
 ```
 
-Note that in this usage, unlike an `AsyncWaiting` / `AsyncError` set by `AsyncPhaseNotifier`,
-the `data` is `null` unless you put something in it manually.
+Note that in this usage, the `data` of `AsyncWaiting` / `AsyncError` is not automatically
+set unlike in `AsyncPhaseNotifier` where the existing data is set by `runAsync()`.
 
 As for `AsyncError`, however, it is possible to make sure certain data is set on failure
 using the `fallbackData` property of `AsyncPhase.from()`.

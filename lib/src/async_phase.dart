@@ -17,9 +17,9 @@ abstract class AsyncPhase<T> {
   bool operator ==(Object other) =>
       identical(other, this) ||
       other is AsyncPhase<T> &&
-          // Comparison of runtimeTypes is necessary because otherwise
-          // AsyncWaiting and AsyncComplete will be considered identical
-          // as all properties are equal.
+          // Comparison of runtimeTypes is necessary because
+          // otherwise different subtypes with the same properties
+          // will be considered equal.
           other.runtimeType == runtimeType &&
           other.data == data &&
           other.error == error &&
