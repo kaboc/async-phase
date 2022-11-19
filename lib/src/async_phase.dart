@@ -63,11 +63,13 @@ abstract class AsyncPhase<T> {
   static Future<AsyncPhase<T>> from<T>(
     Future<T> Function() func, {
     required T? fallbackData,
+    void Function(Exception, StackTrace)? onError,
   }) async {
     try {
       final data = await func();
       return AsyncComplete(data: data);
     } on Exception catch (e, s) {
+      onError?.call(e, s);
       return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
     }
   }
