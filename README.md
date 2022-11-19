@@ -214,6 +214,9 @@ waiting phase before the async operation starts. It is recommended that `copyAsW
 is used as shown below to switch the phase to `AsyncWaiting` without losing the
 previous `data`.
 
+It should also be noted that `fallbackData` is necessary to specify the data that
+should be used when the async operation results in failure.
+
 ```dart
 import 'package:async_phase_notifier/async_phase.dart';
 
@@ -227,19 +230,10 @@ class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
 
     value = await AsyncPhase.from(
       () => repository.fetchWeather(Cities.tokyo),
+      fallbackData: value.data,
     );
   }
 }
-```
-
-As for `AsyncError`, it is possible to make sure certain data is set on failure
-using the `fallbackData` property of `AsyncPhase.from()`.
-
-```dart
-value = await AsyncPhase.from(
-  () => repository.fetchWeather(Cities.tokyo),
-  fallbackData: const Weather(),
-)
 ```
 
 ## TODO

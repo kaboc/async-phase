@@ -62,7 +62,7 @@ abstract class AsyncPhase<T> {
 
   static Future<AsyncPhase<T>> from<T>(
     Future<T> Function() func, {
-    T? fallbackData,
+    required T? fallbackData,
   }) async {
     try {
       final data = await func();
