@@ -25,9 +25,8 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
       super.value = newValue;
     }
     if (newValue.isWaiting) {
-      super.value = newValue.data == value.data
-          ? newValue
-          : AsyncWaiting(data: value.data);
+      super.value =
+          newValue.data == value.data ? newValue : value.copyAsWaiting();
     }
     if (newValue.isError) {
       super.value = newValue.data == value.data
@@ -43,7 +42,7 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
   }
 
   Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
-    value = AsyncWaiting(data: value.data);
+    value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from<T>(
       () => func(value.data),

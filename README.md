@@ -209,16 +209,21 @@ how `AsyncPhase` is used with a different type of notifier like `ValueNotifier`.
 Use `AsyncPhase.from()` to execute an async function and transform the result into
 either an `AsyncComplete` or an `AsyncError`.
 
+In this usage, the `value` of ValueNotifier is not automatically updated to the
+waiting phase before the async operation starts. It is recommended that `copyAsWaiting()`
+is used as shown below to switch the phase to `AsyncWaiting` without losing the
+previous `data`.
+
 ```dart
 import 'package:async_phase_notifier/async_phase.dart';
 
-class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
-  WeatherNotifier() : super(const AsyncInitial());
+class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
+  WeatherNotifier() : super(const AsyncInitial(data: Weather()));
 
   final repository = WeatherRepository();
 
   Future<void> fetch() async {
-    value = const AsyncWaiting();
+    value = value.copyAsWaiting();
 
     value = await AsyncPhase.from(
       () => repository.fetchWeather(Cities.tokyo),
@@ -227,10 +232,7 @@ class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather?>> {
 }
 ```
 
-Note that in this usage, the `data` of `AsyncWaiting` / `AsyncError` is not automatically
-set unlike in `AsyncPhaseNotifier` where the existing data is set by `runAsync()`.
-
-As for `AsyncError`, however, it is possible to make sure certain data is set on failure
+As for `AsyncError`, it is possible to make sure certain data is set on failure
 using the `fallbackData` property of `AsyncPhase.from()`.
 
 ```dart

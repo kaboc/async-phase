@@ -71,6 +71,10 @@ abstract class AsyncPhase<T> {
       return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
     }
   }
+
+  AsyncWaiting<T> copyAsWaiting() {
+    return AsyncWaiting(data: data);
+  }
 }
 
 class AsyncInitial<T> extends AsyncPhase<T> {
