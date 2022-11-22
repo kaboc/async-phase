@@ -18,12 +18,12 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="An example app of async_phase_notifier.">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="async_phase_notifier_example">
+  <meta name="apple-mobile-web-app-title" content="AsyncPhaseNotifier Demo">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -31,6 +31,7 @@
 
   <title>AsyncPhaseNotifier Demo</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 
   <script>
     // The value below is injected by flutter build, do not touch.
@@ -40,6 +41,7 @@
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  <div id="loading"><div></div><div></div></div>
   <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
@@ -51,6 +53,8 @@
         return engineInitializer.initializeEngine();
       }).then(function(appRunner) {
         return appRunner.runApp();
+      }).then(function() {
+        document.getElementById('loading').remove();
       });
     });
   </script>

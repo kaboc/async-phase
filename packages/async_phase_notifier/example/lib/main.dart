@@ -4,23 +4,19 @@ import 'package:async_phase_notifier/async_phase_notifier.dart';
 import 'package:grab/grab.dart';
 
 import 'package:async_phase_notifier_example/api.dart';
-import 'package:async_phase_notifier_example/footer.dart';
-
-final _factNotifier = FactNotifier();
-final _switchNotifier = ValueNotifier(true);
+import 'package:async_phase_notifier_example/widgets.dart';
 
 class FactNotifier extends AsyncPhaseNotifier<Fact> {
-  FactNotifier() {
-    fetch();
-  }
-
   final _api = RandomFactApi();
 
   void fetch() {
-    final enabled = _switchNotifier.value;
+    final enabled = switchNotifier.value;
     runAsync((_) => _api.fetch(enabled: enabled));
   }
 }
+
+final factNotifier = FactNotifier()..fetch();
+final switchNotifier = ValueNotifier(true);
 
 //======================================================================
 
@@ -36,8 +32,8 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   void dispose() {
-    _factNotifier.dispose();
-    _switchNotifier.dispose();
+    factNotifier.dispose();
+    switchNotifier.dispose();
     super.dispose();
   }
 
@@ -53,10 +49,8 @@ class _AppState extends State<App> {
           title: const Text('Useless Facts'),
           centerTitle: true,
         ),
-        body: const Center(
-          child: _Body(),
-        ),
-        floatingActionButton: const _Fab(),
+        body: const _Body(),
+        floatingActionButton: const Fab(),
         bottomNavigationBar: const Footer(),
       ),
     );
@@ -68,61 +62,27 @@ class _Body extends StatelessWidget with Grab {
 
   @override
   Widget build(BuildContext context) {
-    final factPhase = context.grab<AsyncPhase<Fact>>(_factNotifier);
-    final enabled = context.grab<bool>(_switchNotifier);
+    final factPhase = context.grab<AsyncPhase<Fact>>(factNotifier);
+    final enabled = context.grab<bool>(switchNotifier);
 
-    return Padding(
-      padding: const EdgeInsets.all(18.0),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: factPhase.when(
-                waiting: (_) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                error: (v, e, s) => Text(
-                  '$e',
-                  style: const TextStyle(color: Colors.red),
-                ),
-                complete: (fact) => Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      fact.text,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(fact.sourceUrl),
-                  ],
-                ),
-              ),
+    return FilledList(
+      children: [
+        Expanded(
+          child: Center(
+            child: factPhase.when(
+              waiting: (_) => const CircularProgressIndicator(),
+              error: (fact, e, s) => ErrorText(message: '$e'),
+              complete: (fact) => FactView(fact: fact),
             ),
           ),
-          const SizedBox(height: 24.0),
-          Switch(
-            value: enabled,
-            onChanged: (v) => _switchNotifier.value = v,
-          ),
-          Text('Web API ${enabled ? 'enabled' : 'disabled'}'),
-        ],
-      ),
-    );
-  }
-}
-
-class _Fab extends StatelessWidget with Grab {
-  const _Fab();
-
-  @override
-  Widget build(BuildContext context) {
-    final factPhase = context.grab<AsyncPhase<Fact>>(_factNotifier);
-
-    return FloatingActionButton(
-      backgroundColor: factPhase.isWaiting ? Colors.blueGrey.shade200 : null,
-      onPressed: factPhase.isWaiting ? null : _factNotifier.fetch,
-      child: const Icon(Icons.refresh),
+        ),
+        const SizedBox(height: 24.0),
+        Switch(
+          value: enabled,
+          onChanged: (v) => switchNotifier.value = v,
+        ),
+        Text('Web API ${enabled ? 'enabled' : 'disabled'}'),
+      ],
     );
   }
 }
