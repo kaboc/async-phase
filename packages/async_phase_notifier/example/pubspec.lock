@@ -11,9 +11,11 @@ packages:
   async_phase:
     dependency: transitive
     description:
-      path: "../../async_phase"
-      relative: true
-    source: path
+      path: "packages/async_phase"
+      ref: HEAD
+      resolved-ref: d05a1294a7a397ced099faac34ffab08b8822431
+      url: "https://github.com/kaboc/async-phase"
+    source: git
     version: "0.0.1"
   async_phase_notifier:
     dependency: "direct main"
