@@ -60,6 +60,20 @@ abstract class AsyncPhase<T> {
     return error(data, this.error, stackTrace);
   }
 
+  U? whenOrNull<U>({
+    U Function(T?)? initial,
+    U Function(T?)? waiting,
+    U Function(T)? complete,
+    U Function(T?, Object?, StackTrace?)? error,
+  }) {
+    return when(
+      initial: initial,
+      waiting: (data) => waiting?.call(data),
+      complete: (data) => complete?.call(data),
+      error: (data, e, s) => error?.call(data, e, s),
+    );
+  }
+
   static Future<AsyncPhase<T>> from<T>(
     Future<T> Function() func, {
     required T? fallbackData,
