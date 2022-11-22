@@ -4,13 +4,13 @@ version: 0.0.1
 repository: https://github.com/kaboc/async-phase-notifier
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  meta: ^1.7.0
+  meta: ^1.8.0
 
 dev_dependencies:
   flutter_lints: ^2.0.1
