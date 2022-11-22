@@ -81,7 +81,7 @@ abstract class AsyncPhase<T> {
   }) async {
     try {
       final data = await func();
-      return AsyncComplete(data: data);
+      return AsyncComplete(data);
     } on Exception catch (e, s) {
       onError?.call(e, s);
       return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
@@ -89,23 +89,22 @@ abstract class AsyncPhase<T> {
   }
 
   AsyncWaiting<T> copyAsWaiting() {
-    return AsyncWaiting(data: data);
+    return AsyncWaiting(data);
   }
 }
 
 class AsyncInitial<T> extends AsyncPhase<T> {
-  const AsyncInitial({T? data}) : super(data);
+  const AsyncInitial([super.data]);
 }
 
 class AsyncWaiting<T> extends AsyncPhase<T> {
-  const AsyncWaiting({T? data}) : super(data);
+  const AsyncWaiting([super.data]);
 }
 
 class AsyncComplete<T> extends AsyncPhase<T> {
-  const AsyncComplete({required T data}) : super(data);
+  const AsyncComplete(super.data);
 }
 
 class AsyncError<T> extends AsyncPhase<T> {
-  const AsyncError({Object? error, T? data, StackTrace? stackTrace})
-      : super(data, error: error, stackTrace: stackTrace);
+  const AsyncError({T? data, super.error, super.stackTrace}) : super(data);
 }

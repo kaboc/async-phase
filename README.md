@@ -221,7 +221,7 @@ should be used when the async operation results in failure.
 import 'package:async_phase_notifier/async_phase.dart';
 
 class WeatherNotifier extends ValueNotifier<AsyncPhase<Weather>> {
-  WeatherNotifier() : super(const AsyncInitial(data: Weather()));
+  WeatherNotifier() : super(const AsyncInitial(Weather()));
 
   final repository = WeatherRepository();
 
