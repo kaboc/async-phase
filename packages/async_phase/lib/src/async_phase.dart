@@ -27,7 +27,7 @@ abstract class AsyncPhase<T> {
           other.stackTrace == stackTrace;
 
   @override
-  int get hashCode => Object.hashAll([data, error, stackTrace]);
+  int get hashCode => Object.hashAll([runtimeType, data, error, stackTrace]);
 
   bool get isInitial => this is AsyncInitial;
 
@@ -40,7 +40,7 @@ abstract class AsyncPhase<T> {
   @override
   String toString() {
     final shortHash = hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0');
-    return '$runtimeType#$shortHash(value: $data, error: $error)';
+    return '$runtimeType#$shortHash(data: $data, error: $error)';
   }
 
   U when<U>({
