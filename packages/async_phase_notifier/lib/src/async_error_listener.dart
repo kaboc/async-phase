@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 
 import 'async_phase_notifier.dart';
 
-// TODO: Describe in document that this should not be used in many places because this adds a listener.
 class AsyncErrorListener<T> extends StatefulWidget {
   const AsyncErrorListener({
     super.key,

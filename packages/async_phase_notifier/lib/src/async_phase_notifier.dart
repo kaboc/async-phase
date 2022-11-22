@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
-import 'async_phase.dart';
+import 'package:async_phase/async_phase.dart';
 
 typedef ErrorListener = void Function(Object?, StackTrace?);
 typedef RemoveErrorListener = void Function();

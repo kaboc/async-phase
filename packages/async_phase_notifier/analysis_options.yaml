@@ -50,7 +50,7 @@ linter:
     comment_references: true
     conditional_uri_does_not_exist: true
     deprecated_consistency: true
-    directives_ordering: true
+#    directives_ordering: true
     do_not_use_environment: true
     eol_at_end_of_file: true
     invariant_booleans: true

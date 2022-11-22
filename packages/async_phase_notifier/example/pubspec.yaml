@@ -1,5 +1,5 @@
 name: async_phase_notifier_example
-description: A example app of AsyncPhaseNotifier.
+description: An example app of AsyncPhaseNotifier.
 publish_to: 'none'
 version: 1.0.0+1
 

@@ -1,0 +1,13 @@
+name: async_phase
+description: A class and its subclasses representing phases of an async operation.
+version: 0.0.1
+repository: https://github.com/kaboc/async-phase/tree/main/packages/async_phase
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  meta: ^1.8.0
+
+dev_dependencies:
+  lints: ^2.0.1
