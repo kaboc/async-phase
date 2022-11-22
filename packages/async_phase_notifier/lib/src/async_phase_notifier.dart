@@ -41,7 +41,7 @@ class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
     _notifyErrorListeners();
   }
 
-  Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
+  Future<AsyncPhase<T>> runAsync(FutureOr<T> Function(T?) func) async {
     value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from<T>(

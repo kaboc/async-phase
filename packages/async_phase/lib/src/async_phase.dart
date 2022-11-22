@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -75,7 +76,7 @@ abstract class AsyncPhase<T> {
   }
 
   static Future<AsyncPhase<T>> from<T>(
-    Future<T> Function() func, {
+    FutureOr<T> Function() func, {
     required T? fallbackData,
     void Function(Exception, StackTrace)? onError,
   }) async {
