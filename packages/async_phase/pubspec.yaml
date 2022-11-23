@@ -1,5 +1,5 @@
 name: async_phase
-description: A class and its subclasses representing phases of an async operation.
+description: A class and its subclasses representing phases of an asynchronous operation.
 version: 0.0.1
 repository: https://github.com/kaboc/async-phase/tree/main/packages/async_phase
 

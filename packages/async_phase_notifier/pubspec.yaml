@@ -1,5 +1,5 @@
 name: async_phase_notifier
-description: A ValueNotifier that helps you better manage phases of async operations.
+description: A variant of ValueNotifier that helps you better manage phases of asynchronous operations.
 version: 0.0.1
 repository: https://github.com/kaboc/async-phase/tree/main/packages/async_phase_notifier
 
