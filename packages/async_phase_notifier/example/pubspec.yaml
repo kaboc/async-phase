@@ -13,7 +13,7 @@ dependencies:
   async_phase_notifier:
     path: ..
 
-  grab: ^0.2.2
+  grab: ^0.3.0+1
   http: ^0.13.5
 
 dev_dependencies:

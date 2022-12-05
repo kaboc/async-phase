@@ -1,4 +1,6 @@
-A variant of `ValueNotifier` that has `AsyncPhase` representing the initial /
+[![Pub Version](https://img.shields.io/pub/v/async_phase_notifier)](https://pub.dev/packages/async_phase_notifier)
+
+A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the initial /
 waiting / complete / error phases of an asynchronous operation.
 
 `AsyncPhaseNotifier` + `AsyncPhase` is similar to `AsyncNotifier` + `AsyncValue` of Riverpod.
@@ -34,11 +36,13 @@ notifier.runAsync((data) => someAsyncOperation());
 
 ### AsyncPhase
 
-The value of `AsyncPhaseNotifier` is either `AsyncInitial`, `AsyncWaiting`,
-`AsyncComplete` or `AsyncError`. They are subtypes of `AsyncPhase`.
+The value of `AsyncPhaseNotifier` is either [AsyncInitial][AsyncInitial],
+[AsyncWaiting][AsyncWaiting], [AsyncComplete][AsyncComplete] or [AsyncError][AsyncError].
+They are subtypes of `AsyncPhase`.
 
-`AsyncPhase` provides the `when()` and `whenOrNull()` methods, which are useful for
-choosing an action based on the current phase, like returning an appropriate widget.
+`AsyncPhase` provides the [when()][when] and [whenOrNull()][whenOrNull] methods,
+which are useful for choosing an action based on the current phase, like returning
+an appropriate widget.
 
 ```dart
 child: phase.when(
@@ -197,4 +201,10 @@ Widget build(BuildContext context) {
 - [ ] Add API documents
 - [ ] Write tests
 
-[AsyncPhase]: https://github.com/kaboc/async-phase/tree/main/packages/async_phase
+[AsyncPhase]: https://pub.dev/packages/async_phase
+[AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html
+[AsyncWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncWaiting-class.html
+[AsyncComplete]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncComplete-class.html
+[AsyncError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncError-class.html
+[when]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/when.html
+[whenOrNull]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/whenOrNull.html

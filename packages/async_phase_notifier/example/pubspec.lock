@@ -11,11 +11,9 @@ packages:
   async_phase:
     dependency: transitive
     description:
-      path: "packages/async_phase"
-      ref: HEAD
-      resolved-ref: d05a1294a7a397ced099faac34ffab08b8822431
-      url: "https://github.com/kaboc/async-phase"
-    source: git
+      name: async_phase
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.0.1"
   async_phase_notifier:
     dependency: "direct main"
@@ -56,7 +54,7 @@ packages:
       name: grab
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.2"
+    version: "0.3.0+1"
   http:
     dependency: "direct main"
     description:
