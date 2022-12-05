@@ -137,7 +137,7 @@ if (phase.isError) {
 
 ## TODO
 
-- [x] Add API documents
+- [x] ~~Add API documents~~
 - [ ] Write tests
 
 [AsyncPhase]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase-class.html
@@ -153,4 +153,4 @@ if (phase.isError) {
 [isWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isWaiting.html
 [isComplete]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isComplete.html
 [isError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isError.html
-[AsyncPhaseNotifier]: https://github.com/kaboc/async-phase/tree/main/packages/async_phase_notifier
+[AsyncPhaseNotifier]: https://pub.dev/packages/async_phase_notifier
