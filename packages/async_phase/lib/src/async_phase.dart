@@ -8,19 +8,16 @@ import 'package:meta/meta.dart';
 abstract class AsyncPhase<T extends Object?> {
   const AsyncPhase(
     this.data, {
-    this.error,
-    this.stackTrace,
-  });
+    Object? error,
+    StackTrace? stackTrace,
+  })  : _error = error,
+        _stackTrace = stackTrace;
 
   /// The result of an asynchronous operation.
   final T? data;
 
-  /// The error that occurred in an asynchronous operation.
-  final Object? error;
-
-  /// The stack trace of the error that occurred in an
-  /// asynchronous operation.
-  final StackTrace? stackTrace;
+  final Object? _error;
+  final StackTrace? _stackTrace;
 
   @override
   bool operator ==(Object other) =>
@@ -30,11 +27,11 @@ abstract class AsyncPhase<T extends Object?> {
           // different subtypes with the same values will be considered equal.
           other.runtimeType == runtimeType &&
           other.data == data &&
-          other.error == error &&
-          other.stackTrace == stackTrace;
+          other._error == _error &&
+          other._stackTrace == _stackTrace;
 
   @override
-  int get hashCode => Object.hashAll([runtimeType, data, error, stackTrace]);
+  int get hashCode => Object.hashAll([runtimeType, data, _error, _stackTrace]);
 
   /// Whether the phase is of type [AsyncInitial].
   bool get isInitial => this is AsyncInitial;
@@ -51,7 +48,9 @@ abstract class AsyncPhase<T extends Object?> {
   @override
   String toString() {
     final shortHash = hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0');
-    return '$runtimeType#$shortHash(data: $data, error: $error)';
+    return this is AsyncError
+        ? '$runtimeType#$shortHash(data: $data, error: $_error)'
+        : '$runtimeType#$shortHash(data: $data)';
   }
 
   /// A method that returns a value returned from one of callback
@@ -84,7 +83,7 @@ abstract class AsyncPhase<T extends Object?> {
     if (isComplete) {
       return complete(data as T);
     }
-    return error(data, this.error, stackTrace);
+    return error(data, _error, _stackTrace);
   }
 
   /// A method that returns a value returned from one of callback
@@ -180,4 +179,11 @@ class AsyncError<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncError] object representing the phase
   /// where an asynchronous operation has resulted in an error.
   const AsyncError({T? data, super.error, super.stackTrace}) : super(data);
+
+  /// The error that occurred in an asynchronous operation.
+  Object? get error => _error;
+
+  /// The stack trace of the error that occurred in an
+  /// asynchronous operation.
+  Object? get stackTrace => _stackTrace;
 }

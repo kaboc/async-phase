@@ -38,10 +38,10 @@ used to represent phases of an asynchronous operation.
       and [copyAsWaiting()][copyAsWaiting] are used properly, where the `T` is non-nullable.
 - **error**
     - The error that occurred in an asynchronous operation.
-    - Always `null` in a phase other than `AsyncError`.
+    - This property only exists in `AsyncError`.
 - **stackTrace**
     - The stack trace of the error that occurred in an asynchronous operation.
-    - Always `null` in a phase other than `AsyncError`.
+    - This property only exists in `AsyncError`.
 
 ## Usage
 
