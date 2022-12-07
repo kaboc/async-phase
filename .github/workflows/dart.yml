@@ -35,6 +35,7 @@ jobs:
           dart pub global activate coverage
           dart pub global run coverage:test_with_coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: coverage/lcov.info
+          fail_ci_if_error: true
