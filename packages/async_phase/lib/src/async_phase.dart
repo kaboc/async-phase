@@ -166,7 +166,12 @@ class AsyncWaiting<T extends Object?> extends AsyncPhase<T> {
 class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncComplete] object representing the phase
   /// where an asynchronous operation has completed successfully.
-  const AsyncComplete(super.data);
+  const AsyncComplete(T super.data) : _data = data;
+
+  final T _data;
+
+  @override
+  T get data => _data;
 }
 
 /// A subclass of [AsyncPhase] representing the phase where
