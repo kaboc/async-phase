@@ -6,7 +6,8 @@ import 'package:async_phase/async_phase.dart';
 typedef ErrorListener = void Function(Object?, StackTrace?);
 typedef RemoveErrorListener = void Function();
 
-class AsyncPhaseNotifier<T> extends ValueNotifier<AsyncPhase<T>> {
+class AsyncPhaseNotifier<T extends Object?>
+    extends ValueNotifier<AsyncPhase<T>> {
   AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data));
 
   StreamController<AsyncError<T>>? _errorStreamController;

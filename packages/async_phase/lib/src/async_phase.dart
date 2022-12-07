@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 /// an asynchronous operation.
 @immutable
 @sealed
-abstract class AsyncPhase<T> {
+abstract class AsyncPhase<T extends Object?> {
   const AsyncPhase(
     this.data, {
     this.error,
@@ -147,7 +147,7 @@ abstract class AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has not been executed yet.
-class AsyncInitial<T> extends AsyncPhase<T> {
+class AsyncInitial<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncInitial] object representing the phase
   /// where an asynchronous operation has not been executed yet.
   const AsyncInitial([super.data]);
@@ -155,7 +155,7 @@ class AsyncInitial<T> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation is in progress.
-class AsyncWaiting<T> extends AsyncPhase<T> {
+class AsyncWaiting<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncWaiting] object representing the phase
   /// where an asynchronous operation is in progress.
   const AsyncWaiting([super.data]);
@@ -163,7 +163,7 @@ class AsyncWaiting<T> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has completed successfully.
-class AsyncComplete<T> extends AsyncPhase<T> {
+class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncComplete] object representing the phase
   /// where an asynchronous operation has completed successfully.
   const AsyncComplete(super.data);
@@ -171,7 +171,7 @@ class AsyncComplete<T> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has resulted in an error.
-class AsyncError<T> extends AsyncPhase<T> {
+class AsyncError<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncError] object representing the phase
   /// where an asynchronous operation has resulted in an error.
   const AsyncError({T? data, super.error, super.stackTrace}) : super(data);
