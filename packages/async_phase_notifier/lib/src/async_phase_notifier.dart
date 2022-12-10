@@ -22,23 +22,7 @@ class AsyncPhaseNotifier<T extends Object?>
   @override
   @protected
   set value(AsyncPhase<T> newValue) {
-    if (newValue.data != null || newValue is AsyncComplete) {
-      super.value = newValue;
-    }
-    if (newValue.isWaiting) {
-      super.value =
-          newValue.data == value.data ? newValue : value.copyAsWaiting();
-    }
-    if (newValue.isError) {
-      super.value = newValue.data == value.data
-          ? newValue
-          : AsyncError(
-              data: value.data,
-              error: newValue.error,
-              stackTrace: newValue.stackTrace,
-            );
-    }
-
+    super.value = newValue;
     _notifyErrorListeners();
   }
 
