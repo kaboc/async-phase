@@ -117,7 +117,7 @@ abstract class AsyncPhase<T extends Object?> {
   ///
   /// The [onError] callback is called on error. This may be
   /// useful for logging.
-  static Future<AsyncPhase<T>> from<T>(
+  static Future<AsyncPhase<T>> from<T extends Object?>(
     FutureOr<T> Function() func, {
     required T? fallbackData,
     void Function(Object, StackTrace)? onError,
