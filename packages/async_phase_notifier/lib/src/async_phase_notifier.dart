@@ -13,6 +13,9 @@ class AsyncPhaseNotifier<T extends Object?>
   StreamController<AsyncError<T>>? _errorStreamController;
   AsyncPhase<T>? _prevPhase;
 
+  @visibleForTesting
+  bool get hasErrorListener => _errorStreamController?.hasListener ?? false;
+
   @override
   void dispose() {
     _errorStreamController?.close();
