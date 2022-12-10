@@ -1,4 +1,5 @@
 [![Pub Version](https://img.shields.io/pub/v/async_phase_notifier)](https://pub.dev/packages/async_phase_notifier)
+[![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
 A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the initial /
 waiting / complete / error phases of an asynchronous operation.
@@ -148,17 +149,14 @@ Or you can use `AnimatedBuilder` in a similar way.
 
 ```dart
 final notifier = WeatherNotifier();
+notifier.fetch();
+```
 
-...
-
+```dart
 ValueListenableProvider<AsyncPhase<Weather>>.value(
   value: notifier,
   child: MaterialApp(home: ...),
 )
-
-...
-
-notifier.fetch();
 ```
 
 ```dart
@@ -199,7 +197,7 @@ Widget build(BuildContext context) {
 ## TODO
 
 - [ ] Add API documents
-- [ ] Write tests
+- [x] ~~Write tests~~
 
 [AsyncPhase]: https://pub.dev/packages/async_phase
 [AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html
