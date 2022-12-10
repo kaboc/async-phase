@@ -9,7 +9,7 @@ void main() {
   group('runAsync()', () {
     test('Phase is AsyncInitial when notifier is created', () {
       final notifier = AsyncPhaseNotifier(10);
-      expect(notifier.value, isA<AsyncInitial>());
+      expect(notifier.value, isA<AsyncInitial<int>>());
     });
 
     test('Callback function is given existing data', () async {
@@ -53,23 +53,29 @@ void main() {
           return Future.value(20);
         }),
       );
-      expect(notifier.value, isA<AsyncWaiting>());
+      expect(notifier.value, isA<AsyncWaiting<int>>());
     });
 
     test('Phase is AsyncComplete and has correct data if successful', () async {
       final notifier = AsyncPhaseNotifier(10);
       final phase = await notifier.runAsync((_) => 20);
-      expect(phase, isA<AsyncComplete>());
-      expect(notifier.value, isA<AsyncComplete>());
+      expect(phase, isA<AsyncComplete<int>>());
+      expect(notifier.value, isA<AsyncComplete<int>>());
       expect(phase.data, equals(20));
     });
 
     test('Phase is AsyncError and has prev data if not successful', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      final phase = await notifier.runAsync((_) => throw Exception());
-      expect(phase, isA<AsyncError>());
-      expect(notifier.value, isA<AsyncError>());
-      expect(phase.data, equals(10));
+      final notifier1 = AsyncPhaseNotifier(10);
+      final phase1 = await notifier1.runAsync((_) => throw Exception());
+      expect(phase1, isA<AsyncError<int>>());
+      expect(notifier1.value, isA<AsyncError<int>>());
+      expect(phase1.data, equals(10));
+
+      final notifier2 = AsyncPhaseNotifier<int?>();
+      final phase2 = await notifier2.runAsync((_) => throw Exception());
+      expect(phase2, isA<AsyncError<int?>>());
+      expect(notifier2.value, isA<AsyncError<int?>>());
+      expect(phase2.data, isNull);
     });
 
     test('AsyncError has error info', () async {
