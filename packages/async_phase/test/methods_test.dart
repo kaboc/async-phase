@@ -128,7 +128,7 @@ void main() {
     test('onError is called with error and stack trace on error', () async {
       Object? error;
       StackTrace? stackTrace;
-      final exception = Exception('error');
+      final exception = Exception();
 
       await AsyncPhase.from(
         () => throw exception,

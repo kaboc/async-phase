@@ -22,16 +22,21 @@ void main() {
       expect(isNullable(AsyncError<int>(data: 10).data), isTrue);
     });
 
-    test('All phases accept a non-null value', () {
-      expect(AsyncInitial(null).data, isNull);
-      expect(AsyncWaiting(null).data, isNull);
-      expect(AsyncComplete(null).data, isNull);
-      expect(
-        // ignore: avoid_redundant_argument_values
-        AsyncError(data: null, error: '', stackTrace: StackTrace.empty).data,
-        isNull,
-      );
-    });
+    test(
+      'Phases except AsyncComplete accept null when generic type is non-null',
+      () {
+        final errorPhase = AsyncError<int>(
+          // ignore: avoid_redundant_argument_values
+          data: null,
+          error: '',
+          stackTrace: StackTrace.empty,
+        );
+
+        expect(AsyncInitial<int>(null).data, isNull);
+        expect(AsyncWaiting<int>(null).data, isNull);
+        expect(errorPhase.data, isNull);
+      },
+    );
   });
 
   group('Nullability of when() / whenOrNull()', () {
@@ -144,7 +149,7 @@ void main() {
 
     test('fallbackData can be null', () async {
       final result = await AsyncPhase.from<int?>(
-        () => throw Exception('error'),
+        () => throw Exception(),
         fallbackData: null,
       );
       expect(result, isA<AsyncError>());
