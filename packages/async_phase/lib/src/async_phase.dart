@@ -119,7 +119,7 @@ abstract class AsyncPhase<T extends Object?> {
   /// useful for logging.
   static Future<AsyncPhase<T>> from<T>(
     FutureOr<T> Function() func, {
-    required T fallbackData,
+    required T? fallbackData,
     void Function(Object, StackTrace)? onError,
   }) async {
     try {
