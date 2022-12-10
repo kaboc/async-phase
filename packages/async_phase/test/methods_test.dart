@@ -130,7 +130,7 @@ void main() {
       StackTrace? stackTrace;
       final exception = Exception();
 
-      await AsyncPhase.from(
+      final phase = await AsyncPhase.from(
         () => throw exception,
         fallbackData: 0,
         onError: (e, s) {
@@ -140,6 +140,10 @@ void main() {
       );
       expect(error, equals(exception));
       expect(stackTrace.toString(), startsWith('#0 '));
+
+      final errorPhase = phase as AsyncError<int>;
+      expect(errorPhase.error, equals(exception));
+      expect(errorPhase.stackTrace, equals(stackTrace));
     });
 
     test('Callback function can return non-Future', () async {
