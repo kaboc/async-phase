@@ -122,23 +122,30 @@ final message = phase.whenOrWhen(
 );
 ```
 
-### Getters
+### Type checks
 
-For checking if the current phase matches only one of the four phases, you can
-use a getter; [isInitial][isInitial], [isWaiting][isWaiting], [isComplete][isComplete]
+For checking if the current phase matches one of the four phases, you can use
+a getter; [isInitial][isInitial], [isWaiting][isWaiting], [isComplete][isComplete]
 or [isError][isError].
 
 ```dart
+final phase = await AsyncPhase.from(...);
+
 if (phase.isError) {
-  logError(...);
   return;
 }
 ```
 
-## TODO
+Using `isError` like above does not promote the type of the phase to `AsyncError`.
+To make `error` and `stackTrace` available if it is `AsyncError`, check the type
+with the `is` operator instead.
 
-- [x] ~~Add API documents~~
-- [ ] Write tests
+```dart
+if (phase is AsyncError) {
+  print('${phase.error}');
+  return;
+}
+```
 
 [AsyncPhase]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase-class.html
 [AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html

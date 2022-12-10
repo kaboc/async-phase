@@ -43,6 +43,16 @@ abstract class AsyncPhase<T extends Object?> {
   bool get isComplete => this is AsyncComplete;
 
   /// Whether the phase is of type [AsyncError].
+  ///
+  /// This conducts only a type check. If you want the flow analysis
+  /// of Dart to work so that the type is promoted to [AsyncError],
+  /// check the type with the `is` operator instead.
+  ///
+  /// ```dart
+  /// if (phase is AsyncError) {
+  ///   print(phase.error);
+  /// }
+  /// ```
   bool get isError => this is AsyncError;
 
   @override
@@ -119,6 +129,8 @@ abstract class AsyncPhase<T extends Object?> {
   /// useful for logging.
   static Future<AsyncPhase<T>> from<T extends Object?>(
     FutureOr<T> Function() func, {
+    // The type must not be `T` because it can't accept a value of type
+    // `T?` although it accepts `null` if the generic type is nullable.
     required T? fallbackData,
     void Function(Object, StackTrace)? onError,
   }) async {
