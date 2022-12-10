@@ -185,5 +185,5 @@ class AsyncError<T extends Object?> extends AsyncPhase<T> {
 
   /// The stack trace of the error that occurred in an
   /// asynchronous operation.
-  Object? get stackTrace => _stackTrace;
+  StackTrace? get stackTrace => _stackTrace;
 }
