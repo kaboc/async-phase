@@ -1,0 +1,34 @@
+name: async_phase_phase CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/async_phase_notifier/**"
+      - ".github/workflows/async_phase_notifier.yaml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "packages/async_phase_notifier/**"
+      - ".github/workflows/async_phase_notifier.yaml"
+  workflow_dispatch:
+
+jobs:
+  async_phase_notifier_ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/async_phase_notifier
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Check format
+        run: flutter format -n .
+      - name: Analyze
+        run: flutter analyze --no-pub
+      - name: Run tests
+        run: flutter test
