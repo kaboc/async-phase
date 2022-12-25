@@ -95,8 +95,9 @@ widget at multiple places for a single notifier, the callback functions of all t
 widgets are called on error.
 
 ## Examples
-The examples here illustrate how to show a particular UI component depending on the
-phase of an asynchronous operation.
+
+Here is WeatherNotifier extending `AsyncPhaseNotifier`. It fetches the weather
+info of a city and notifies its listeners.
 
 ```dart
 class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
@@ -110,18 +111,17 @@ class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
 }
 ```
 
-Above is an `AsyncPhaseNotifier` that fetches the weather info of a city and notifies
-its listeners. We'll see in the examples below how the notifier is used in combination
-with each of the several ways to rebuild a widget.
-
-### With [ValueListenableBuilder][value_listenable_builder]
-
-[value_listenable_builder]: https://api.flutter.dev/flutter/widgets/ValueListenableBuilder-class.html
-
 ```dart
 final notifier = WeatherNotifier();
 notifier.fetch();
 ```
+
+The examples below use this notifier and show a particular UI component corresponding
+to each phase of the fetch.
+
+### With [ValueListenableBuilder][value_listenable_builder]
+
+[value_listenable_builder]: https://api.flutter.dev/flutter/widgets/ValueListenableBuilder-class.html
 
 ```dart
 @override
@@ -148,11 +148,6 @@ Or you can use `AnimatedBuilder` in a similar way.
 [provider]: https://pub.dev/packages/provider
 
 ```dart
-final notifier = WeatherNotifier();
-notifier.fetch();
-```
-
-```dart
 ValueListenableProvider<AsyncPhase<Weather>>.value(
   value: notifier,
   child: MaterialApp(home: ...),
@@ -175,11 +170,6 @@ Widget build(BuildContext context) {
 ### With [Grab][grab]
 
 [grab]: https://pub.dev/packages/grab
-
-```dart
-final notifier = WeatherNotifier();
-notifier.fetch();
-```
 
 ```dart
 @override

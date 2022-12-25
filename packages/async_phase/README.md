@@ -1,4 +1,5 @@
 [![Pub Version](https://img.shields.io/pub/v/async_phase)](https://pub.dev/packages/async_phase)
+[![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
 A class and its subclasses representing phases of an asynchronous operation.
 
