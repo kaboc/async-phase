@@ -116,12 +116,12 @@ void main() {
       await tester.pumpWidget(createWidget(notifier));
       await tester.pumpAndSettle();
 
-      expect(notifier.hasErrorListener, isTrue);
+      expect(notifier.isListening, isTrue);
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
 
-      expect(notifier.hasErrorListener, isFalse);
+      expect(notifier.isListening, isFalse);
     });
   });
 }

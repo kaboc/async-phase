@@ -88,9 +88,9 @@ void main() {
     });
   });
 
-  group('listenError()', () {
+  group('listen()', () {
     test('void function is returned', () {
-      final cancel = AsyncPhaseNotifier(10).listenError((_, __) {});
+      final cancel = AsyncPhaseNotifier(10).listen(onError: (_, __) {});
       expect(cancel, isA<void Function()>());
     });
 
@@ -98,7 +98,7 @@ void main() {
       final notifier = AsyncPhaseNotifier(10);
       var called = false;
 
-      notifier.listenError((_, __) => called = true);
+      notifier.listen(onError: (_, __) => called = true);
       expect(called, isFalse);
 
       await notifier.runAsync((_) => throw Exception());
@@ -110,7 +110,7 @@ void main() {
       final notifier = AsyncPhaseNotifier(10);
       var called = false;
 
-      notifier.listenError((_, __) => called = true);
+      notifier.listen(onError: (_, __) => called = true);
       expect(called, isFalse);
 
       // ignore: invalid_use_of_protected_member
@@ -126,10 +126,12 @@ void main() {
       Object? error;
       StackTrace? stackTrace;
 
-      notifier.listenError((e, s) {
-        error = e;
-        stackTrace = s;
-      });
+      notifier.listen(
+        onError: (e, s) {
+          error = e;
+          stackTrace = s;
+        },
+      );
 
       await notifier.runAsync((_) => throw exception);
       await Future<void>.delayed(const Duration(milliseconds: 20));
@@ -140,7 +142,7 @@ void main() {
     test('Called twice if two different errors occur in a row', () async {
       final notifier = AsyncPhaseNotifier(10);
       final errors = <Object?>[];
-      notifier.listenError((e, _) => errors.add(e));
+      notifier.listen(onError: (e, _) => errors.add(e));
 
       // ignore: cascade_invocations, invalid_use_of_protected_member
       notifier.value = const AsyncError(error: 'error1');
@@ -158,8 +160,8 @@ void main() {
       var called1 = false;
       var called2 = false;
 
-      final cancel1 = notifier.listenError((_, __) => called1 = true);
-      notifier.listenError((_, __) => called2 = true);
+      final cancel1 = notifier.listen(onError: (_, __) => called1 = true);
+      notifier.listen(onError: (_, __) => called2 = true);
 
       await notifier.runAsync((_) => throw Exception());
       await Future<void>.delayed(const Duration(milliseconds: 20));

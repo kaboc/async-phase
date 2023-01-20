@@ -21,19 +21,19 @@ class AsyncErrorListener<T> extends StatefulWidget {
 }
 
 class _AsyncErrorListenerState<T> extends State<AsyncErrorListener<T>> {
-  RemoveErrorListener? _removeErrorListener;
+  RemoveListener? _removeListener;
 
   @override
   void initState() {
     super.initState();
-    _removeErrorListener = widget.notifier.listenError((e, s) {
-      widget.onError?.call(context, e, s);
-    });
+    _removeListener = widget.notifier.listen(
+      onError: (e, s) => widget.onError?.call(context, e, s),
+    );
   }
 
   @override
   void dispose() {
-    _removeErrorListener?.call();
+    _removeListener?.call();
     super.dispose();
   }
 
