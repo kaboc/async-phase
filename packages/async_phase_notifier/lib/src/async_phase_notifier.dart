@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
 import 'package:async_phase/async_phase.dart';
 
@@ -54,6 +55,7 @@ class AsyncPhaseNotifier<T extends Object?>
     return phase;
   }
 
+  @useResult
   RemoveListener listen({
     void Function(bool)? onWaiting,
     void Function(T)? onComplete,

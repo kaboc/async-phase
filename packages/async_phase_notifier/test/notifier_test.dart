@@ -98,7 +98,8 @@ void main() {
       final notifier = AsyncPhaseNotifier(10);
       var called = false;
 
-      notifier.listen(onError: (_, __) => called = true);
+      final cancel = notifier.listen(onError: (_, __) => called = true);
+      addTearDown(cancel);
       expect(called, isFalse);
 
       await notifier.runAsync((_) => throw Exception());
@@ -110,7 +111,8 @@ void main() {
       final notifier = AsyncPhaseNotifier(10);
       var called = false;
 
-      notifier.listen(onError: (_, __) => called = true);
+      final cancel = notifier.listen(onError: (_, __) => called = true);
+      addTearDown(cancel);
       expect(called, isFalse);
 
       // ignore: invalid_use_of_protected_member
@@ -126,12 +128,13 @@ void main() {
       Object? error;
       StackTrace? stackTrace;
 
-      notifier.listen(
+      final cancel = notifier.listen(
         onError: (e, s) {
           error = e;
           stackTrace = s;
         },
       );
+      addTearDown(cancel);
 
       await notifier.runAsync((_) => throw exception);
       await Future<void>.delayed(const Duration(milliseconds: 20));
@@ -142,7 +145,8 @@ void main() {
     test('Called twice if two different errors occur in a row', () async {
       final notifier = AsyncPhaseNotifier(10);
       final errors = <Object?>[];
-      notifier.listen(onError: (e, _) => errors.add(e));
+      final cancel = notifier.listen(onError: (e, _) => errors.add(e));
+      addTearDown(cancel);
 
       // ignore: cascade_invocations, invalid_use_of_protected_member
       notifier.value = const AsyncError(error: 'error1');
@@ -161,7 +165,8 @@ void main() {
       var called2 = false;
 
       final cancel1 = notifier.listen(onError: (_, __) => called1 = true);
-      notifier.listen(onError: (_, __) => called2 = true);
+      final cancel2 = notifier.listen(onError: (_, __) => called2 = true);
+      addTearDown(cancel2);
 
       await notifier.runAsync((_) => throw Exception());
       await Future<void>.delayed(const Duration(milliseconds: 20));
