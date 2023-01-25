@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -88,99 +90,121 @@ void main() {
     });
   });
 
-  group('listen()', () {
-    test('void function is returned', () {
-      final cancel = AsyncPhaseNotifier(10).listen(onError: (_, __) {});
-      expect(cancel, isA<void Function()>());
-    });
-
-    test('Called when value changes to AsyncError by runAsync()', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      var called = false;
-
-      final cancel = notifier.listen(onError: (_, __) => called = true);
-      addTearDown(cancel);
-      expect(called, isFalse);
-
-      await notifier.runAsync((_) => throw Exception());
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(called, isTrue);
-    });
-
-    test('Called when value is updated to AsyncError manually', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      var called = false;
-
-      final cancel = notifier.listen(onError: (_, __) => called = true);
-      addTearDown(cancel);
-      expect(called, isFalse);
-
-      // ignore: invalid_use_of_protected_member
-      notifier.value = const AsyncError(data: 10);
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(called, isTrue);
-    });
-
-    test('Called with error and stack trace', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      final exception = Exception();
-
-      Object? error;
-      StackTrace? stackTrace;
+  test(
+    'Appropriate callbacks is called when phase changes or '
+    'when content changes while phase stays the same',
+    () async {
+      final notifier = AsyncPhaseNotifier('abc');
+      final phases = <AsyncPhase<String>>[];
 
       final cancel = notifier.listen(
-        onError: (e, s) {
-          error = e;
-          stackTrace = s;
-        },
+        onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
+        onComplete: (v) => phases.add(AsyncComplete(v)),
+        onError: (e, _) => phases.add(AsyncError(data: '', error: '$e')),
       );
       addTearDown(cancel);
 
-      await notifier.runAsync((_) => throw exception);
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(error, equals(exception));
-      expect(stackTrace.toString(), startsWith('#0 '));
-    });
+      notifier
+        ..value = const AsyncInitial('abc')
+        ..value = const AsyncComplete('abc')
+        ..value = const AsyncComplete('abc')
+        ..value = const AsyncComplete('def')
+        ..value = const AsyncWaiting('def')
+        ..value = const AsyncWaiting('def')
+        ..value = const AsyncWaiting('ghi')
+        ..value = const AsyncComplete('ghi')
+        ..value = const AsyncError(data: 'ghi')
+        ..value = const AsyncError(data: 'ghi')
+        ..value = const AsyncError(data: 'jkl')
+        ..value = const AsyncWaiting('jkl')
+        ..value = const AsyncError(data: 'jkl');
 
-    test('Called twice if two different errors occur in a row', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      final errors = <Object?>[];
-      final cancel = notifier.listen(onError: (e, _) => errors.add(e));
-      addTearDown(cancel);
-
-      // ignore: cascade_invocations, invalid_use_of_protected_member
-      notifier.value = const AsyncError(error: 'error1');
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-
-      // ignore: invalid_use_of_protected_member
-      notifier.value = const AsyncError(error: 'error2');
       await Future<void>.delayed(const Duration(milliseconds: 20));
 
-      expect(errors, equals(['error1', 'error2']));
-    });
+      expect(
+        phases,
+        orderedEquals(const [
+          AsyncComplete('abc'),
+          AsyncComplete('def'),
+          AsyncWaiting('true'),
+          AsyncWaiting('true'),
+          AsyncWaiting('false'),
+          AsyncComplete('ghi'),
+          AsyncError(data: '', error: 'null'),
+          AsyncError(data: '', error: 'null'),
+          AsyncWaiting('true'),
+          AsyncWaiting('false'),
+          AsyncError(data: '', error: 'null'),
+        ]),
+      );
+    },
+  );
 
-    test('Not called after subscription is cancelled', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      var called1 = false;
-      var called2 = false;
+  test('onError is called with error and stack trace', () async {
+    final notifier = AsyncPhaseNotifier(10);
+    final exception = Exception();
 
-      final cancel1 = notifier.listen(onError: (_, __) => called1 = true);
-      final cancel2 = notifier.listen(onError: (_, __) => called2 = true);
-      addTearDown(cancel2);
+    Object? error;
+    StackTrace? stackTrace;
 
-      await notifier.runAsync((_) => throw Exception());
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(called1, isTrue);
-      expect(called2, isTrue);
+    final cancel = notifier.listen(
+      onError: (e, s) {
+        error = e;
+        stackTrace = s;
+      },
+    );
+    addTearDown(cancel);
 
-      called1 = false;
-      called2 = false;
-      cancel1();
+    await notifier.runAsync((_) => throw exception);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(error, equals(exception));
+    expect(stackTrace.toString(), startsWith('#0 '));
+  });
 
-      await notifier.runAsync((_) => throw Exception());
-      await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(called1, isFalse);
-      expect(called2, isTrue);
-    });
+  test('No callback is called after subscription is cancelled', () async {
+    final notifier = AsyncPhaseNotifier<void>();
+    var count1 = 0;
+    var count2 = 0;
+
+    final cancel1 = notifier.listen(
+      onWaiting: (_) => count1++,
+      onComplete: (_) => count1++,
+      onError: (_, __) => count1++,
+    );
+    final cancel2 = notifier.listen(
+      onWaiting: (_) => count2++,
+      onComplete: (_) => count2++,
+      onError: (_, __) => count2++,
+    );
+    addTearDown(cancel2);
+
+    notifier
+      ..value = const AsyncComplete(null)
+      ..value = const AsyncError();
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(count1, equals(2));
+    expect(count2, equals(2));
+
+    count1 = 0;
+    count2 = 0;
+    cancel1();
+
+    notifier
+      ..value = const AsyncWaiting()
+      ..value = const AsyncComplete(null)
+      ..value = const AsyncError();
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(count1, isZero);
+    expect(count2, equals(4));
+
+    expect(notifier.isListening, isTrue);
+    cancel2();
+    expect(notifier.isListening, isFalse);
+  });
+
+  test('Listener is not added if all callbacks are omitted', () {
+    // ignore: unused_result
+    final notifier = AsyncPhaseNotifier<void>()..listen();
+    expect(notifier.hasListeners, isFalse);
   });
 }
