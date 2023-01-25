@@ -4,30 +4,36 @@ import 'package:flutter/widgets.dart';
 
 import 'async_phase_notifier.dart';
 
-class AsyncErrorListener<T> extends StatefulWidget {
-  const AsyncErrorListener({
+class AsyncPhaseListener<T> extends StatefulWidget {
+  const AsyncPhaseListener({
     super.key,
     required this.notifier,
-    required this.onError,
+    this.onWaiting,
+    this.onComplete,
+    this.onError,
     required this.child,
   });
 
   final AsyncPhaseNotifier<T> notifier;
-  final void Function(BuildContext, Object?, StackTrace?)? onError;
+  final void Function(bool)? onWaiting;
+  final void Function(T)? onComplete;
+  final void Function(Object?, StackTrace?)? onError;
   final Widget child;
 
   @override
-  State<AsyncErrorListener<T>> createState() => _AsyncErrorListenerState<T>();
+  State<AsyncPhaseListener<T>> createState() => _AsyncPhaseListenerState<T>();
 }
 
-class _AsyncErrorListenerState<T> extends State<AsyncErrorListener<T>> {
+class _AsyncPhaseListenerState<T> extends State<AsyncPhaseListener<T>> {
   RemoveListener? _removeListener;
 
   @override
   void initState() {
     super.initState();
     _removeListener = widget.notifier.listen(
-      onError: (e, s) => widget.onError?.call(context, e, s),
+      onWaiting: widget.onWaiting,
+      onComplete: widget.onComplete,
+      onError: widget.onError,
     );
   }
 
