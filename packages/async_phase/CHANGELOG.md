@@ -1,6 +1,10 @@
+## 0.2.0
+
+- Raise minimum Dart SDK version to 2.19.0.
+
 ## 0.1.0
 
-- Breaking
+- Breaking changes:
     - Improve `data` of `AsyncComplete<T>` to be non-null if `T` is not nullable.
     - Hide `error` and `stackTrace` in AsyncPhase and make them only available
       in AsyncError. 
