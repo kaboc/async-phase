@@ -20,9 +20,10 @@ and convenient methods for manipulating the phases.
 
 ### runAsync()
 
-The `runAsync()` method of `AsyncPhaseNotifier` executes an asynchronous function,
-updates the `value` of `AsyncPhaseNotifier` automatically according to the phase of
-the asynchronous operation, and notifies the listeners of those changes.
+The [runAsync()][runAsync] method of [AsyncPhaseNotifier][AsyncPhaseNotifier] executes
+an asynchronous function, updates the `value` of `AsyncPhaseNotifier` automatically
+according to the phase of the asynchronous operation, and notifies the listeners of
+those changes.
 
 1. The value of the notifier is switched to `AsyncWaiting` when the operation starts.
 2. The change is notified to listeners. 
@@ -57,40 +58,51 @@ child: phase.when(
 `async_phase` is a separate package, contained in this package. See
 [its document][AsyncPhase] for details not covered here.
 
-### Listening for errors
+### Listening for phase changes
 
-#### listenError()
+#### listen()
 
-You can listen for errors to imperatively trigger some action when the phase is
-turned into `AsyncError` by `runAsync()`, like showing an AlertDialog or a SnackBar,
-or to just log them.
+With [listen()][listen], you can listen for phase changes to imperatively trigger
+some action, like showing an indicator or a dialog / snack bar, or to just log
+the events.
+
+Note:
+
+- All callbacks are optional.
+    - Listener is not added if no callback function is passed.
+- The `onWaiting` callback gets a boolean value that indicates the start / end
+  of an asynchronous operation.
 
 ```dart
 final notifier = AsyncPhaseNotifier<Auth>();
-final removeErrorListener = notifier.listenError((e, s) { ... });
+final cancel = notifier.listen(
+  onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
+  onComplete: (data) { /* e.g. Logging the result of an operation */ }, 
+  onError: (e, s) { /* e.g. Showing an error dialog */ },
+);
 
 ...
 
 // Remove the listener if it is no longer necessary.
-removeErrorListener();
+cancel();
 ```
 
-#### AsyncErrorListener
+#### AsyncPhaseListener
 
-It is also possible to use `AsyncErrorListener` to listen for errors. The `onError`
-callback is called when an asynchronous operation results in failure.
+It is also possible to use the [AsyncPhaseListener][AsyncPhaseListener] widget to
+listen for phase changes.
 
 ```dart
-child: AsyncErrorListener(
+child: AsyncPhaseListener(
   notifier: notifier,
-  onError: (context, error, stackTrace) {
-    ScaffoldMessenger.of(context).showMaterialBanner(...);
-  },
+  onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
+  onComplete: (data) { /* e.g. Logging the result of an operation */ },
+  onError: (e, s) { /* e.g. Showing an error dialog */ },
   child: ...,
 )
 ```
 
-A listener is added per each `AsyncErrorListener`. Please note that if you use this
+A listener is added per each `AsyncPhaseListener`. Please note that if you use this
 widget at multiple places for a single notifier, the callback functions of all those
 widgets are called on error.
 
@@ -188,6 +200,11 @@ Widget build(BuildContext context) {
 
 - [ ] Add API documents
 - [x] ~~Write tests~~
+
+[AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
+[AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
+[runAsync]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/runAsync.html
+[listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
 
 [AsyncPhase]: https://pub.dev/packages/async_phase
 [AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html

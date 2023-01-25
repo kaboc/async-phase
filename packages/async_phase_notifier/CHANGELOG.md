@@ -1,3 +1,14 @@
+## 0.2.0
+
+- Breaking changes:
+    - Change listeners to listen to not only errors but also changes to waiting/complete phases.
+        - Rename `listenError()` to `listen()` and add callbacks.
+        - Rename `AsyncErrorListener` to `AsyncPhaseListener` and add callbacks.
+            - `BuildContext` is not passed to `onError` any more.
+    - Require Flutter 3.7.0 or above.
+- Add dependency on meta.
+- Warn if the result of `listen()` is not used.
+
 ## 0.1.0
 
 - Update async_phase to 0.1.0.
