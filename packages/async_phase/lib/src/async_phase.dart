@@ -6,6 +6,7 @@ import 'package:meta/meta.dart';
 @immutable
 @sealed
 abstract class AsyncPhase<T extends Object?> {
+  // ignore: public_member_api_docs
   const AsyncPhase(
     this.data, {
     Object? error,

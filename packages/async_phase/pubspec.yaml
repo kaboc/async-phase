@@ -4,11 +4,11 @@ version: 0.1.0
 repository: https://github.com/kaboc/async-phase/tree/main/packages/async_phase
 
 environment:
-  sdk: ">=2.18.0 <3.0.0"
+  sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
   meta: ^1.8.0
 
 dev_dependencies:
   lints: ^2.0.1
-  test: ^1.22.0
+  test: ^1.22.2
