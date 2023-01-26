@@ -63,8 +63,7 @@ child: phase.when(
 #### listen()
 
 With [listen()][listen], you can listen for phase changes to imperatively trigger
-some action, like showing an indicator or a dialog / snack bar, or to just log
-the events.
+some action, like showing an indicator or a dialog / snack bar, or to just log errors.
 
 Note:
 
@@ -102,9 +101,10 @@ child: AsyncPhaseListener(
 )
 ```
 
-A listener is added per each `AsyncPhaseListener`. Please note that if you use this
-widget at multiple places for a single notifier, the callback functions of all those
-widgets are called on error.
+Please note that a listener is added per each `AsyncPhaseListener`, not per
+notifier. If you use this widget at various places for a single notifier to call
+some function to show an error or trigger a logger, make sure not to call it at
+multiple of them to avoid duplication.
 
 ## Examples
 
