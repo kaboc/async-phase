@@ -1,3 +1,7 @@
+## 0.2.0+1
+
+- Fix description on AsyncPhaseListener.
+
 ## 0.2.0
 
 - Breaking changes:

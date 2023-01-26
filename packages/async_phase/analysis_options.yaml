@@ -32,6 +32,7 @@ linter:
     avoid_null_checks_in_equality_operators: true
     avoid_positional_boolean_parameters: true
     avoid_print: true
+    avoid_private_typedef_functions: true
     avoid_redundant_argument_values: true
     avoid_returning_null: true
     avoid_returning_this: true
@@ -51,6 +52,7 @@ linter:
     dangling_library_doc_comments: true
     deprecated_consistency: true
 #    directives_ordering: true
+#    discarded_futures: true
     do_not_use_environment: true
     eol_at_end_of_file: true
     implicit_call_tearoffs: true
@@ -94,10 +96,12 @@ linter:
     unnecessary_await_in_return: true
     unnecessary_lambdas: true
     unnecessary_library_directive: true
+    unnecessary_null_aware_operator_on_extension_on_nullable: true
     unnecessary_null_checks: true
     unnecessary_parenthesis: true
     unnecessary_raw_strings: true
     unnecessary_statements: true
+    unnecessary_to_list_in_spreads: true
     unreachable_from_main: true
     unsafe_html: true
     use_enums: true
