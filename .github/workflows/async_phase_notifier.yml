@@ -1,11 +1,11 @@
-name: async_phase_phase CI
+name: async_phase_notifier CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "packages/async_phase_notifier/**"
-      - ".github/workflows/async_phase_notifier.yaml"
+#  push:
+#    branches: [main]
+#    paths:
+#      - "packages/async_phase_notifier/**"
+#      - ".github/workflows/async_phase_notifier.yaml"
   pull_request:
     branches: [main]
     paths:
