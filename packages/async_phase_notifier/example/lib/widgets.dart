@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:async_phase_notifier/async_phase.dart';
 import 'package:grab/grab.dart';
 
 import 'package:async_phase_notifier_example/api.dart';
@@ -32,7 +31,7 @@ class Fab extends StatelessWidget with Grab {
 
   @override
   Widget build(BuildContext context) {
-    final factPhase = context.grab<AsyncPhase<Fact>>(factNotifier);
+    final factPhase = factNotifier.grab(context);
 
     return FloatingActionButton(
       backgroundColor: factPhase.isWaiting ? Colors.blueGrey.shade200 : null,

@@ -62,8 +62,8 @@ class _Body extends StatelessWidget with Grab {
 
   @override
   Widget build(BuildContext context) {
-    final factPhase = context.grab<AsyncPhase<Fact>>(factNotifier);
-    final enabled = context.grab<bool>(switchNotifier);
+    final factPhase = factNotifier.grab(context);
+    final enabled = switchNotifier.grab(context);
 
     return FilledList(
       children: [
