@@ -4,8 +4,7 @@ import 'package:meta/meta.dart';
 /// The base class for the classes that represent phases of
 /// an asynchronous operation.
 @immutable
-@sealed
-abstract class AsyncPhase<T extends Object?> {
+sealed class AsyncPhase<T extends Object?> {
   // ignore: public_member_api_docs
   const AsyncPhase(
     this.data, {
@@ -59,9 +58,13 @@ abstract class AsyncPhase<T extends Object?> {
   @override
   String toString() {
     final shortHash = hashCode.toUnsigned(20).toRadixString(16).padLeft(5, '0');
-    return this is AsyncError
-        ? '$runtimeType#$shortHash(data: $data, error: $_error)'
-        : '$runtimeType#$shortHash(data: $data)';
+
+    return switch (this) {
+      AsyncInitial() => 'AsyncInitial<$T>#$shortHash(data: $data)',
+      AsyncWaiting() => 'AsyncWaiting<$T>#$shortHash(data: $data)',
+      AsyncComplete() => 'AsyncComplete<$T>#$shortHash(data: $data)',
+      AsyncError() => 'AsyncError<$T>#$shortHash(data: $data, error: $_error)'
+    };
   }
 
   /// A method that returns a value returned from one of callback
@@ -85,16 +88,12 @@ abstract class AsyncPhase<T extends Object?> {
     required U Function(T?, Object?, StackTrace?) error,
     U Function(T?)? initial,
   }) {
-    if (isInitial) {
-      return initial == null ? waiting(data) : initial(data);
-    }
-    if (isWaiting) {
-      return waiting(data);
-    }
-    if (isComplete) {
-      return complete(data as T);
-    }
-    return error(data, _error, _stackTrace);
+    return switch (this) {
+      AsyncInitial() => initial == null ? waiting(data) : initial(data),
+      AsyncWaiting() => waiting(data),
+      AsyncComplete() => complete(data as T),
+      AsyncError() => error(data, _error, _stackTrace),
+    };
   }
 
   /// A method that returns a value returned from one of callback
@@ -159,7 +158,7 @@ abstract class AsyncPhase<T extends Object?> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has not been executed yet.
-class AsyncInitial<T extends Object?> extends AsyncPhase<T> {
+final class AsyncInitial<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncInitial] object representing the phase
   /// where an asynchronous operation has not been executed yet.
   const AsyncInitial([super.data]);
@@ -167,7 +166,7 @@ class AsyncInitial<T extends Object?> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation is in progress.
-class AsyncWaiting<T extends Object?> extends AsyncPhase<T> {
+final class AsyncWaiting<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncWaiting] object representing the phase
   /// where an asynchronous operation is in progress.
   const AsyncWaiting([super.data]);
@@ -175,7 +174,7 @@ class AsyncWaiting<T extends Object?> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has completed successfully.
-class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
+final class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncComplete] object representing the phase
   /// where an asynchronous operation has completed successfully.
   const AsyncComplete(T super.data) : _data = data;
@@ -188,7 +187,7 @@ class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
 
 /// A subclass of [AsyncPhase] representing the phase where
 /// an asynchronous operation has resulted in an error.
-class AsyncError<T extends Object?> extends AsyncPhase<T> {
+final class AsyncError<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncError] object representing the phase
   /// where an asynchronous operation has resulted in an error.
   const AsyncError({T? data, super.error, super.stackTrace}) : super(data);

@@ -5,7 +5,7 @@ import 'package:async_phase/async_phase.dart';
 void main() {
   group('when()', () {
     test('`initial` is called if phase is AsyncInitial', () {
-      final result = AsyncInitial(10).when(
+      final result = const AsyncInitial(10).when(
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
@@ -15,7 +15,7 @@ void main() {
     });
 
     test('`waiting` is called if phase is AsyncWaiting', () {
-      final result = AsyncWaiting(10).when(
+      final result = const AsyncWaiting(10).when(
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
@@ -25,7 +25,7 @@ void main() {
     });
 
     test('`complete` is called if phase is AsyncComplete', () {
-      final result = AsyncComplete(10).when(
+      final result = const AsyncComplete(10).when(
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('`error` is called if phase is AsyncError', () {
-      final result = AsyncError(data: 10).when(
+      final result = const AsyncError(data: 10).when(
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
@@ -63,7 +63,7 @@ void main() {
     test(
       '`waiting` is called if phase is AsyncInitial but `initial` is omitted',
       () {
-        final result = AsyncInitial(10).when(
+        final result = const AsyncInitial(10).when(
           waiting: (d) => '[waiting] $d',
           complete: (d) => '[complete] $d',
           error: (d, _, __) => '[error] $d',
@@ -77,9 +77,9 @@ void main() {
     test('Matching callback is called', () {
       final stackTrace = StackTrace.fromString('stack trace');
 
-      expect(AsyncInitial(10).whenOrNull(initial: (d) => d), 10);
-      expect(AsyncWaiting(10).whenOrNull(waiting: (d) => d), 10);
-      expect(AsyncComplete(10).whenOrNull(complete: (d) => d), 10);
+      expect(const AsyncInitial(10).whenOrNull(initial: (d) => d), 10);
+      expect(const AsyncWaiting(10).whenOrNull(waiting: (d) => d), 10);
+      expect(const AsyncComplete(10).whenOrNull(complete: (d) => d), 10);
       expect(
         AsyncError(data: 10, error: 20, stackTrace: stackTrace)
             .whenOrNull(error: (d, e, s) => '$d, $e, $s'),
@@ -88,20 +88,20 @@ void main() {
     });
 
     test('Returns null if no parameter is specified', () {
-      expect(AsyncComplete(10).whenOrNull<Object?>(), isNull);
+      expect(const AsyncComplete(10).whenOrNull<Object?>(), isNull);
     });
 
     test('Returns null if there is no matching callback', () {
-      expect(AsyncInitial(10).whenOrNull(complete: (d) => d), isNull);
-      expect(AsyncWaiting(10).whenOrNull(complete: (d) => d), isNull);
-      expect(AsyncComplete(10).whenOrNull(waiting: (d) => d), isNull);
-      expect(AsyncError(data: 10).whenOrNull(complete: (d) => d), isNull);
+      expect(const AsyncInitial(10).whenOrNull(complete: (d) => d), isNull);
+      expect(const AsyncWaiting(10).whenOrNull(complete: (d) => d), isNull);
+      expect(const AsyncComplete(10).whenOrNull(waiting: (d) => d), isNull);
+      expect(const AsyncError(data: 10).whenOrNull(complete: (d) => d), isNull);
     });
 
     test(
       '`waiting` is called if phase is AsyncInitial but `initial` is omitted',
       () {
-        expect(AsyncInitial(10).whenOrNull(waiting: (d) => d), 10);
+        expect(const AsyncInitial(10).whenOrNull(waiting: (d) => d), 10);
       },
     );
   });
@@ -112,7 +112,7 @@ void main() {
         () => Future.value(10),
         fallbackData: 0,
       );
-      expect(result, AsyncComplete(10));
+      expect(result, const AsyncComplete(10));
     });
 
     test('Returns AsyncError with fallbackValue if not successful', () async {
@@ -157,7 +157,10 @@ void main() {
 
   group('copyAsWaiting()', () {
     test('AsyncWaiting created with copyAsWaiting() has preserved value', () {
-      expect(AsyncComplete(10).copyAsWaiting(), equals(AsyncWaiting(10)));
+      expect(
+        const AsyncComplete(10).copyAsWaiting(),
+        equals(const AsyncWaiting(10)),
+      );
     });
   });
 }
