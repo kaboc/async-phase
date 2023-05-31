@@ -16,6 +16,7 @@ class MyWidget<T extends Object?> extends StatefulWidget {
   });
 
   final AsyncPhaseNotifier<T> notifier;
+  // ignore: avoid_positional_boolean_parameters
   final void Function(bool)? onWaiting;
   final void Function(T)? onComplete;
   final void Function(Object?, StackTrace?) onError;

@@ -4,15 +4,15 @@ version: 0.2.0+1
 repository: https://github.com/kaboc/async-phase/tree/main/packages/async_phase_notifier
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
-  flutter: '>=3.7.0'
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  async_phase: ^0.2.0
-  meta: ^1.8.0
+  async_phase: ^0.3.0
+  meta: ^1.9.1
 
 dev_dependencies:
   flutter_test:

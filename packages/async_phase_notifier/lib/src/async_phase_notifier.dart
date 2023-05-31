@@ -4,23 +4,19 @@ import 'package:meta/meta.dart';
 
 import 'package:async_phase/async_phase.dart';
 
+enum _EventType { start, end, success, error }
+
+typedef _Event<T> = ({_EventType type, AsyncPhase<T> phase});
 typedef RemoveListener = void Function();
-
-enum _EventType { waitingStart, waitingEnd, complete, error }
-
-class _Event<T extends Object?> {
-  const _Event(this.type, this.phase);
-
-  final _EventType type;
-  final AsyncPhase<T> phase;
-}
 
 class AsyncPhaseNotifier<T extends Object?>
     extends ValueNotifier<AsyncPhase<T>> {
   AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data));
 
   StreamController<_Event<T>>? _streamController;
-  AsyncPhase<T>? _prevPhase;
+  AsyncPhase<T> _prevPhase = const AsyncInitial();
+
+  StreamSink<_Event<T>>? get _sink => _streamController?.sink;
 
   @visibleForTesting
   bool get isListening => _streamController?.hasListener ?? false;
@@ -38,7 +34,7 @@ class AsyncPhaseNotifier<T extends Object?>
 
     final phase = value;
     if (phase != _prevPhase) {
-      _notifyListeners(phase: phase, prevPhase: _prevPhase);
+      _notifyListeners(prevPhase: _prevPhase, newPhase: phase);
     }
     _prevPhase = phase;
   }
@@ -57,6 +53,7 @@ class AsyncPhaseNotifier<T extends Object?>
 
   @useResult
   RemoveListener listen({
+    // ignore: avoid_positional_boolean_parameters
     void Function(bool)? onWaiting,
     void Function(T)? onComplete,
     void Function(Object?, StackTrace?)? onError,
@@ -71,20 +68,16 @@ class AsyncPhaseNotifier<T extends Object?>
     _streamController ??= StreamController<_Event<T>>.broadcast();
     final subscription = _streamController?.stream.listen((event) {
       switch (event.type) {
-        case _EventType.waitingStart:
+        case _EventType.start:
           onWaiting?.call(true);
-          break;
-        case _EventType.waitingEnd:
+        case _EventType.end:
           onWaiting?.call(false);
-          break;
-        case _EventType.complete:
+        case _EventType.success:
           final phase = event.phase as AsyncComplete<T>;
           onComplete?.call(phase.data);
-          break;
         case _EventType.error:
           final phase = event.phase as AsyncError<T>;
           onError?.call(phase.error, phase.stackTrace);
-          break;
       }
     });
 
@@ -92,21 +85,22 @@ class AsyncPhaseNotifier<T extends Object?>
   }
 
   void _notifyListeners({
-    required AsyncPhase<T> phase,
-    required AsyncPhase<T>? prevPhase,
+    required AsyncPhase<T> prevPhase,
+    required AsyncPhase<T> newPhase,
   }) {
-    if (phase is AsyncWaiting<T>) {
-      _streamController?.sink.add(_Event(_EventType.waitingStart, phase));
-    } else {
-      if (prevPhase is AsyncWaiting<T>) {
-        _streamController?.sink.add(_Event(_EventType.waitingEnd, phase));
-      }
+    if (prevPhase.isWaiting && !newPhase.isWaiting) {
+      _sink?.add((type: _EventType.end, phase: newPhase));
+    }
 
-      if (phase is AsyncComplete<T>) {
-        _streamController?.sink.add(_Event(_EventType.complete, phase));
-      } else if (phase is AsyncError<T>) {
-        _streamController?.sink.add(_Event(_EventType.error, phase));
-      }
+    switch (newPhase) {
+      case AsyncInitial():
+        break;
+      case AsyncWaiting():
+        _sink?.add((type: _EventType.start, phase: newPhase));
+      case AsyncComplete():
+        _sink?.add((type: _EventType.success, phase: newPhase));
+      case AsyncError():
+        _sink?.add((type: _EventType.error, phase: newPhase));
     }
   }
 }
