@@ -8,17 +8,18 @@ class AsyncPhaseListener<T> extends StatefulWidget {
   const AsyncPhaseListener({
     super.key,
     required this.notifier,
+    required this.child,
     this.onWaiting,
     this.onComplete,
     this.onError,
-    required this.child,
   });
 
   final AsyncPhaseNotifier<T> notifier;
+  final Widget child;
+  // ignore: avoid_positional_boolean_parameters
   final void Function(bool)? onWaiting;
   final void Function(T)? onComplete;
   final void Function(Object?, StackTrace?)? onError;
-  final Widget child;
 
   @override
   State<AsyncPhaseListener<T>> createState() => _AsyncPhaseListenerState<T>();

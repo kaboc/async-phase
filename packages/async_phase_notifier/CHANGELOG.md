@@ -1,3 +1,9 @@
+## 0.3.0
+
+- Raise minimum Flutter SDK version to 3.10.0.
+- Bump async_phase to 0.3.0.
+- Related refactorings.
+
 ## 0.2.0+1
 
 - Fix description on AsyncPhaseListener.

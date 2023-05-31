@@ -1,4 +1,5 @@
 [![Pub Version](https://img.shields.io/pub/v/async_phase_notifier)](https://pub.dev/packages/async_phase_notifier)
+[![async_phase_notifier CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml)
 [![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
 A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the initial /
@@ -55,7 +56,7 @@ child: phase.when(
 )
 ```
 
-`async_phase` is a separate package, contained in this package. See
+`async_phase` is a separate package, included in this package. See
 [its document][AsyncPhase] for details not covered here.
 
 ### Listening for phase changes
@@ -69,7 +70,7 @@ Note:
 
 - All callbacks are optional.
     - Listener is not added if no callback function is passed.
-- The `onWaiting` callback gets a boolean value that indicates the start / end
+- The `onWaiting` callback gets a boolean value that indicates the start or end
   of an asynchronous operation.
 
 ```dart
@@ -102,9 +103,8 @@ child: AsyncPhaseListener(
 ```
 
 Please note that a listener is added per each `AsyncPhaseListener`, not per
-notifier. If you use this widget at various places for a single notifier to call
-some function to show an error or trigger a logger, make sure not to call it at
-multiple of them to avoid duplication.
+notifier. If this widget is used at various places for one certain notifier,
+a single notification causes each of them to run its callback function. 
 
 ## Examples
 
@@ -153,7 +153,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-Or you can use `AnimatedBuilder` in a similar way.
+Or you can use `AnimatedBuilder` / `ListenableBuilder` in a similar way.
 
 ### With [Provider][provider]
 
@@ -186,7 +186,7 @@ Widget build(BuildContext context) {
 ```dart
 @override
 Widget build(BuildContext context) {
-  final phase = context.grab<AsyncPhase<Weather>>(notifier);
+  final phase = notifier.grab(context);
 
   return phase.when(
     waiting: (weather) => const CircularProgressIndicator(),
