@@ -1,4 +1,5 @@
 [![Pub Version](https://img.shields.io/pub/v/async_phase)](https://pub.dev/packages/async_phase)
+[![async_phase CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml)
 [![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
 A class and its subclasses representing phases of an asynchronous operation.
@@ -88,13 +89,16 @@ class WeatherForecast {
 [copyAsWaiting()][copyAsWaiting] is a handy method to switch the phase to `AsyncWaiting`
 without losing the previous data.
 
-`fallbackData` is a parameter for specifying the data that should be used when the
+`fallbackData` is an argument for specifying the data that should be used when the
 asynchronous operation results in failure.
 
 ### when()
 
 The [when()][when] method is useful for returning something that corresponds to the
 current phase, like a message, or a widget in a Flutter app.
+
+If `initial` is not specified and the current phase is `AsyncInitial`, the callback
+function passed to `waiting` is called instead.
 
 ```dart
 final message = phase.when(
@@ -142,8 +146,8 @@ To make `error` and `stackTrace` available if it is `AsyncError`, check the type
 with the `is` operator instead.
 
 ```dart
-if (phase is AsyncError) {
-  print('${phase.error}');
+if (phase is AsyncError<Weather>) {
+  print(phase.error);
   return;
 }
 ```

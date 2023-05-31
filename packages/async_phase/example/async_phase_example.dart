@@ -3,7 +3,7 @@ import 'package:async_phase/async_phase.dart';
 import 'utils.dart';
 
 Future<void> main() async {
-  final calc = Calculation(80.0, onCalc);
+  final calc = Calculation(80.0, onPhaseChanged: _onPhaseChanged);
   await wait();
 
   for (final divisor in [2, 4, 0]) {
@@ -15,7 +15,7 @@ Future<void> main() async {
   }
 }
 
-void onCalc(AsyncPhase<double> phase) {
+void _onPhaseChanged(AsyncPhase<double> phase) {
   final message = phase.when(
     initial: (data) => 'Initial value\n  $data',
     waiting: (data) => '  $data (waiting)',
@@ -26,21 +26,22 @@ void onCalc(AsyncPhase<double> phase) {
 }
 
 class Calculation {
-  Calculation(double initial, CalcCallback onCalc) {
+  Calculation(double initial, {required this.onPhaseChanged}) {
     phase = AsyncInitial(initial);
-    onCalc(phase);
+    onPhaseChanged(phase);
   }
 
   late AsyncPhase<double> phase;
+  late CalcCallback onPhaseChanged;
 
   Future<void> divideBy(num value) async {
     phase = phase.copyAsWaiting();
-    onCalc(phase);
+    onPhaseChanged(phase);
 
     phase = await AsyncPhase.from(
       () => phase.data!.divideBy(value),
       fallbackData: -1.0,
     );
-    onCalc(phase);
+    onPhaseChanged(phase);
   }
 }
