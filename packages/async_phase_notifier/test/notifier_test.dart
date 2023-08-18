@@ -21,7 +21,7 @@ void main() {
         d = data;
         return Future.value(data);
       });
-      expect(d, equals(10));
+      expect(d, 10);
     });
 
     test('data is initially null when none is passed', () {
@@ -44,17 +44,18 @@ void main() {
     test('Callback can return non-Future', () async {
       final notifier = AsyncPhaseNotifier(10);
       final phase = await notifier.runAsync((_) => 20);
-      expect(phase.data, equals(20));
+      expect(phase.data, 20);
     });
 
     test('Phase turns into AsyncWaiting immediately', () async {
       final notifier = AsyncPhaseNotifier(10);
       unawaited(
         notifier.runAsync((_) async {
-          await Future<void>.delayed(const Duration(milliseconds: 30));
+          await pumpEventQueue();
           return Future.value(20);
         }),
       );
+      expect(notifier.value.data, 10);
       expect(notifier.value, isA<AsyncWaiting<int>>());
     });
 
@@ -63,7 +64,7 @@ void main() {
       final phase = await notifier.runAsync((_) => 20);
       expect(phase, isA<AsyncComplete<int>>());
       expect(notifier.value, isA<AsyncComplete<int>>());
-      expect(phase.data, equals(20));
+      expect(phase.data, 20);
     });
 
     test('Phase is AsyncError and has prev data if not successful', () async {
@@ -71,7 +72,7 @@ void main() {
       final phase1 = await notifier1.runAsync((_) => throw Exception());
       expect(phase1, isA<AsyncError<int>>());
       expect(notifier1.value, isA<AsyncError<int>>());
-      expect(phase1.data, equals(10));
+      expect(phase1.data, 10);
 
       final notifier2 = AsyncPhaseNotifier<int?>();
       final phase2 = await notifier2.runAsync((_) => throw Exception());
@@ -85,126 +86,128 @@ void main() {
       final exception = Exception();
       final phase =
           await notifier.runAsync((_) => throw exception) as AsyncError<int>;
-      expect(phase.error, equals(exception));
+      expect(phase.error, exception);
       expect(phase.stackTrace.toString(), startsWith('#0 '));
     });
   });
 
-  test(
-    'Appropriate callbacks is called when phase changes or '
-    'when content changes while phase stays the same',
-    () async {
-      final notifier = AsyncPhaseNotifier('abc');
-      final phases = <AsyncPhase<String>>[];
+  group('listen()', () {
+    test(
+      'Callback is called when phase or its data changes, and onWaiting '
+      'is called also when phase changes _from_ AsyncWaiting',
+      () async {
+        final notifier = AsyncPhaseNotifier('abc');
+        final phases = <AsyncPhase<String>>[];
+
+        final cancel = notifier.listen(
+          onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
+          onComplete: (v) => phases.add(AsyncComplete(v)),
+          onError: (e, _) => phases.add(AsyncError(data: '', error: '$e')),
+        );
+        addTearDown(cancel);
+
+        notifier
+          ..value = const AsyncInitial('abc')
+          ..value = const AsyncComplete('abc')
+          ..value = const AsyncComplete('abc')
+          ..value = const AsyncComplete('def')
+          ..value = const AsyncWaiting('def')
+          ..value = const AsyncWaiting('def')
+          ..value = const AsyncWaiting('ghi')
+          ..value = const AsyncComplete('ghi')
+          ..value = const AsyncError(data: 'ghi')
+          ..value = const AsyncError(data: 'ghi')
+          ..value = const AsyncError(data: 'jkl')
+          ..value = const AsyncWaiting('jkl')
+          ..value = const AsyncError(data: 'jkl');
+
+        await pumpEventQueue();
+
+        expect(
+          phases,
+          orderedEquals(const [
+            AsyncComplete('abc'),
+            AsyncComplete('def'),
+            AsyncWaiting('true'),
+            AsyncWaiting('true'),
+            AsyncWaiting('false'),
+            AsyncComplete('ghi'),
+            AsyncError(data: '', error: 'null'),
+            AsyncError(data: '', error: 'null'),
+            AsyncWaiting('true'),
+            AsyncWaiting('false'),
+            AsyncError(data: '', error: 'null'),
+          ]),
+        );
+      },
+    );
+
+    test('onError is called with error and stack trace', () async {
+      final notifier = AsyncPhaseNotifier(10);
+      final exception = Exception();
+
+      Object? error;
+      StackTrace? stackTrace;
 
       final cancel = notifier.listen(
-        onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
-        onComplete: (v) => phases.add(AsyncComplete(v)),
-        onError: (e, _) => phases.add(AsyncError(data: '', error: '$e')),
+        onError: (e, s) {
+          error = e;
+          stackTrace = s;
+        },
       );
       addTearDown(cancel);
 
-      notifier
-        ..value = const AsyncInitial('abc')
-        ..value = const AsyncComplete('abc')
-        ..value = const AsyncComplete('abc')
-        ..value = const AsyncComplete('def')
-        ..value = const AsyncWaiting('def')
-        ..value = const AsyncWaiting('def')
-        ..value = const AsyncWaiting('ghi')
-        ..value = const AsyncComplete('ghi')
-        ..value = const AsyncError(data: 'ghi')
-        ..value = const AsyncError(data: 'ghi')
-        ..value = const AsyncError(data: 'jkl')
-        ..value = const AsyncWaiting('jkl')
-        ..value = const AsyncError(data: 'jkl');
+      await notifier.runAsync((_) => throw exception);
+      await pumpEventQueue();
+      expect(error, exception);
+      expect(stackTrace.toString(), startsWith('#0 '));
+    });
 
-      await Future<void>.delayed(const Duration(milliseconds: 20));
+    test('No callback is called after subscription is cancelled', () async {
+      final notifier = AsyncPhaseNotifier<void>();
+      var count1 = 0;
+      var count2 = 0;
 
-      expect(
-        phases,
-        orderedEquals(const [
-          AsyncComplete('abc'),
-          AsyncComplete('def'),
-          AsyncWaiting('true'),
-          AsyncWaiting('true'),
-          AsyncWaiting('false'),
-          AsyncComplete('ghi'),
-          AsyncError(data: '', error: 'null'),
-          AsyncError(data: '', error: 'null'),
-          AsyncWaiting('true'),
-          AsyncWaiting('false'),
-          AsyncError(data: '', error: 'null'),
-        ]),
+      final cancel1 = notifier.listen(
+        onWaiting: (_) => count1++,
+        onComplete: (_) => count1++,
+        onError: (_, __) => count1++,
       );
-    },
-  );
+      final cancel2 = notifier.listen(
+        onWaiting: (_) => count2++,
+        onComplete: (_) => count2++,
+        onError: (_, __) => count2++,
+      );
+      addTearDown(cancel2);
 
-  test('onError is called with error and stack trace', () async {
-    final notifier = AsyncPhaseNotifier(10);
-    final exception = Exception();
+      notifier
+        ..value = const AsyncComplete(null)
+        ..value = const AsyncError();
+      await pumpEventQueue();
+      expect(count1, 2);
+      expect(count2, 2);
 
-    Object? error;
-    StackTrace? stackTrace;
+      cancel1();
+      count1 = 0;
+      count2 = 0;
 
-    final cancel = notifier.listen(
-      onError: (e, s) {
-        error = e;
-        stackTrace = s;
-      },
-    );
-    addTearDown(cancel);
+      notifier
+        ..value = const AsyncWaiting()
+        ..value = const AsyncComplete(null)
+        ..value = const AsyncError();
+      await pumpEventQueue();
+      expect(count1, isZero);
+      expect(count2, 4);
 
-    await notifier.runAsync((_) => throw exception);
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect(error, equals(exception));
-    expect(stackTrace.toString(), startsWith('#0 '));
-  });
+      expect(notifier.isListening, isTrue);
+      cancel2();
+      expect(notifier.isListening, isFalse);
+    });
 
-  test('No callback is called after subscription is cancelled', () async {
-    final notifier = AsyncPhaseNotifier<void>();
-    var count1 = 0;
-    var count2 = 0;
-
-    final cancel1 = notifier.listen(
-      onWaiting: (_) => count1++,
-      onComplete: (_) => count1++,
-      onError: (_, __) => count1++,
-    );
-    final cancel2 = notifier.listen(
-      onWaiting: (_) => count2++,
-      onComplete: (_) => count2++,
-      onError: (_, __) => count2++,
-    );
-    addTearDown(cancel2);
-
-    notifier
-      ..value = const AsyncComplete(null)
-      ..value = const AsyncError();
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect(count1, equals(2));
-    expect(count2, equals(2));
-
-    count1 = 0;
-    count2 = 0;
-    cancel1();
-
-    notifier
-      ..value = const AsyncWaiting()
-      ..value = const AsyncComplete(null)
-      ..value = const AsyncError();
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    expect(count1, isZero);
-    expect(count2, equals(4));
-
-    expect(notifier.isListening, isTrue);
-    cancel2();
-    expect(notifier.isListening, isFalse);
-  });
-
-  test('Listener is not added if all callbacks are omitted', () {
-    // ignore: unused_result
-    final notifier = AsyncPhaseNotifier<void>()..listen();
-    expect(notifier.hasListeners, isFalse);
+    test('Listener is not added if all callbacks are omitted', () {
+      // ignore: unused_result
+      final notifier = AsyncPhaseNotifier<void>()..listen();
+      expect(notifier.hasListeners, isFalse);
+    });
   });
 }

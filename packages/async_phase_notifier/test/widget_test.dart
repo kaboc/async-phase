@@ -108,8 +108,8 @@ void main() {
         await tester.pump();
         expect(waiting, isFalse);
         expect(data, 10);
-        expect(error, equals('error'));
-        expect(stackTrace, equals(StackTrace.empty));
+        expect(error, 'error');
+        expect(stackTrace, StackTrace.empty);
       },
     );
 
@@ -124,18 +124,18 @@ void main() {
         // all callbacks, so only `onError` is used for simplicity.
         notifier.value = AsyncError(error: Exception());
         await tester.pump();
-        expect(errorCount, equals(1));
+        expect(errorCount, 1);
         expect(buildCount, greaterThanOrEqualTo(1));
 
         final buttonFinder = find.byType(ElevatedButton).first;
         await tester.tap(buttonFinder);
         await tester.pumpAndSettle();
-        expect(errorCount, equals(1));
+        expect(errorCount, 1);
         expect(buildCount, greaterThanOrEqualTo(2));
 
         await tester.tap(buttonFinder);
         await tester.pumpAndSettle();
-        expect(errorCount, equals(1));
+        expect(errorCount, 1);
         expect(buildCount, greaterThanOrEqualTo(3));
       },
     );
