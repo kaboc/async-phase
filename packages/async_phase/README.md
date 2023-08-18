@@ -2,7 +2,7 @@
 [![async_phase CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml)
 [![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
-A class and its subclasses representing phases of an asynchronous operation.
+A sealed class and its subclasses representing phases of an asynchronous operation.
 
 ## About this package
 
@@ -27,7 +27,6 @@ used to represent phases of an asynchronous operation.
 - [AsyncWaiting][AsyncWaiting]
 - [AsyncComplete][AsyncComplete]
 - [AsyncError][AsyncError]
-
 
 ## Properties
 

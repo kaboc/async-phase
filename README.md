@@ -8,7 +8,7 @@ of each package.
 [![Pub Version](https://img.shields.io/pub/v/async_phase?label=async_phase)](https://pub.dev/packages/async_phase)
 [![async_phase CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase.yml)
 
-A class and its subclasses representing phases of an asynchronous operation.
+A sealed class and its subclasses representing phases of an asynchronous operation.
 
 ## [async_phase_notifier](https://github.com/kaboc/async-phase/tree/main/packages/async_phase_notifier)
 
