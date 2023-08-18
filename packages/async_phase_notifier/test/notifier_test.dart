@@ -91,6 +91,84 @@ void main() {
     });
   });
 
+  group('listen()', () {
+    test(
+      'Callback is called with phase when phase or its data changes',
+      () async {
+        final notifier = AsyncPhaseNotifier('abc');
+        final phases = <AsyncPhase<String>>[];
+
+        final cancel = notifier.listen(phases.add);
+        addTearDown(cancel);
+
+        notifier
+          ..value = const AsyncInitial('abc')
+          ..value = const AsyncComplete('abc')
+          ..value = const AsyncComplete('abc')
+          ..value = const AsyncComplete('def')
+          ..value = const AsyncWaiting('def')
+          ..value = const AsyncWaiting('def')
+          ..value = const AsyncWaiting('ghi')
+          ..value = const AsyncComplete('ghi')
+          ..value = const AsyncError(data: 'ghi')
+          ..value = const AsyncError(data: 'ghi')
+          ..value = const AsyncError(data: 'jkl')
+          ..value = const AsyncWaiting('jkl')
+          ..value = const AsyncError(data: 'jkl');
+
+        await pumpEventQueue();
+
+        expect(
+          phases,
+          orderedEquals(const [
+            AsyncComplete('abc'),
+            AsyncComplete('def'),
+            AsyncWaiting('def'),
+            AsyncWaiting('ghi'),
+            AsyncComplete('ghi'),
+            AsyncError(data: 'ghi'),
+            AsyncError(data: 'jkl'),
+            AsyncWaiting('jkl'),
+            AsyncError(data: 'jkl'),
+          ]),
+        );
+      },
+    );
+
+    test('Callback is not called after subscription is cancelled', () async {
+      final notifier = AsyncPhaseNotifier<void>();
+      var count1 = 0;
+      var count2 = 0;
+
+      final cancel1 = notifier.listen((_) => count1++);
+      final cancel2 = notifier.listen((_) => count2++);
+      addTearDown(cancel2);
+
+      notifier
+        ..value = const AsyncComplete(null)
+        ..value = const AsyncError();
+      await pumpEventQueue();
+      expect(count1, 2);
+      expect(count2, 2);
+
+      cancel1();
+      count1 = 0;
+      count2 = 0;
+
+      notifier
+        ..value = const AsyncWaiting()
+        ..value = const AsyncComplete(null)
+        ..value = const AsyncError();
+      await pumpEventQueue();
+      expect(count1, isZero);
+      expect(count2, 3);
+
+      expect(notifier.isListening, isTrue);
+      cancel2();
+      expect(notifier.isListening, isFalse);
+    });
+  });
+
   group('listenFor()', () {
     test(
       'Callback is called when phase or its data changes, and onWaiting '

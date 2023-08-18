@@ -61,6 +61,26 @@ child: phase.when(
 
 ### Listening for phase changes
 
+#### listen()
+
+With [listen()][listen], you can trigger some action when the phase or its data changes.
+
+This is not much different from `addListener()`, except for the following points:
+
+- Returns a function to easily stop listening.
+- Takes a listener function that receives the phase at the time of the call.
+- The listener is called asynchronously because this method uses `Stream` internally.
+
+```dart
+final notifier = AsyncPhaseNotifier<Auth>();
+final cancel = notifier.listen((phase) { /* Some action */ });
+
+...
+
+// Remove the listener if it is no longer necessary.
+cancel();
+```
+
 #### listenFor()
 
 With [listenFor()][listenFor], you can trigger some action in one of the callbacks
@@ -205,6 +225,7 @@ Widget build(BuildContext context) {
 [AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
 [AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
 [runAsync]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/runAsync.html
+[listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
 [listenFor]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listenFor.html
 
 [AsyncPhase]: https://pub.dev/packages/async_phase

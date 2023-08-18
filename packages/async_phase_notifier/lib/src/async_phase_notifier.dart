@@ -52,6 +52,21 @@ class AsyncPhaseNotifier<T extends Object?>
   }
 
   @useResult
+  RemoveListener listen(void Function(AsyncPhase<T>) listener) {
+    // ignore: prefer_asserts_with_message
+    assert(ChangeNotifier.debugAssertNotDisposed(this));
+
+    _streamController ??= StreamController<_Event<T>>.broadcast();
+    final subscription = _streamController?.stream.listen((event) {
+      if (event.type != _EventType.end) {
+        listener(event.phase);
+      }
+    });
+
+    return () => subscription?.cancel();
+  }
+
+  @useResult
   RemoveListener listenFor({
     // ignore: avoid_positional_boolean_parameters
     void Function(bool)? onWaiting,
