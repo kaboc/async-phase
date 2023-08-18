@@ -1,3 +1,10 @@
+## 0.4.0
+
+- Breaking changes:
+    - Rename `listen()` to `listenFor()`.
+    - Add the new `listen()` method.
+        - This method takes a single listener function that receives the latest phase, whereas `listenFor()` takes several callback functions, each of which corresponds to a certain phases.
+
 ## 0.3.0
 
 - Raise minimum Flutter SDK version to 3.10.0.
