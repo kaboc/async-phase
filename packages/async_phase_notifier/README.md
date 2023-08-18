@@ -61,21 +61,22 @@ child: phase.when(
 
 ### Listening for phase changes
 
-#### listen()
+#### listenFor()
 
-With [listen()][listen], you can listen for phase changes to imperatively trigger
-some action, like showing an indicator or a dialog / snack bar, or to just log errors.
+With [listenFor()][listenFor], you can trigger some action in one of the callbacks
+relevant to the latest phase when the phase or its data changes.
 
 Note:
 
 - All callbacks are optional.
     - Listener is not added if no callback function is passed.
-- The `onWaiting` callback gets a boolean value that indicates the start or end
-  of an asynchronous operation.
+- The `onWaiting` callback is called when the phase has changed to `AsyncWaiting` and
+  also from `AsyncWaiting`. A boolean value is passed to the callback to indicate the
+  start or end of an asynchronous operation.
 
 ```dart
 final notifier = AsyncPhaseNotifier<Auth>();
-final cancel = notifier.listen(
+final cancel = notifier.listenFor(
   onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
   onComplete: (data) { /* e.g. Logging the result of an operation */ }, 
   onError: (e, s) { /* e.g. Showing an error dialog */ },
@@ -204,7 +205,7 @@ Widget build(BuildContext context) {
 [AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
 [AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
 [runAsync]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/runAsync.html
-[listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
+[listenFor]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listenFor.html
 
 [AsyncPhase]: https://pub.dev/packages/async_phase
 [AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html

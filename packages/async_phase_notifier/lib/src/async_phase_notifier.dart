@@ -52,7 +52,7 @@ class AsyncPhaseNotifier<T extends Object?>
   }
 
   @useResult
-  RemoveListener listen({
+  RemoveListener listenFor({
     // ignore: avoid_positional_boolean_parameters
     void Function(bool)? onWaiting,
     void Function(T)? onComplete,

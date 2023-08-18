@@ -91,7 +91,7 @@ void main() {
     });
   });
 
-  group('listen()', () {
+  group('listenFor()', () {
     test(
       'Callback is called when phase or its data changes, and onWaiting '
       'is called also when phase changes _from_ AsyncWaiting',
@@ -99,7 +99,7 @@ void main() {
         final notifier = AsyncPhaseNotifier('abc');
         final phases = <AsyncPhase<String>>[];
 
-        final cancel = notifier.listen(
+        final cancel = notifier.listenFor(
           onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
           onComplete: (v) => phases.add(AsyncComplete(v)),
           onError: (e, _) => phases.add(AsyncError(data: '', error: '$e')),
@@ -149,7 +149,7 @@ void main() {
       Object? error;
       StackTrace? stackTrace;
 
-      final cancel = notifier.listen(
+      final cancel = notifier.listenFor(
         onError: (e, s) {
           error = e;
           stackTrace = s;
@@ -168,12 +168,12 @@ void main() {
       var count1 = 0;
       var count2 = 0;
 
-      final cancel1 = notifier.listen(
+      final cancel1 = notifier.listenFor(
         onWaiting: (_) => count1++,
         onComplete: (_) => count1++,
         onError: (_, __) => count1++,
       );
-      final cancel2 = notifier.listen(
+      final cancel2 = notifier.listenFor(
         onWaiting: (_) => count2++,
         onComplete: (_) => count2++,
         onError: (_, __) => count2++,
@@ -206,7 +206,7 @@ void main() {
 
     test('Listener is not added if all callbacks are omitted', () {
       // ignore: unused_result
-      final notifier = AsyncPhaseNotifier<void>()..listen();
+      final notifier = AsyncPhaseNotifier<void>()..listenFor();
       expect(notifier.hasListeners, isFalse);
     });
   });
