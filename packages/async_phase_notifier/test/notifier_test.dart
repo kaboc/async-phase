@@ -285,7 +285,7 @@ void main() {
     test('Listener is not added if all callbacks are omitted', () {
       // ignore: unused_result
       final notifier = AsyncPhaseNotifier<void>()..listenFor();
-      expect(notifier.hasListeners, isFalse);
+      expect(notifier.isListening, isFalse);
     });
   });
 }
