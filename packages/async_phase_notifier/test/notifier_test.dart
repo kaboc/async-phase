@@ -288,4 +288,24 @@ void main() {
       expect(notifier.isListening, isFalse);
     });
   });
+
+  group('dispose()', () {
+    test('StreamController for events is closed when notifier is disposed', () {
+      // ignore: unused_result
+      final notifier = AsyncPhaseNotifier<void>()..listen((_) {});
+      expect(notifier.isListening, isTrue);
+      expect(notifier.isClosed, isFalse);
+
+      notifier.dispose();
+      expect(notifier.isClosed, isTrue);
+    });
+
+    test('Using notifier after dispose() throws', () {
+      final notifier = AsyncPhaseNotifier<void>()..dispose();
+      expect(
+        notifier.listenFor,
+        throwsA(predicate((e) => e.toString().contains('dispose'))),
+      );
+    });
+  });
 }

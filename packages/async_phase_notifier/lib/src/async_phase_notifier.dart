@@ -121,4 +121,7 @@ class AsyncPhaseNotifier<T extends Object?>
 extension AsyncPhaseTest on AsyncPhaseNotifier {
   @visibleForTesting
   bool get isListening => _eventStreamController?.hasListener ?? false;
+
+  @visibleForTesting
+  bool get isClosed => _eventStreamController?.isClosed ?? false;
 }
