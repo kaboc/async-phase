@@ -13,17 +13,14 @@ class AsyncPhaseNotifier<T extends Object?>
     extends ValueNotifier<AsyncPhase<T>> {
   AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data));
 
-  StreamController<_Event<T>>? _streamController;
+  StreamController<_Event<T>>? _eventStreamController;
   AsyncPhase<T> _prevPhase = const AsyncInitial();
 
-  StreamSink<_Event<T>>? get _sink => _streamController?.sink;
-
-  @visibleForTesting
-  bool get isListening => _streamController?.hasListener ?? false;
+  StreamSink<_Event<T>>? get _sink => _eventStreamController?.sink;
 
   @override
   void dispose() {
-    _streamController?.close();
+    _eventStreamController?.close();
     super.dispose();
   }
 
@@ -56,8 +53,8 @@ class AsyncPhaseNotifier<T extends Object?>
     // ignore: prefer_asserts_with_message
     assert(ChangeNotifier.debugAssertNotDisposed(this));
 
-    _streamController ??= StreamController<_Event<T>>.broadcast();
-    final subscription = _streamController?.stream.listen((event) {
+    _eventStreamController ??= StreamController<_Event<T>>.broadcast();
+    final subscription = _eventStreamController?.stream.listen((event) {
       if (event.type != _EventType.end) {
         listener(event.phase);
       }
@@ -80,8 +77,8 @@ class AsyncPhaseNotifier<T extends Object?>
       return () {};
     }
 
-    _streamController ??= StreamController<_Event<T>>.broadcast();
-    final subscription = _streamController?.stream.listen((event) {
+    _eventStreamController ??= StreamController<_Event<T>>.broadcast();
+    final subscription = _eventStreamController?.stream.listen((event) {
       switch (event.type) {
         case _EventType.start:
           onWaiting?.call(true);
@@ -118,4 +115,10 @@ class AsyncPhaseNotifier<T extends Object?>
         _sink?.add((type: _EventType.error, phase: newPhase));
     }
   }
+}
+
+@visibleForTesting
+extension AsyncPhaseTest on AsyncPhaseNotifier {
+  @visibleForTesting
+  bool get isListening => _eventStreamController?.hasListener ?? false;
 }
