@@ -1,9 +1,17 @@
+## 0.4.1
+
+- Update dependencies.
+    - `copyWith()` added to AsyncPhase at async_phase 0.3.2 is available.
+- Add tests for `dispose()` of AsyncPhaseNotifier.
+- Fix test for `listenFor()`.
+- Small refactorings.
+
 ## 0.4.0
 
 - Breaking changes:
     - Rename `listen()` to `listenFor()`.
     - Add the new `listen()` method.
-        - This method takes a single listener function that receives the latest phase, whereas `listenFor()` takes several callback functions, each of which corresponds to a certain phases.
+        - This method takes a single listener function that receives the latest phase, whereas `listenFor()` takes several callback functions, each of which corresponds to a certain phase.
 
 ## 0.3.0
 

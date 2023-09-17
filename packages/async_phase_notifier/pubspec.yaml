@@ -1,6 +1,6 @@
 name: async_phase_notifier
 description: A variant of ValueNotifier that helps you better manage phases of asynchronous operations.
-version: 0.4.0
+version: 0.4.1
 repository: https://github.com/kaboc/async-phase
 
 environment:
@@ -11,11 +11,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-  async_phase: ^0.3.1
+  async_phase: ^0.3.2
   meta: ^1.9.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.2
+  flutter_lints: ^2.0.3
