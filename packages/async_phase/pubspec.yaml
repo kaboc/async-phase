@@ -1,6 +1,6 @@
 name: async_phase
 description: A sealed class and its subclasses representing phases of an asynchronous operation.
-version: 0.3.1
+version: 0.3.2
 repository: https://github.com/kaboc/async-phase
 
 environment:
