@@ -144,6 +144,20 @@ sealed class AsyncPhase<T extends Object?> {
     }
   }
 
+  /// A method that copy a phase to create a new phase with new data.
+  ///
+  /// The returned phase has the same type as that of the original phase
+  /// this method was called on.
+  AsyncPhase<T> copyWith(T newData) {
+    return switch (this) {
+      AsyncInitial() => AsyncInitial(newData),
+      AsyncWaiting() => AsyncWaiting(newData),
+      AsyncComplete() => AsyncComplete(newData),
+      AsyncError() =>
+        AsyncError(data: newData, error: _error, stackTrace: _stackTrace),
+    };
+  }
+
   /// A method that creates an [AsyncWaiting] object based on the
   /// phase that this method is called on.
   ///

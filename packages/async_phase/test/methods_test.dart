@@ -155,6 +155,31 @@ void main() {
     });
   });
 
+  group('copyWith()', () {
+    test('On AsyncInitial', () {
+      expect(const AsyncInitial(10).copyWith(20), const AsyncInitial(20));
+    });
+
+    test('On AsyncWaiting', () {
+      expect(const AsyncWaiting(10).copyWith(20), const AsyncWaiting(20));
+    });
+
+    test('On AsyncComplete', () {
+      expect(const AsyncComplete(10).copyWith(20), const AsyncComplete(20));
+    });
+
+    test('On AsyncError', () {
+      const error = 'error';
+      const stack = StackTrace.empty;
+
+      expect(
+        const AsyncError(data: 10, error: error, stackTrace: stack)
+            .copyWith(20),
+        const AsyncError(data: 20, error: error, stackTrace: stack),
+      );
+    });
+  });
+
   group('copyAsWaiting()', () {
     test('AsyncWaiting created with copyAsWaiting() has preserved value', () {
       expect(const AsyncComplete(10).copyAsWaiting(), const AsyncWaiting(10));
