@@ -29,11 +29,10 @@ class AsyncPhaseNotifier<T extends Object?>
   set value(AsyncPhase<T> newValue) {
     super.value = newValue;
 
-    final phase = value;
-    if (phase != _prevPhase) {
-      _notifyListeners(prevPhase: _prevPhase, newPhase: phase);
+    if (newValue != _prevPhase) {
+      _notifyListeners(prevPhase: _prevPhase, newPhase: newValue);
     }
-    _prevPhase = phase;
+    _prevPhase = newValue;
   }
 
   Future<AsyncPhase<T>> runAsync(FutureOr<T> Function(T?) func) async {
