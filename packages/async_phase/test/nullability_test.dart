@@ -51,7 +51,7 @@ void main() {
             return data;
           },
         );
-        expect(result, equals(10));
+        expect(result, 10);
       },
     );
 
@@ -64,7 +64,7 @@ void main() {
             return data;
           },
         );
-        expect(result, equals(10));
+        expect(result, 10);
       },
     );
 
@@ -75,7 +75,7 @@ void main() {
           return data;
         },
       );
-      expect(result1, equals(10));
+      expect(result1, 10);
 
       final result2 = const AsyncWaiting<int>(10).whenOrNull(
         waiting: (data) {
@@ -83,7 +83,7 @@ void main() {
           return data;
         },
       );
-      expect(result2, equals(10));
+      expect(result2, 10);
 
       final result3 = const AsyncError<int>(data: 10).whenOrNull(
         error: (data, _, __) {
@@ -91,7 +91,7 @@ void main() {
           return data;
         },
       );
-      expect(result3, equals(10));
+      expect(result3, 10);
     });
 
     test('callbacks of when() can return null', () {

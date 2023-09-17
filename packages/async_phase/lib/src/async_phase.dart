@@ -31,7 +31,7 @@ sealed class AsyncPhase<T extends Object?> {
           other._stackTrace == _stackTrace;
 
   @override
-  int get hashCode => Object.hashAll([runtimeType, data, _error, _stackTrace]);
+  int get hashCode => Object.hash(runtimeType, data, _error, _stackTrace);
 
   /// Whether the phase is of type [AsyncInitial].
   bool get isInitial => this is AsyncInitial;

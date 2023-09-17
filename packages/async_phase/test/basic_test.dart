@@ -9,30 +9,27 @@ Matcher isNotEqual(Object? valueOrMatcher) => isNot(equals(valueOrMatcher));
 void main() {
   group('Equality', () {
     test('Objects of same type with same values are equal', () {
-      expect(AsyncInitial(10), equals(AsyncInitial(10)));
-      expect(AsyncWaiting(10), equals(AsyncWaiting(10)));
-      expect(AsyncComplete(10), equals(AsyncComplete(10)));
-      expect(AsyncError(data: 10), equals(AsyncError(data: 10)));
+      expect(AsyncInitial(10), AsyncInitial(10));
+      expect(AsyncWaiting(10), AsyncWaiting(10));
+      expect(AsyncComplete(10), AsyncComplete(10));
+      expect(AsyncError(data: 10), AsyncError(data: 10));
       expect(
         AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
-        equals(AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty)),
+        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
       );
     });
 
     test('Objects of same type with same values have same hashCode', () {
-      expect(AsyncInitial(10).hashCode, equals(AsyncInitial(10).hashCode));
-      expect(AsyncWaiting(10).hashCode, equals(AsyncWaiting(10).hashCode));
-      expect(AsyncComplete(10).hashCode, equals(AsyncComplete(10).hashCode));
+      expect(AsyncInitial(10).hashCode, AsyncInitial(10).hashCode);
+      expect(AsyncWaiting(10).hashCode, AsyncWaiting(10).hashCode);
+      expect(AsyncComplete(10).hashCode, AsyncComplete(10).hashCode);
       expect(
         AsyncError(data: 10).hashCode,
-        equals(AsyncError(data: 10).hashCode),
+        AsyncError(data: 10).hashCode,
       );
       expect(
         AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty).hashCode,
-        equals(
-          AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty)
-              .hashCode,
-        ),
+        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty).hashCode,
       );
     });
 

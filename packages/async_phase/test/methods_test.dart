@@ -11,7 +11,7 @@ void main() {
         complete: (d) => '[complete] $d',
         error: (d, _, __) => '[error] $d',
       );
-      expect(result, equals('[initial] 10'));
+      expect(result, '[initial] 10');
     });
 
     test('`waiting` is called if phase is AsyncWaiting', () {
@@ -21,7 +21,7 @@ void main() {
         complete: (d) => '[complete] $d',
         error: (d, _, __) => '[error] $d',
       );
-      expect(result, equals('[waiting] 10'));
+      expect(result, '[waiting] 10');
     });
 
     test('`complete` is called if phase is AsyncComplete', () {
@@ -31,7 +31,7 @@ void main() {
         complete: (d) => '[complete] $d',
         error: (d, _, __) => '[error] $d',
       );
-      expect(result, equals('[complete] 10'));
+      expect(result, '[complete] 10');
     });
 
     test('`error` is called if phase is AsyncError', () {
@@ -41,7 +41,7 @@ void main() {
         complete: (d) => '[complete] $d',
         error: (d, _, __) => '[error] $d',
       );
-      expect(result, equals('[error] 10'));
+      expect(result, '[error] 10');
     });
 
     test('`error` is given correct error and stack trace', () {
@@ -57,7 +57,7 @@ void main() {
         complete: (_) => '',
         error: (d, e, s) => '$d, $e, $s',
       );
-      expect(result, equals('10, 20, stack trace'));
+      expect(result, '10, 20, stack trace');
     });
 
     test(
@@ -68,7 +68,7 @@ void main() {
           complete: (d) => '[complete] $d',
           error: (d, _, __) => '[error] $d',
         );
-        expect(result, equals('[waiting] 10'));
+        expect(result, '[waiting] 10');
       },
     );
   });
@@ -121,8 +121,8 @@ void main() {
         fallbackData: 0,
       );
       expect(result, isA<AsyncError>());
-      expect(result.data, equals(0));
-      expect((result as AsyncError).error, equals('error'));
+      expect(result.data, 0);
+      expect((result as AsyncError).error, 'error');
     });
 
     test('onError is called with error and stack trace on error', () async {
@@ -138,12 +138,12 @@ void main() {
           stackTrace = s;
         },
       );
-      expect(error, equals(exception));
+      expect(error, exception);
       expect(stackTrace.toString(), startsWith('#0 '));
 
       final errorPhase = phase as AsyncError<int>;
-      expect(errorPhase.error, equals(exception));
-      expect(errorPhase.stackTrace, equals(stackTrace));
+      expect(errorPhase.error, exception);
+      expect(errorPhase.stackTrace, stackTrace);
     });
 
     test('Callback function can return non-Future', () async {
@@ -151,16 +151,13 @@ void main() {
         () => 10,
         fallbackData: 20,
       );
-      expect(result.data, equals(10));
+      expect(result.data, 10);
     });
   });
 
   group('copyAsWaiting()', () {
     test('AsyncWaiting created with copyAsWaiting() has preserved value', () {
-      expect(
-        const AsyncComplete(10).copyAsWaiting(),
-        equals(const AsyncWaiting(10)),
-      );
+      expect(const AsyncComplete(10).copyAsWaiting(), const AsyncWaiting(10));
     });
   });
 }
