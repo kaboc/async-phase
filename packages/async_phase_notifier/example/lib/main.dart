@@ -4,9 +4,14 @@ import 'package:async_phase_notifier/async_phase_notifier.dart';
 import 'package:grab/grab.dart';
 
 import 'package:async_phase_notifier_example/api.dart';
+import 'package:async_phase_notifier_example/theme.dart';
 import 'package:async_phase_notifier_example/widgets.dart';
 
 class FactNotifier extends AsyncPhaseNotifier<Fact> {
+  FactNotifier() {
+    fetch();
+  }
+
   final _api = RandomFactApi();
 
   void fetch() {
@@ -15,7 +20,7 @@ class FactNotifier extends AsyncPhaseNotifier<Fact> {
   }
 }
 
-final factNotifier = FactNotifier()..fetch();
+final factNotifier = FactNotifier();
 final switchNotifier = ValueNotifier(true);
 
 //======================================================================
@@ -41,9 +46,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AsyncPhaseNotifier Demo',
-      theme: ThemeData.from(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
-      ),
+      theme: AppTheme.data,
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Useless Facts'),
