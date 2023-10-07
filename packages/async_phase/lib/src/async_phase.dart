@@ -91,6 +91,8 @@ sealed class AsyncPhase<T extends Object?> {
     return switch (this) {
       AsyncInitial() => initial == null ? waiting(data) : initial(data),
       AsyncWaiting() => waiting(data),
+      // Don't use `!` instead of `as T`.
+      // `data` can be null if `T` itself is nullable.
       AsyncComplete() => complete(data as T),
       AsyncError() => error(data, _error, _stackTrace),
     };
@@ -129,8 +131,8 @@ sealed class AsyncPhase<T extends Object?> {
   /// useful for logging.
   static Future<AsyncPhase<T>> from<T extends Object?>(
     FutureOr<T> Function() func, {
-    // The type must not be `T` because it can't accept a value of type
-    // `T?` although it accepts `null` if the generic type is nullable.
+    // Used as the value of AsyncError's `data`, which is of
+    // type `T?`, so the type here needs to be `T?`, not `T`.
     required T? fallbackData,
     void Function(Object, StackTrace)? onError,
   }) async {

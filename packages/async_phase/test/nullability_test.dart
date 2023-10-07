@@ -55,6 +55,19 @@ void main() {
       },
     );
 
+    test('`complete` of when() is given null if the value is null', () {
+      var called = false;
+      final result = const AsyncComplete<int?>(null).whenOrNull(
+        complete: (data) {
+          called = true;
+          expect(data, isNull);
+          return data;
+        },
+      );
+      expect(called, isTrue);
+      expect(result, isNull);
+    });
+
     test(
       '`complete` of when() is given a non-null if generic type is non-null',
       () {
@@ -138,22 +151,28 @@ void main() {
   });
 
   group('Nullability of from()', () {
-    test('Callback function can return null', () async {
-      final result = await AsyncPhase.from<int?>(
-        () => null,
-        fallbackData: 10,
-      );
-      expect(result, isA<AsyncComplete>());
-      expect(result.data, isNull);
-    });
+    test(
+      'Callback function can return null if generic type is nullable',
+      () async {
+        final result = await AsyncPhase.from<int?>(
+          () => null,
+          fallbackData: 10,
+        );
+        expect(result, isA<AsyncComplete>());
+        expect(result.data, isNull);
+      },
+    );
 
-    test('fallbackData can be null', () async {
-      final result = await AsyncPhase.from<int?>(
-        () => throw Exception(),
-        fallbackData: null,
-      );
-      expect(result, isA<AsyncError>());
-      expect(result.data, isNull);
-    });
+    test(
+      'fallbackData can be null even if generic type is not nullable',
+      () async {
+        final result = await AsyncPhase.from<int>(
+          () => throw Exception(),
+          fallbackData: null,
+        );
+        expect(result, isA<AsyncError>());
+        expect(result.data, isNull);
+      },
+    );
   });
 }
