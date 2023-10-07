@@ -32,11 +32,8 @@ used to represent phases of an asynchronous operation.
 
 - **data**
     - The result of an asynchronous operation.
-    - Nullable, but always non-null once a value is set by `runAsync()` of
-      `AsyncPhaseNotifier<T>` if the `T` is a non-nullable type, even if the
-      phase is of type `AsyncError`.
-    - It is also non-null once a value is given and then [AsyncPhase.from\<T\>()][from]
-      and [copyAsWaiting()][copyAsWaiting] are used properly, where the `T` is non-nullable.
+    - Nullable basically, but non-nullable in `AsyncComplete<T>` if the `T`
+      is non-nullable.
 - **error**
     - The error that occurred in an asynchronous operation.
     - This property only exists in `AsyncError`.
