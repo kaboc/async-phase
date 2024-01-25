@@ -1,11 +1,13 @@
 name: async_phase CI
 
 on:
-#  push:
+  push:
 #    branches: [main]
 #    paths:
 #      - "packages/async_phase/**"
 #      - ".github/workflows/async_phase.yaml"
+    tags:
+      - '*'
   pull_request:
     branches: [main]
     paths:
