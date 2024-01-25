@@ -25,7 +25,11 @@ final switchNotifier = ValueNotifier(true);
 
 //======================================================================
 
-void main() => runApp(const App());
+void main() {
+  runApp(
+    const Grab(child: App()),
+  );
+}
 
 class App extends StatefulWidget {
   const App();
@@ -60,7 +64,7 @@ class _AppState extends State<App> {
   }
 }
 
-class _Body extends StatelessWidget with Grab {
+class _Body extends StatelessWidget {
   const _Body();
 
   @override

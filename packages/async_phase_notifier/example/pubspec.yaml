@@ -13,11 +13,11 @@ dependencies:
   async_phase_notifier:
     path: ..
 
-  grab: ^0.4.1
+  grab: ^1.0.0-dev.1
   http: ^1.1.0
 
 dev_dependencies:
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true

@@ -26,7 +26,7 @@ class FilledList extends StatelessWidget {
   }
 }
 
-class Fab extends StatelessWidget with Grab {
+class Fab extends StatelessWidget {
   const Fab();
 
   @override
