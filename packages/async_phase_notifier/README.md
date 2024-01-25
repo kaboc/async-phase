@@ -205,6 +205,14 @@ Widget build(BuildContext context) {
 [grab]: https://pub.dev/packages/grab
 
 ```dart
+void main() {
+  runApp(
+    const Grab(child: App()),
+  ); 
+}
+```
+
+```dart
 @override
 Widget build(BuildContext context) {
   final phase = notifier.grab(context);

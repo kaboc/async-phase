@@ -1,3 +1,9 @@
+## 0.4.2
+
+- Improve comments and tests to reduce risk of nullability mistakes.
+- Fix and simplify description on nullability of `data` in README.
+- Update dependencies.
+
 ## 0.4.1
 
 - Update dependencies.

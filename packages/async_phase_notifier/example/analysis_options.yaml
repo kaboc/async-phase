@@ -2,5 +2,4 @@ include: ../analysis_options.yaml
 
 linter:
   rules:
-    directives_ordering: false
     use_key_in_widget_constructors: false

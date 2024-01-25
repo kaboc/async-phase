@@ -31,11 +31,12 @@ class Fab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final factPhase = factNotifier.grab(context);
+    final isWaiting = factNotifier.grabAt(context, (n) => n.isWaiting);
 
     return FloatingActionButton(
-      backgroundColor: factPhase.isWaiting ? Colors.blueGrey.shade200 : null,
-      onPressed: factPhase.isWaiting ? null : factNotifier.fetch,
+      backgroundColor: isWaiting ? Theme.of(context).disabledColor : null,
+      disabledElevation: 0,
+      onPressed: isWaiting ? null : factNotifier.fetch,
       child: const Icon(Icons.refresh),
     );
   }

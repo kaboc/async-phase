@@ -77,7 +77,7 @@ class _Body extends StatelessWidget {
         Expanded(
           child: Center(
             child: factPhase.when(
-              waiting: (_) => const CircularProgressIndicator(),
+              waiting: (fact) => const CircularProgressIndicator(),
               error: (fact, e, s) => ErrorText(message: '$e'),
               complete: (fact) => FactView(fact: fact),
             ),
