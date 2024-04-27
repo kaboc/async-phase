@@ -3,9 +3,9 @@ name: async_phase_notifier CI
 on:
   push:
 #    branches: [main]
-#    paths:
-#      - "packages/async_phase_notifier/**"
-#      - ".github/workflows/async_phase_notifier.yaml"
+    paths:
+      - "packages/async_phase_notifier/**"
+      - ".github/workflows/async_phase_notifier.yaml"
     tags:
       - '*'
   pull_request:
@@ -22,10 +22,8 @@ jobs:
       run:
         working-directory: packages/async_phase_notifier
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
       - name: Install dependencies
         run: flutter pub get
       - name: Check format
