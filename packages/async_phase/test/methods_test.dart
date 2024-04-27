@@ -127,6 +127,27 @@ void main() {
       expect((result as AsyncError).error, 'error');
     });
 
+    test('onComplete is called with data on complete', () async {
+      Object? data;
+      final result = await AsyncPhase.from<int, int>(
+        () => 10,
+        onComplete: (d) => data = d,
+      );
+      expect(result.data, 10);
+      expect(data, 10);
+    });
+
+    test('onComplete is not called if callback throws', () async {
+      Object? data;
+      final result = await AsyncPhase.from<int, int>(
+        () => throw Exception(),
+        fallbackData: 0,
+        onComplete: (d) => data = d,
+      );
+      expect(result.data, 0);
+      expect(data, null);
+    });
+
     test('onError is called with error and stack trace on error', () async {
       Object? dataOnError;
       Object? error;

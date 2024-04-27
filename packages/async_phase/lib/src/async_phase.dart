@@ -135,10 +135,12 @@ sealed class AsyncPhase<T extends Object?> {
     // `T?`, in which case this method returns an `AsyncPhase<T?>` in
     // stead of `AsyncPhase<T>` if `null` is passed in.
     S? fallbackData,
+    void Function(T)? onComplete,
     void Function(S?, Object, StackTrace)? onError,
   }) async {
     try {
       final data = await func();
+      onComplete?.call(data);
       return AsyncComplete(data);
     }
     // ignore: avoid_catches_without_on_clauses
