@@ -128,6 +128,7 @@ void main() {
     });
 
     test('onError is called with error and stack trace on error', () async {
+      Object? dataOnError;
       Object? error;
       StackTrace? stackTrace;
       final exception = Exception();
@@ -135,17 +136,17 @@ void main() {
       final phase = await AsyncPhase.from<int, int>(
         () => throw exception,
         fallbackData: 0,
-        onError: (e, s) {
+        onError: (d, e, s) {
+          dataOnError = d;
           error = e;
           stackTrace = s;
         },
       );
+      expect(phase, isA<AsyncError>());
+      expect(phase.data, 0);
+      expect(dataOnError, 0);
       expect(error, exception);
       expect(stackTrace.toString(), startsWith('#0 '));
-
-      final errorPhase = phase as AsyncError<int>;
-      expect(errorPhase.error, exception);
-      expect(errorPhase.stackTrace, stackTrace);
     });
   });
 
