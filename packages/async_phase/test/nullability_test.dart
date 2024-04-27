@@ -154,9 +154,9 @@ void main() {
     test(
       'Callback can return null if first generic type parameter is nullable',
       () async {
-        final result = await AsyncPhase.from<int?, int>(() => null);
-        expect(result, isA<AsyncComplete>());
-        expect(result.data, isNull);
+        final phase = await AsyncPhase.from<int?, int>(() => null);
+        expect(phase, isA<AsyncComplete>());
+        expect(phase.data, isNull);
       },
     );
 
@@ -167,11 +167,11 @@ void main() {
         // Makes sure `isA<Foo<T>>` passes only if `T` is non-nullable.
         expect(<int?>[], isNot(isA<List<int>>()));
 
-        final result = await AsyncPhase.from(
+        final phase = await AsyncPhase.from(
           () => 10,
           fallbackData: null,
         );
-        expect(result, isA<AsyncComplete<int>>());
+        expect(phase, isA<AsyncComplete<int>>());
       },
     );
   });

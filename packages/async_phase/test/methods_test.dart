@@ -108,43 +108,45 @@ void main() {
 
   group('from()', () {
     test('Callback function can return non-Future', () async {
-      final result = await AsyncPhase.from(() => 10);
-      expect(result.data, 10);
+      final phase = await AsyncPhase.from(() => 10);
+      expect(phase.data, 10);
     });
 
     test('Returns AsyncComplete if successful', () async {
-      final result = await AsyncPhase.from(() => Future.value(10));
-      expect(result, const AsyncComplete(10));
+      final phase = await AsyncPhase.from(() => Future.value(10));
+      expect(phase, const AsyncComplete(10));
     });
 
     test('Returns AsyncError with fallbackValue if not successful', () async {
-      final result = await AsyncPhase.from(
-        () => Future<int>.error('error'),
-        fallbackData: 0,
+      final stackTrace = StackTrace.current;
+      final phase = await AsyncPhase.from(
+        () => Future<int>.error('error', stackTrace),
+        fallbackData: 20,
       );
-      expect(result, isA<AsyncError>());
-      expect(result.data, 0);
-      expect((result as AsyncError).error, 'error');
+      expect(phase, isA<AsyncError>());
+      expect(phase.data, 20);
+      expect((phase as AsyncError).error, 'error');
+      expect((phase as AsyncError).stackTrace, stackTrace);
     });
 
     test('onComplete is called with data on complete', () async {
       Object? data;
-      final result = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from<int, int>(
         () => 10,
         onComplete: (d) => data = d,
       );
-      expect(result.data, 10);
+      expect(phase.data, 10);
       expect(data, 10);
     });
 
     test('onComplete is not called if callback throws', () async {
       Object? data;
-      final result = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from<int, int>(
         () => throw Exception(),
-        fallbackData: 0,
+        fallbackData: 20,
         onComplete: (d) => data = d,
       );
-      expect(result.data, 0);
+      expect(phase.data, 20);
       expect(data, null);
     });
 
@@ -156,7 +158,7 @@ void main() {
 
       final phase = await AsyncPhase.from<int, int>(
         () => throw exception,
-        fallbackData: 0,
+        fallbackData: 20,
         onError: (d, e, s) {
           dataOnError = d;
           error = e;
@@ -164,10 +166,29 @@ void main() {
         },
       );
       expect(phase, isA<AsyncError>());
-      expect(phase.data, 0);
-      expect(dataOnError, 0);
+      expect(phase.data, 20);
+      expect(dataOnError, 20);
       expect(error, exception);
       expect(stackTrace.toString(), startsWith('#0 '));
+    });
+
+    test('onError is not called if callback has no error', () async {
+      Object? dataOnError;
+      Object? error;
+      StackTrace? stackTrace;
+
+      final phase = await AsyncPhase.from<int, int>(
+        () => 10,
+        onError: (d, e, s) {
+          dataOnError = d;
+          error = e;
+          stackTrace = s;
+        },
+      );
+      expect(phase.data, 10);
+      expect(dataOnError, null);
+      expect(error, null);
+      expect(stackTrace, null);
     });
   });
 
