@@ -129,20 +129,22 @@ sealed class AsyncPhase<T extends Object?> {
   ///
   /// The [onError] callback is called on error. This may be
   /// useful for logging.
-  static Future<AsyncPhase<T>> from<T extends Object?>(
+  static Future<AsyncPhase<T>> from<T extends Object?, S extends T?>(
     FutureOr<T> Function() func, {
-    // Used as the value of AsyncError's `data`, which is of
-    // type `T?`, so the type here needs to be `T?`, not `T`.
-    required T? fallbackData,
+    // `S` is a subtype of `T?`, but this parameter must not be of type
+    // `T?`, in which case this method returns an `AsyncPhase<T?>` in
+    // stead of `AsyncPhase<T>` if `null` is passed in.
+    S? fallbackData,
     void Function(Object, StackTrace)? onError,
   }) async {
     try {
       final data = await func();
       return AsyncComplete(data);
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e, s) {
+    }
+    // ignore: avoid_catches_without_on_clauses
+    catch (e, s) {
       onError?.call(e, s);
-      return AsyncError<T>(data: fallbackData, error: e, stackTrace: s);
+      return AsyncError(data: fallbackData, error: e, stackTrace: s);
     }
   }
 

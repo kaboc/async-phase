@@ -152,26 +152,26 @@ void main() {
 
   group('Nullability of from()', () {
     test(
-      'Callback function can return null if generic type is nullable',
+      'Callback can return null if first generic type parameter is nullable',
       () async {
-        final result = await AsyncPhase.from<int?>(
-          () => null,
-          fallbackData: 10,
-        );
+        final result = await AsyncPhase.from<int?, int>(() => null);
         expect(result, isA<AsyncComplete>());
         expect(result.data, isNull);
       },
     );
 
     test(
-      'fallbackData can be null even if generic type is not nullable',
+      'Non-nullability of callback result is not affected by nullability '
+      'of fallbackData',
       () async {
-        final result = await AsyncPhase.from<int>(
-          () => throw Exception(),
+        // Makes sure `isA<Foo<T>>` passes only if `T` is non-nullable.
+        expect(<int?>[], isNot(isA<List<int>>()));
+
+        final result = await AsyncPhase.from(
+          () => 10,
           fallbackData: null,
         );
-        expect(result, isA<AsyncError>());
-        expect(result.data, isNull);
+        expect(result, isA<AsyncComplete<int>>());
       },
     );
   });

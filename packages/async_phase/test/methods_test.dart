@@ -107,11 +107,13 @@ void main() {
   });
 
   group('from()', () {
+    test('Callback function can return non-Future', () async {
+      final result = await AsyncPhase.from(() => 10);
+      expect(result.data, 10);
+    });
+
     test('Returns AsyncComplete if successful', () async {
-      final result = await AsyncPhase.from(
-        () => Future.value(10),
-        fallbackData: 0,
-      );
+      final result = await AsyncPhase.from(() => Future.value(10));
       expect(result, const AsyncComplete(10));
     });
 
@@ -130,7 +132,7 @@ void main() {
       StackTrace? stackTrace;
       final exception = Exception();
 
-      final phase = await AsyncPhase.from(
+      final phase = await AsyncPhase.from<int, int>(
         () => throw exception,
         fallbackData: 0,
         onError: (e, s) {
@@ -144,14 +146,6 @@ void main() {
       final errorPhase = phase as AsyncError<int>;
       expect(errorPhase.error, exception);
       expect(errorPhase.stackTrace, stackTrace);
-    });
-
-    test('Callback function can return non-Future', () async {
-      final result = await AsyncPhase.from(
-        () => 10,
-        fallbackData: 20,
-      );
-      expect(result.data, 10);
     });
   });
 
