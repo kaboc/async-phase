@@ -23,7 +23,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.4.2"
+    version: "0.4.3"
   characters:
     dependency: transitive
     description:
@@ -57,10 +57,10 @@ packages:
     dependency: "direct main"
     description:
       name: grab
-      sha256: "0dce3258548cfa800f2442e06b54b04198a2f3bdfbb2aed7bc34fbec2bff182f"
+      sha256: f3e2045dc9d6cd1f0d26a091120eb0f97c191d6f58d859dc931be50e0dfa0213
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.1"
+    version: "1.0.0"
   http:
     dependency: "direct main"
     description:

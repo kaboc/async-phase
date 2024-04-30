@@ -1,3 +1,7 @@
+## 0.4.3
+
+- Upgrade async_phase to 0.4.0.
+
 ## 0.4.2
 
 - Improve comments and tests to reduce risk of nullability mistakes.
