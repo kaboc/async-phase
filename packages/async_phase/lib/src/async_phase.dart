@@ -88,14 +88,16 @@ sealed class AsyncPhase<T extends Object?> {
     required U Function(T?, Object?, StackTrace?) error,
     U Function(T?)? initial,
   }) {
-    return switch (this) {
-      AsyncInitial() => initial == null ? waiting(data) : initial(data),
-      AsyncWaiting() => waiting(data),
-      // Don't use `!` instead of `as T`.
-      // `data` can be null if `T` itself is nullable.
-      AsyncComplete() => complete(data as T),
-      AsyncError() => error(data, _error, _stackTrace),
-    };
+    switch (this) {
+      case AsyncInitial(:final data):
+        return initial == null ? waiting(data) : initial(data);
+      case AsyncWaiting(:final data):
+        return waiting(data);
+      case AsyncComplete(:final data):
+        return complete(data);
+      case AsyncError(:final data, error: final e, stackTrace: final s):
+        return error(data, e, s);
+    }
   }
 
   /// A method that returns a value returned from one of callback
