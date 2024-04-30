@@ -1,3 +1,12 @@
+## 0.4.0
+
+- **Breaking**:
+    - Change `onError` function of `AsyncPhase.from()` to receive data.
+- Improve `AsyncPhase.from()`.
+    - Change `fallbackData` to optional.
+    - Add `onComplete`.
+    - Refactor `when()` to use destructured fields.
+
 ## 0.3.2
 
 - Add `copyWith()`.

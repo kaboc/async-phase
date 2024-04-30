@@ -14,13 +14,13 @@ For details on `AsyncPhaseNotifier`, see [its document][AsyncPhaseNotifier].
 
 ## AsyncPhase
 
-[AsyncPhase][AsyncPhase] is similar to `AsyncValue` of Riverpod. Unlike AsyncValue,
-which is part of package:riverpod, `AsyncPhase` is an independent package, so you
-can use it without unnecessary dependencies.
+[AsyncPhase][AsyncPhase] is similar to `AsyncValue`, which is part of package:riverpod.
+Unlike it, this `AsyncPhase` is an independent package, so you can use it without
+unnecessary dependencies, and is much simpler without surprising behaviours.
 
 ## Subclasses (Phases)
 
-`AsyncPhase` itself is an abstract class. Its four subclasses listed below are
+`AsyncPhase` itself is a sealed class. Its four subclasses listed below are
 used to represent phases of an asynchronous operation.
 
 - [AsyncInitial][AsyncInitial]
@@ -86,7 +86,8 @@ class WeatherForecast {
 without losing the previous data.
 
 `fallbackData` is an argument for specifying the data that should be used when the
-asynchronous operation results in failure.
+asynchronous operation results in failure. If it is not specified, the `data` field
+of the resulting `AsyncError` is set to null.
 
 ### when()
 
@@ -103,6 +104,20 @@ final message = phase.when(
   complete: (data) => 'phase: AsyncComplete ($data)',
   error: (data, error, stackTrace) => 'phase: AsyncError ($error)',
 );
+```
+
+#### Pattern matching as an alternative to when()
+
+As [AsyncPhase] is a sealed class, it is possible to use pattern matching instead
+instead of [when()][when]. Which to use is just a matter of preference.
+
+```dart
+final message = switch (phase) {
+  AsyncInitial(:final data) => 'phase: AsyncInitial ($data)',
+  AsyncWaiting(:final data) => 'phase: AsyncWaiting ($data)',
+  AsyncComplete(:final data) => 'phase: AsyncComplete ($data)',
+  AsyncError(:final error) => 'phase: AsyncError ($error)',
+};
 ```
 
 ### whenOrNull()
@@ -146,6 +161,23 @@ if (phase is AsyncError<Weather>) {
   print(phase.error);
   return;
 }
+```
+
+### onComplete / onError
+
+`onComplete` and `onError` of [AsyncPhase.from()][from] are handy if you just
+want to do something depending on whether an operation was successful.
+
+```dart
+final phase = await AsyncPhase.from(
+  () => someOperation(),
+  onComplete: (data) {
+    // Called when the operation completes successfully.
+  },
+  onError: (data, error, stackTrace) {
+    // Called when the operation fails.
+  },
+);
 ```
 
 [AsyncPhase]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase-class.html
