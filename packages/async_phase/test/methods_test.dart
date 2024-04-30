@@ -117,7 +117,7 @@ void main() {
       expect(phase, const AsyncComplete(10));
     });
 
-    test('Returns AsyncError with fallbackValue if not successful', () async {
+    test('Returns AsyncError with fallbackData if not successful', () async {
       final stackTrace = StackTrace.current;
       final phase = await AsyncPhase.from(
         () => Future<int>.error('error', stackTrace),
@@ -127,6 +127,12 @@ void main() {
       expect(phase.data, 20);
       expect((phase as AsyncError).error, 'error');
       expect((phase as AsyncError).stackTrace, stackTrace);
+    });
+
+    test('AsyncError has null data if there is no fallbackData', () async {
+      final phase = await AsyncPhase.from(() => throw Exception());
+      expect(phase, isA<AsyncError>());
+      expect(phase.data, null);
     });
 
     test('onComplete is called with data on complete', () async {
@@ -170,6 +176,22 @@ void main() {
       expect(dataOnError, 20);
       expect(error, exception);
       expect(stackTrace.toString(), startsWith('#0 '));
+    });
+
+    test('onError receives null data if there is no fallbackData', () async {
+      Object? dataOnError;
+      Object? error;
+      final exception = Exception();
+
+      await AsyncPhase.from<int, int>(
+        () => throw exception,
+        onError: (d, e, s) {
+          dataOnError = d;
+          error = e;
+        },
+      );
+      expect(dataOnError, null);
+      expect(error, exception);
     });
 
     test('onError is not called if callback has no error', () async {
