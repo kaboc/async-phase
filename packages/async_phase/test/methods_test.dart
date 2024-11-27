@@ -75,14 +75,15 @@ void main() {
 
   group('whenOrNull()', () {
     test('Matching callback is called', () {
-      final stackTrace = StackTrace.fromString('stack trace');
-
       expect(const AsyncInitial(10).whenOrNull(initial: (d) => d), 10);
       expect(const AsyncWaiting(10).whenOrNull(waiting: (d) => d), 10);
       expect(const AsyncComplete(10).whenOrNull(complete: (d) => d), 10);
       expect(
-        AsyncError(data: 10, error: 20, stackTrace: stackTrace)
-            .whenOrNull(error: (d, e, s) => '$d, $e, $s'),
+        AsyncError(
+          data: 10,
+          error: 20,
+          stackTrace: StackTrace.fromString('stack trace'),
+        ).whenOrNull(error: (d, e, s) => '$d, $e, $s'),
         '10, 20, stack trace',
       );
     });
@@ -137,7 +138,7 @@ void main() {
 
     test('onComplete is called with data on complete', () async {
       Object? data;
-      final phase = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from(
         () => 10,
         onComplete: (d) => data = d,
       );
@@ -183,7 +184,7 @@ void main() {
       Object? error;
       final exception = Exception();
 
-      await AsyncPhase.from<int, int>(
+      await AsyncPhase.from(
         () => throw exception,
         onError: (d, e, s) {
           dataOnError = d;
@@ -199,7 +200,7 @@ void main() {
       Object? error;
       StackTrace? stackTrace;
 
-      final phase = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from(
         () => 10,
         onError: (d, e, s) {
           dataOnError = d;
@@ -214,32 +215,19 @@ void main() {
     });
   });
 
-  group('copyWith()', () {
-    test('On AsyncInitial', () {
+  group('Copy', () {
+    test('copyWith()', () {
       expect(const AsyncInitial(10).copyWith(20), const AsyncInitial(20));
-    });
-
-    test('On AsyncWaiting', () {
       expect(const AsyncWaiting(10).copyWith(20), const AsyncWaiting(20));
-    });
-
-    test('On AsyncComplete', () {
       expect(const AsyncComplete(10).copyWith(20), const AsyncComplete(20));
-    });
 
-    test('On AsyncError', () {
-      const error = 'error';
-      const stack = StackTrace.empty;
-
+      final stack = StackTrace.current;
       expect(
-        const AsyncError(data: 10, error: error, stackTrace: stack)
-            .copyWith(20),
-        const AsyncError(data: 20, error: error, stackTrace: stack),
+        AsyncError(data: 10, error: 'error', stackTrace: stack).copyWith(20),
+        AsyncError(data: 20, error: 'error', stackTrace: stack),
       );
     });
-  });
 
-  group('copyAsWaiting()', () {
     test('AsyncWaiting created with copyAsWaiting() has preserved value', () {
       expect(const AsyncComplete(10).copyAsWaiting(), const AsyncWaiting(10));
     });

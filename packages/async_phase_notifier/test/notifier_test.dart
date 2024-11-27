@@ -59,7 +59,7 @@ void main() {
       expect(notifier.value, isA<AsyncWaiting<int>>());
     });
 
-    test('Phase is AsyncComplete and has correct data if successful', () async {
+    test('Result is AsyncComplete with correct data if successful', () async {
       final notifier = AsyncPhaseNotifier(10);
       final phase = await notifier.runAsync((_) => 20);
       expect(phase, isA<AsyncComplete<int>>());
@@ -67,18 +67,18 @@ void main() {
       expect(phase.data, 20);
     });
 
-    test('Phase is AsyncError and has prev data if not successful', () async {
+    test('Result is AsyncError with previous data if not successful', () async {
       final notifier1 = AsyncPhaseNotifier(10);
       final phase1 = await notifier1.runAsync((_) => throw Exception());
       expect(phase1, isA<AsyncError<int>>());
       expect(notifier1.value, isA<AsyncError<int>>());
       expect(phase1.data, 10);
 
-      final notifier2 = AsyncPhaseNotifier<int?>();
+      final notifier2 = AsyncPhaseNotifier<int?>(10);
       final phase2 = await notifier2.runAsync((_) => throw Exception());
-      expect(phase2, isA<AsyncError<int?>>());
-      expect(notifier2.value, isA<AsyncError<int?>>());
-      expect(phase2.data, isNull);
+      expect(phase2, isNot(isA<AsyncError<int>>()));
+      expect(notifier2.value, isNot(isA<AsyncError<int>>()));
+      expect(phase2.data, 10);
     });
 
     test('AsyncError has error info', () async {

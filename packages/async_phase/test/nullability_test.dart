@@ -25,16 +25,10 @@ void main() {
     test(
       'Phases except AsyncComplete accept null when generic type is non-null',
       () {
-        const errorPhase = AsyncError<int>(
-          // ignore: avoid_redundant_argument_values
-          data: null,
-          error: '',
-          stackTrace: StackTrace.empty,
-        );
-
         expect(const AsyncInitial<int>(null).data, isNull);
         expect(const AsyncWaiting<int>(null).data, isNull);
-        expect(errorPhase.data, isNull);
+        // ignore: avoid_redundant_argument_values
+        expect(const AsyncError<int>(data: null, error: '').data, isNull);
       },
     );
   });
@@ -164,8 +158,8 @@ void main() {
       'Non-nullability of callback result is not affected by nullability '
       'of fallbackData',
       () async {
-        // Makes sure `isA<Foo<T>>` passes only if `T` is non-nullable.
-        expect(<int?>[], isNot(isA<List<int>>()));
+        // Makes sure `isA<AsyncComplete<T>>` passes only if T is non-nullable.
+        expect(const AsyncComplete(null), isNot(isA<AsyncComplete<int>>()));
 
         final phase = await AsyncPhase.from(
           () => 10,

@@ -12,10 +12,11 @@ void main() {
       expect(AsyncInitial(10), AsyncInitial(10));
       expect(AsyncWaiting(10), AsyncWaiting(10));
       expect(AsyncComplete(10), AsyncComplete(10));
-      expect(AsyncError(data: 10), AsyncError(data: 10));
+
+      final stackTrace = StackTrace.current;
       expect(
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
+        AsyncError(data: 10, error: 20, stackTrace: stackTrace),
+        AsyncError(data: 10, error: 20, stackTrace: stackTrace),
       );
     });
 
@@ -23,13 +24,11 @@ void main() {
       expect(AsyncInitial(10).hashCode, AsyncInitial(10).hashCode);
       expect(AsyncWaiting(10).hashCode, AsyncWaiting(10).hashCode);
       expect(AsyncComplete(10).hashCode, AsyncComplete(10).hashCode);
+
+      final stackTrace = StackTrace.current;
       expect(
-        AsyncError(data: 10).hashCode,
-        AsyncError(data: 10).hashCode,
-      );
-      expect(
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty).hashCode,
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty).hashCode,
+        AsyncError(data: 10, error: 20, stackTrace: stackTrace).hashCode,
+        AsyncError(data: 10, error: 20, stackTrace: stackTrace).hashCode,
       );
     });
 
@@ -68,16 +67,8 @@ void main() {
       expect(AsyncComplete(10), isNotEqual(AsyncComplete(11)));
       expect(AsyncError(data: 10), isNotEqual(AsyncError(data: 11)));
       expect(
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
-        isNotEqual(
-          AsyncError(data: 11, error: 20, stackTrace: StackTrace.empty),
-        ),
-      );
-      expect(
-        AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty),
-        isNotEqual(
-          AsyncError(data: 10, error: 21, stackTrace: StackTrace.empty),
-        ),
+        AsyncError(data: 10, error: 20),
+        isNotEqual(AsyncError(data: 10, error: 21)),
       );
       expect(
         AsyncError(data: 10, error: 20, stackTrace: StackTrace.current),
@@ -92,19 +83,37 @@ void main() {
       () {
         expect(
           AsyncInitial(10).hashCode,
-          isNotEqual(AsyncComplete(11).hashCode),
-        );
-        expect(
-          AsyncWaiting(10).hashCode,
-          isNotEqual(AsyncComplete(11).hashCode),
-        );
-        expect(
-          AsyncComplete(10).hashCode,
           isNotEqual(AsyncInitial(11).hashCode),
         );
         expect(
-          AsyncError(data: 10).hashCode,
+          AsyncWaiting(10).hashCode,
+          isNotEqual(AsyncWaiting(11).hashCode),
+        );
+        expect(
+          AsyncComplete(10).hashCode,
           isNotEqual(AsyncComplete(11).hashCode),
+        );
+        expect(
+          AsyncError(data: 10).hashCode,
+          isNotEqual(AsyncError(data: 11).hashCode),
+        );
+        expect(
+          AsyncError(data: 10, error: 20).hashCode,
+          isNotEqual(AsyncError(data: 10, error: 21).hashCode),
+        );
+        expect(
+          AsyncError(
+            data: 10,
+            error: 20,
+            stackTrace: StackTrace.current,
+          ).hashCode,
+          isNotEqual(
+            AsyncError(
+              data: 10,
+              error: 20,
+              stackTrace: StackTrace.current,
+            ).hashCode,
+          ),
         );
       },
     );
@@ -116,7 +125,7 @@ void main() {
       final waiting = AsyncWaiting(10).toString();
       final complete = AsyncComplete(10).toString();
       final error =
-          AsyncError(data: 10, error: 20, stackTrace: StackTrace.empty)
+          AsyncError(data: 10, error: 20, stackTrace: StackTrace.current)
               .toString();
 
       expect(initial, startsWith('AsyncInitial<int>#'));

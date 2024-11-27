@@ -100,11 +100,7 @@ void main() {
         expect(data, 10);
         expect(error, isNull);
 
-        notifier.value = const AsyncError(
-          data: 20,
-          error: 'error',
-          stackTrace: StackTrace.empty,
-        );
+        notifier.value = const AsyncError(data: 20, error: 'error');
         await tester.pump();
         expect(waiting, isFalse);
         expect(data, 10);
