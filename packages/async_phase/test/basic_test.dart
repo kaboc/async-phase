@@ -32,15 +32,15 @@ void main() {
       );
     });
 
-    test('Objects of different types with same values are not equal', () {
+    test('Objects of different types with same `data` are not equal', () {
       expect(AsyncInitial(10), isNotEqual(AsyncComplete(10)));
       expect(AsyncWaiting(10), isNotEqual(AsyncComplete(10)));
       expect(AsyncComplete(10), isNotEqual(AsyncInitial(10)));
-      expect(AsyncError(data: 10), isNotEqual(AsyncComplete(10)));
+      expect(AsyncError(data: 10, error: 20), isNotEqual(AsyncComplete(10)));
     });
 
     test(
-      'Objects of different types with same values have different hashCode',
+      'Objects of different types with same `data` have different hashCode',
       () {
         expect(
           AsyncInitial(10).hashCode,
@@ -55,7 +55,7 @@ void main() {
           isNotEqual(AsyncInitial(10).hashCode),
         );
         expect(
-          AsyncError(data: 10).hashCode,
+          AsyncError(data: 10, error: 20).hashCode,
           isNotEqual(AsyncComplete(10).hashCode),
         );
       },
@@ -65,7 +65,10 @@ void main() {
       expect(AsyncInitial(10), isNotEqual(AsyncInitial(11)));
       expect(AsyncWaiting(10), isNotEqual(AsyncWaiting(11)));
       expect(AsyncComplete(10), isNotEqual(AsyncComplete(11)));
-      expect(AsyncError(data: 10), isNotEqual(AsyncError(data: 11)));
+      expect(
+        AsyncError(data: 10, error: 20),
+        isNotEqual(AsyncError(data: 11, error: 20)),
+      );
       expect(
         AsyncError(data: 10, error: 20),
         isNotEqual(AsyncError(data: 10, error: 21)),
@@ -94,8 +97,8 @@ void main() {
           isNotEqual(AsyncComplete(11).hashCode),
         );
         expect(
-          AsyncError(data: 10).hashCode,
-          isNotEqual(AsyncError(data: 11).hashCode),
+          AsyncError(data: 10, error: 20).hashCode,
+          isNotEqual(AsyncError(data: 11, error: 20).hashCode),
         );
         expect(
           AsyncError(data: 10, error: 20).hashCode,
@@ -166,7 +169,7 @@ void main() {
     });
 
     test('isError', () {
-      const phase = AsyncError(data: 10);
+      const phase = AsyncError(data: 10, error: 20);
       expect(phase.isInitial, isFalse);
       expect(phase.isWaiting, isFalse);
       expect(phase.isComplete, isFalse);

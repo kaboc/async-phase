@@ -19,7 +19,10 @@ void main() {
     test('data of phases except AsyncComplete is always nullable', () {
       expect(isNullable(const AsyncInitial<int>(10).data), isTrue);
       expect(isNullable(const AsyncWaiting<int>(10).data), isTrue);
-      expect(isNullable(const AsyncError<int>(data: 10).data), isTrue);
+      expect(
+        isNullable(const AsyncError<int>(data: 10, error: 20).data),
+        isTrue,
+      );
     });
 
     test(
@@ -92,7 +95,7 @@ void main() {
       );
       expect(result2, 10);
 
-      final result3 = const AsyncError<int>(data: 10).whenOrNull(
+      final result3 = const AsyncError<int>(data: 10, error: 20).whenOrNull(
         error: (data, _, __) {
           expect(isNullable(data), isTrue);
           return data;
@@ -133,7 +136,7 @@ void main() {
       expect(result3, isNull);
 
       var called4 = false;
-      final result4 = const AsyncError(data: 10).whenOrNull(
+      final result4 = const AsyncError(data: 10, error: 20).whenOrNull(
         error: (data, _, __) {
           called4 = true;
           return null;

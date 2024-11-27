@@ -5,18 +5,13 @@ import 'package:meta/meta.dart';
 @immutable
 sealed class AsyncPhase<T extends Object?> {
   // ignore: public_member_api_docs
-  const AsyncPhase(
-    this.data, {
-    Object? error,
-    StackTrace? stackTrace,
-  })  : _error = error,
-        _stackTrace = stackTrace;
+  const AsyncPhase(this.data);
 
   /// The result of an asynchronous operation.
   final T? data;
 
-  final Object? _error;
-  final StackTrace? _stackTrace;
+  Object? get _error => null;
+  StackTrace? get _stackTrace => null;
 
   @override
   bool operator ==(Object other) =>
@@ -84,7 +79,7 @@ sealed class AsyncPhase<T extends Object?> {
   U when<U>({
     required U Function(T?) waiting,
     required U Function(T) complete,
-    required U Function(T?, Object?, StackTrace?) error,
+    required U Function(T?, Object, StackTrace) error,
     U Function(T?)? initial,
   }) {
     switch (this) {
@@ -110,7 +105,7 @@ sealed class AsyncPhase<T extends Object?> {
     U Function(T?)? initial,
     U Function(T?)? waiting,
     U Function(T)? complete,
-    U Function(T?, Object?, StackTrace?)? error,
+    U Function(T?, Object, StackTrace)? error,
   }) {
     return when(
       initial: initial,
@@ -160,8 +155,8 @@ sealed class AsyncPhase<T extends Object?> {
       AsyncInitial() => AsyncInitial(newData),
       AsyncWaiting() => AsyncWaiting(newData),
       AsyncComplete() => AsyncComplete(newData),
-      AsyncError() =>
-        AsyncError(data: newData, error: _error, stackTrace: _stackTrace),
+      AsyncError(:final error, :final stackTrace) =>
+        AsyncError(data: newData, error: error, stackTrace: stackTrace),
     };
   }
 
@@ -209,12 +204,24 @@ final class AsyncComplete<T extends Object?> extends AsyncPhase<T> {
 final class AsyncError<T extends Object?> extends AsyncPhase<T> {
   /// Creates an [AsyncError] object representing the phase
   /// where an asynchronous operation has resulted in an error.
-  const AsyncError({T? data, super.error, super.stackTrace}) : super(data);
+  const AsyncError({
+    T? data,
+    // ignore: always_put_required_named_parameters_first
+    required Object error,
+    StackTrace stackTrace = StackTrace.empty,
+  })  : _error = error,
+        _stackTrace = stackTrace,
+        super(data);
+
+  @override
+  final Object _error;
+  @override
+  final StackTrace _stackTrace;
 
   /// The error that occurred in an asynchronous operation.
-  Object? get error => _error;
+  Object get error => _error;
 
   /// The stack trace of the error that occurred in an
   /// asynchronous operation.
-  StackTrace? get stackTrace => _stackTrace;
+  StackTrace get stackTrace => _stackTrace;
 }

@@ -9,7 +9,7 @@ void main() {
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
-        error: (d, _, __) => '[error] $d',
+        error: (d, e, _) => '[error] $d, $e',
       );
       expect(result, '[initial] 10');
     });
@@ -19,7 +19,7 @@ void main() {
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
-        error: (d, _, __) => '[error] $d',
+        error: (d, e, _) => '[error] $d, $e',
       );
       expect(result, '[waiting] 10');
     });
@@ -29,7 +29,7 @@ void main() {
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
-        error: (d, _, __) => '[error] $d',
+        error: (d, e, _) => '[error] $d, $e',
       );
       expect(result, '[complete] 10');
     });
@@ -49,13 +49,13 @@ void main() {
     );
 
     test('`error` is called if phase is AsyncError', () {
-      final result = const AsyncError(data: 10).when(
+      final result = const AsyncError(data: 10, error: 20).when(
         initial: (d) => '[initial] $d',
         waiting: (d) => '[waiting] $d',
         complete: (d) => '[complete] $d',
-        error: (d, _, __) => '[error] $d',
+        error: (d, e, _) => '[error] $d, $e',
       );
-      expect(result, '[error] 10');
+      expect(result, '[error] 10, 20');
     });
 
     test('`error` is given correct error and stack trace', () {
@@ -80,7 +80,7 @@ void main() {
         final result = const AsyncInitial(10).when(
           waiting: (d) => '[waiting] $d',
           complete: (d) => '[complete] $d',
-          error: (d, _, __) => '[error] $d',
+          error: (d, e, _) => '[error] $d, $e',
         );
         expect(result, '[waiting] 10');
       },
@@ -110,7 +110,10 @@ void main() {
       expect(const AsyncInitial(10).whenOrNull(complete: (d) => d), isNull);
       expect(const AsyncWaiting(10).whenOrNull(complete: (d) => d), isNull);
       expect(const AsyncComplete(10).whenOrNull(waiting: (d) => d), isNull);
-      expect(const AsyncError(data: 10).whenOrNull(complete: (d) => d), isNull);
+      expect(
+        const AsyncError(data: 10, error: 20).whenOrNull(complete: (d) => d),
+        isNull,
+      );
     });
 
     test(
