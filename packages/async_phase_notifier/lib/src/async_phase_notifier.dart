@@ -18,6 +18,13 @@ class AsyncPhaseNotifier<T extends Object?>
 
   StreamSink<_Event<T>>? get _sink => _eventStreamController?.sink;
 
+  /// A getter for the `data` of the [AsyncPhase] value that this
+  /// [AsyncPhaseNotifier] holds.
+  ///
+  /// This getter returns a non-nullable value when the generic type of
+  /// the notifier is non-nullable, while `value.data` is always nullable.
+  T get data => value.data as T;
+
   @override
   void dispose() {
     _eventStreamController?.close();
@@ -39,7 +46,7 @@ class AsyncPhaseNotifier<T extends Object?>
     value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from(
-      () => func(value.data),
+      () => func(data),
       // Avoids using data as of this moment as fallback because
       // it becomes stale if `value.data` is updated externally
       // while the callback is executed.
@@ -47,7 +54,7 @@ class AsyncPhaseNotifier<T extends Object?>
     );
 
     if (phase is AsyncError) {
-      value = phase.copyWith(value.data as T);
+      value = phase.copyWith(data);
     } else {
       value = phase;
     }

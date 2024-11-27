@@ -59,6 +59,13 @@ child: phase.when(
 `async_phase` is a separate package, included in this package. See
 [its document][AsyncPhase] for details not covered here.
 
+### value.data vs data
+
+`data` is a getter for `value.data`. The former is handy and more type-safe as it
+is non-nullable if the generic type `T` of `AsyncPhaseNotifier<T>` is non-nullable,
+whereas tha latter is always nullable, often requiring a null check or a non-null
+assertion.
+
 ### Listening for phase changes
 
 #### listen()

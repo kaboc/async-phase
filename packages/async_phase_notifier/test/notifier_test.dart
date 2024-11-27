@@ -111,6 +111,22 @@ void main() {
     );
   });
 
+  group('data getter', () {
+    test(
+      'data getter returns non-null value when generic type is non nullable',
+      () {
+        final notifier1 = AsyncPhaseNotifier<int?>();
+        final notifier2 = AsyncPhaseNotifier(10);
+
+        expect(isNullable(notifier1.value.data), isTrue);
+        expect(isNullable(notifier2.value.data), isTrue);
+
+        expect(isNullable(notifier1.data), isTrue);
+        expect(isNullable(notifier2.data), isFalse);
+      },
+    );
+  });
+
   group('listen()', () {
     test(
       'Callback is called with phase when phase or its data changes',
