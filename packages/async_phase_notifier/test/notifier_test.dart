@@ -104,11 +104,11 @@ void main() {
           ..value = const AsyncWaiting('def')
           ..value = const AsyncWaiting('ghi')
           ..value = const AsyncComplete('ghi')
-          ..value = const AsyncError(data: 'ghi')
-          ..value = const AsyncError(data: 'ghi')
-          ..value = const AsyncError(data: 'jkl')
+          ..value = const AsyncError(data: 'ghi', error: 'err')
+          ..value = const AsyncError(data: 'ghi', error: 'err')
+          ..value = const AsyncError(data: 'jkl', error: 'err')
           ..value = const AsyncWaiting('jkl')
-          ..value = const AsyncError(data: 'jkl');
+          ..value = const AsyncError(data: 'jkl', error: 'err');
 
         await pumpEventQueue();
 
@@ -120,10 +120,10 @@ void main() {
             AsyncWaiting('def'),
             AsyncWaiting('ghi'),
             AsyncComplete('ghi'),
-            AsyncError(data: 'ghi'),
-            AsyncError(data: 'jkl'),
+            AsyncError(data: 'ghi', error: 'err'),
+            AsyncError(data: 'jkl', error: 'err'),
             AsyncWaiting('jkl'),
-            AsyncError(data: 'jkl'),
+            AsyncError(data: 'jkl', error: 'err'),
           ]),
         );
       },
@@ -140,7 +140,7 @@ void main() {
 
       notifier
         ..value = const AsyncComplete(null)
-        ..value = const AsyncError();
+        ..value = const AsyncError(error: 'err');
       await pumpEventQueue();
       expect(count1, 2);
       expect(count2, 2);
@@ -152,7 +152,7 @@ void main() {
       notifier
         ..value = const AsyncWaiting()
         ..value = const AsyncComplete(null)
-        ..value = const AsyncError();
+        ..value = const AsyncError(error: 'err');
       await pumpEventQueue();
       expect(count1, isZero);
       expect(count2, 3);
@@ -187,11 +187,11 @@ void main() {
           ..value = const AsyncWaiting('def')
           ..value = const AsyncWaiting('ghi')
           ..value = const AsyncComplete('ghi')
-          ..value = const AsyncError(data: 'ghi')
-          ..value = const AsyncError(data: 'ghi')
-          ..value = const AsyncError(data: 'jkl')
+          ..value = const AsyncError(data: 'ghi', error: 'err')
+          ..value = const AsyncError(data: 'ghi', error: 'err')
+          ..value = const AsyncError(data: 'jkl', error: 'err')
           ..value = const AsyncWaiting('jkl')
-          ..value = const AsyncError(data: 'jkl');
+          ..value = const AsyncError(data: 'jkl', error: 'err');
 
         await pumpEventQueue();
 
@@ -204,11 +204,11 @@ void main() {
             AsyncWaiting('true'),
             AsyncWaiting('false'),
             AsyncComplete('ghi'),
-            AsyncError(data: '', error: 'null'),
-            AsyncError(data: '', error: 'null'),
+            AsyncError(data: '', error: 'err'),
+            AsyncError(data: '', error: 'err'),
             AsyncWaiting('true'),
             AsyncWaiting('false'),
-            AsyncError(data: '', error: 'null'),
+            AsyncError(data: '', error: 'err'),
           ]),
         );
       },
@@ -254,7 +254,7 @@ void main() {
 
       notifier
         ..value = const AsyncComplete(null)
-        ..value = const AsyncError();
+        ..value = const AsyncError(error: '');
       await pumpEventQueue();
       expect(count1, 2);
       expect(count2, 2);
@@ -266,7 +266,7 @@ void main() {
       notifier
         ..value = const AsyncWaiting()
         ..value = const AsyncComplete(null)
-        ..value = const AsyncError();
+        ..value = const AsyncError(error: '');
       await pumpEventQueue();
       expect(count1, isZero);
       expect(count2, 4);
