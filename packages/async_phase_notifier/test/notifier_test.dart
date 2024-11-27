@@ -83,6 +83,32 @@ void main() {
       expect(phase.error, exception);
       expect(phase.stackTrace.toString(), startsWith('#0 '));
     });
+
+    test(
+      'Resulting AsyncError has latest value in `data` if `value.data` '
+      'is updated externally while callback is executed',
+      () async {
+        final called = <String>[];
+        final notifier = AsyncPhaseNotifier(10);
+
+        await Future.wait([
+          notifier.runAsync((_) async {
+            called.add('a1');
+            await Future<void>.delayed(const Duration(milliseconds: 10));
+            called.add('a2');
+            throw Exception();
+          }),
+          notifier.runAsync((_) async {
+            called.add('b');
+            return 20;
+          }),
+        ]);
+
+        expect(called, ['a1', 'b', 'a2']);
+        expect(notifier.value, isA<AsyncError>());
+        expect(notifier.value.data, 20);
+      },
+    );
   });
 
   group('listen()', () {

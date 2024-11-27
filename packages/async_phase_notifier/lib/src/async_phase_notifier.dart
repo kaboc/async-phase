@@ -40,11 +40,18 @@ class AsyncPhaseNotifier<T extends Object?>
 
     final phase = await AsyncPhase.from(
       () => func(value.data),
-      fallbackData: value.data,
+      // Avoids using data as of this moment as fallback because
+      // it becomes stale if `value.data` is updated externally
+      // while the callback is executed.
+      fallbackData: null,
     );
-    value = phase;
 
-    return phase;
+    if (phase is AsyncError) {
+      value = phase.copyWith(value.data as T);
+    } else {
+      value = phase;
+    }
+    return value;
   }
 
   @useResult
