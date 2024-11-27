@@ -8,7 +8,7 @@ import 'package:async_phase_notifier/async_phase_notifier.dart';
 bool isNullable<T>(T value) => null is T;
 
 void main() {
-  group('runAsync()', () {
+  group('update()', () {
     test('Phase is AsyncInitial when notifier is created', () {
       final notifier = AsyncPhaseNotifier(10);
       expect(notifier.value, isA<AsyncInitial<int>>());
@@ -17,7 +17,7 @@ void main() {
     test('Callback function is given existing data', () async {
       final notifier = AsyncPhaseNotifier(10);
       int? d;
-      await notifier.runAsync((data) {
+      await notifier.update((data) {
         d = data;
         return Future.value(data);
       });
@@ -34,7 +34,7 @@ void main() {
       expect(notifier.value, isA<AsyncPhase<int>>());
 
       bool? nullable;
-      await notifier.runAsync((data) {
+      await notifier.update((data) {
         nullable = isNullable(data);
         return Future.value(data);
       });
@@ -44,7 +44,7 @@ void main() {
     test('Phase turns into AsyncWaiting immediately', () async {
       final notifier = AsyncPhaseNotifier(10);
       unawaited(
-        notifier.runAsync((_) async {
+        notifier.update((_) async {
           await pumpEventQueue();
           return Future.value(20);
         }),
@@ -55,7 +55,7 @@ void main() {
 
     test('Result is AsyncComplete with correct data if successful', () async {
       final notifier = AsyncPhaseNotifier(10);
-      final phase = await notifier.runAsync((_) => Future.value(20));
+      final phase = await notifier.update((_) => Future.value(20));
       expect(phase, isA<AsyncComplete<int>>());
       expect(notifier.value, isA<AsyncComplete<int>>());
       expect(phase.data, 20);
@@ -63,13 +63,13 @@ void main() {
 
     test('Result is AsyncError with previous data if not successful', () async {
       final notifier1 = AsyncPhaseNotifier(10);
-      final phase1 = await notifier1.runAsync((_) => throw Exception());
+      final phase1 = await notifier1.update((_) => throw Exception());
       expect(phase1, isA<AsyncError<int>>());
       expect(notifier1.value, isA<AsyncError<int>>());
       expect(phase1.data, 10);
 
       final notifier2 = AsyncPhaseNotifier<int?>(10);
-      final phase2 = await notifier2.runAsync((_) => throw Exception());
+      final phase2 = await notifier2.update((_) => throw Exception());
       expect(phase2, isNot(isA<AsyncError<int>>()));
       expect(notifier2.value, isNot(isA<AsyncError<int>>()));
       expect(phase2.data, 10);
@@ -79,7 +79,7 @@ void main() {
       final notifier = AsyncPhaseNotifier(10);
       final exception = Exception();
       final phase =
-          await notifier.runAsync((_) => throw exception) as AsyncError<int>;
+          await notifier.update((_) => throw exception) as AsyncError<int>;
       expect(phase.error, exception);
       expect(phase.stackTrace.toString(), startsWith('#0 '));
     });
@@ -92,13 +92,13 @@ void main() {
         final notifier = AsyncPhaseNotifier(10);
 
         await Future.wait([
-          notifier.runAsync((_) async {
+          notifier.update((_) async {
             called.add('a1');
             await Future<void>.delayed(const Duration(milliseconds: 10));
             called.add('a2');
             throw Exception();
           }),
-          notifier.runAsync((_) async {
+          notifier.update((_) async {
             called.add('b');
             return 20;
           }),
@@ -271,7 +271,7 @@ void main() {
       );
       addTearDown(cancel);
 
-      await notifier.runAsync((_) => throw exception);
+      await notifier.update((_) => throw exception);
       await pumpEventQueue();
       expect(error, exception);
       expect(stackTrace.toString(), startsWith('#0 '));

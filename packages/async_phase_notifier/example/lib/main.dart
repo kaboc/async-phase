@@ -16,7 +16,7 @@ class FactNotifier extends AsyncPhaseNotifier<Fact> {
 
   void fetch() {
     final enabled = switchNotifier.value;
-    runAsync((_) => _api.fetch(enabled: enabled));
+    update((_) => _api.fetch(enabled: enabled));
   }
 }
 

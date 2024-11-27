@@ -42,7 +42,20 @@ class AsyncPhaseNotifier<T extends Object?>
     _prevPhase = newValue;
   }
 
+  @Deprecated(
+    'Use update instead. '
+    'This feature was deprecated after v0.4.0.',
+  )
   Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
+    return update(func);
+  }
+
+  /// Runs the provided asynchronous function and updates the phase.
+  ///
+  /// The phase is updated to [AsyncWaiting] when the callback starts,
+  /// and to [AsyncComplete] or [AsyncError] according to success or
+  /// failure when the callback ends.
+  Future<AsyncPhase<T>> update(Future<T> Function(T?) func) async {
     value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from(

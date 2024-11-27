@@ -19,9 +19,9 @@ and convenient methods for manipulating the phases.
 
 ## Usage
 
-### runAsync()
+### update()
 
-The [runAsync()][runAsync] method of [AsyncPhaseNotifier][AsyncPhaseNotifier] executes
+The [update()][update] method of [AsyncPhaseNotifier][AsyncPhaseNotifier] executes
 an asynchronous function, updates the `value` of `AsyncPhaseNotifier` automatically
 according to the phase of the asynchronous operation, and notifies the listeners of
 those changes.
@@ -34,7 +34,7 @@ those changes.
 
 ```dart
 final notifier = AsyncPhaseNotifier<int>();
-notifier.runAsync((data) => someAsyncOperation());
+notifier.update((data) => someAsyncOperation());
 ```
 
 ### AsyncPhase
@@ -61,10 +61,10 @@ child: phase.when(
 
 ### value.data vs data
 
-`data` is a getter for `value.data`. The former is handy and more type-safe as it
-is non-nullable if the generic type `T` of `AsyncPhaseNotifier<T>` is non-nullable,
-whereas tha latter is always nullable, often requiring a null check or a non-null
-assertion.
+`data` is a getter for `value.data`. The former is handy and more type-safe since
+the return type is non-nullable if the generic type `T` of `AsyncPhaseNotifier<T>`
+is non-nullable, whereas tha latter is always nullable, often requiring a null
+check or a non-null assertion.
 
 ### Listening for phase changes
 
@@ -146,7 +146,7 @@ class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
   final repository = WeatherRepository();
 
   void fetch() {
-    runAsync((weather) => repository.fetchWeather(Cities.tokyo));
+    update((weather) => repository.fetchWeather(Cities.tokyo));
   }
 }
 ```
@@ -239,7 +239,7 @@ Widget build(BuildContext context) {
 
 [AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
 [AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
-[runAsync]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/runAsync.html
+[update]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/update.html
 [listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
 [listenFor]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listenFor.html
 
