@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:meta/meta.dart';
 
 /// The base class for the classes that represent phases of
@@ -132,7 +131,7 @@ sealed class AsyncPhase<T extends Object?> {
   /// The [onError] callback is called on error. This may be
   /// useful for logging.
   static Future<AsyncPhase<T>> from<T extends Object?, S extends T?>(
-    FutureOr<T> Function() func, {
+    Future<T> Function() func, {
     // `S` is a subtype of `T?`, but this parameter must not be of type
     // `T?`, in which case this method returns an `AsyncPhase<T?>` in
     // stead of `AsyncPhase<T>` if `null` is passed in.

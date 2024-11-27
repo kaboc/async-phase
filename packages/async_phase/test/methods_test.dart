@@ -34,6 +34,20 @@ void main() {
       expect(result, '[complete] 10');
     });
 
+    test(
+      'callback of `complete` can return null even if phase is '
+      'AsyncComplete with non-nullable generic type',
+      () {
+        final result = const AsyncComplete<int>(10).when(
+          initial: (d) => '[initial] $d',
+          waiting: (d) => '[waiting] $d',
+          complete: (d) => null,
+          error: (d, e, __) => '[error] $d, $e',
+        );
+        expect(result, null);
+      },
+    );
+
     test('`error` is called if phase is AsyncError', () {
       final result = const AsyncError(data: 10).when(
         initial: (d) => '[initial] $d',
@@ -108,11 +122,6 @@ void main() {
   });
 
   group('from()', () {
-    test('Callback function can return non-Future', () async {
-      final phase = await AsyncPhase.from(() => 10);
-      expect(phase.data, 10);
-    });
-
     test('Returns AsyncComplete if successful', () async {
       final phase = await AsyncPhase.from(() => Future.value(10));
       expect(phase, const AsyncComplete(10));
@@ -139,7 +148,7 @@ void main() {
     test('onComplete is called with data on complete', () async {
       Object? data;
       final phase = await AsyncPhase.from(
-        () => 10,
+        () => Future.value(10),
         onComplete: (d) => data = d,
       );
       expect(phase.data, 10);
@@ -148,7 +157,7 @@ void main() {
 
     test('onComplete is not called if callback throws', () async {
       Object? data;
-      final phase = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from(
         () => throw Exception(),
         fallbackData: 20,
         onComplete: (d) => data = d,
@@ -163,7 +172,7 @@ void main() {
       StackTrace? stackTrace;
       final exception = Exception();
 
-      final phase = await AsyncPhase.from<int, int>(
+      final phase = await AsyncPhase.from(
         () => throw exception,
         fallbackData: 20,
         onError: (d, e, s) {
@@ -201,7 +210,7 @@ void main() {
       StackTrace? stackTrace;
 
       final phase = await AsyncPhase.from(
-        () => 10,
+        () => Future.value(10),
         onError: (d, e, s) {
           dataOnError = d;
           error = e;

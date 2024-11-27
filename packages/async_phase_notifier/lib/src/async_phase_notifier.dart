@@ -35,7 +35,7 @@ class AsyncPhaseNotifier<T extends Object?>
     _prevPhase = newValue;
   }
 
-  Future<AsyncPhase<T>> runAsync(FutureOr<T> Function(T?) func) async {
+  Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
     value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from(

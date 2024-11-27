@@ -41,12 +41,6 @@ void main() {
       expect(nullable, isTrue);
     });
 
-    test('Callback can return non-Future', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      final phase = await notifier.runAsync((_) => 20);
-      expect(phase.data, 20);
-    });
-
     test('Phase turns into AsyncWaiting immediately', () async {
       final notifier = AsyncPhaseNotifier(10);
       unawaited(
@@ -61,7 +55,7 @@ void main() {
 
     test('Result is AsyncComplete with correct data if successful', () async {
       final notifier = AsyncPhaseNotifier(10);
-      final phase = await notifier.runAsync((_) => 20);
+      final phase = await notifier.runAsync((_) => Future.value(20));
       expect(phase, isA<AsyncComplete<int>>());
       expect(notifier.value, isA<AsyncComplete<int>>());
       expect(phase.data, 20);
