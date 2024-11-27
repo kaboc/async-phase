@@ -67,7 +67,7 @@ class AsyncPhaseNotifier<T extends Object?>
     // ignore: avoid_positional_boolean_parameters
     void Function(bool)? onWaiting,
     void Function(T)? onComplete,
-    void Function(Object?, StackTrace?)? onError,
+    void Function(Object, StackTrace)? onError,
   }) {
     // ignore: prefer_asserts_with_message
     assert(ChangeNotifier.debugAssertNotDisposed(this));

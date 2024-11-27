@@ -19,7 +19,7 @@ class AsyncPhaseListener<T> extends StatefulWidget {
   // ignore: avoid_positional_boolean_parameters
   final void Function(bool)? onWaiting;
   final void Function(T)? onComplete;
-  final void Function(Object?, StackTrace?)? onError;
+  final void Function(Object, StackTrace)? onError;
 
   @override
   State<AsyncPhaseListener<T>> createState() => _AsyncPhaseListenerState<T>();

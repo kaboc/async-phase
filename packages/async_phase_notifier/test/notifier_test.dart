@@ -174,7 +174,7 @@ void main() {
         final cancel = notifier.listenFor(
           onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
           onComplete: (v) => phases.add(AsyncComplete(v)),
-          onError: (e, _) => phases.add(AsyncError(data: '', error: '$e')),
+          onError: (e, _) => phases.add(AsyncError(data: '', error: e)),
         );
         addTearDown(cancel);
 
