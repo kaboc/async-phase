@@ -52,9 +52,11 @@ class AsyncPhaseNotifier<T extends Object?>
 
   /// Runs the provided asynchronous function and updates the phase.
   ///
+  /// {@template AsyncPhaseNotifier.update}
   /// The phase is updated to [AsyncWaiting] when the callback starts,
   /// and to [AsyncComplete] or [AsyncError] according to success or
   /// failure when the callback ends.
+  /// {@endtemplate}
   Future<AsyncPhase<T>> update(Future<T> Function(T?) func) async {
     value = value.copyAsWaiting();
 
@@ -71,6 +73,28 @@ class AsyncPhaseNotifier<T extends Object?>
     } else {
       value = phase;
     }
+    return value;
+  }
+
+  /// Runs the provided asynchronous function and only updates the phase.
+  ///
+  /// {@macro AsyncPhaseNotifier.update}
+  ///
+  /// This is the same as [update] except that this method does not update
+  /// `value.data`.
+  ///
+  /// This method is useful when it is necessary to update the phase during
+  /// execution but the callback result should not affect the data.
+  ///
+  /// e.g. Indicating the waiting status on the UI or notifying the phase
+  /// change to other parts of the code, with the existing data being kept
+  /// unchanged.
+  Future<AsyncPhase<T>> updateOnlyPhase(Future<void> Function(T?) func) async {
+    final phase = await update((data) async {
+      await func(data);
+      return value.data as T;
+    });
+    value = phase;
     return value;
   }
 

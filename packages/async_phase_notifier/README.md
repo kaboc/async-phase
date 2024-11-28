@@ -37,6 +37,18 @@ final notifier = AsyncPhaseNotifier<int>();
 notifier.update((data) => someAsyncOperation());
 ```
 
+### updateOnlyPhase()
+
+This is the same as [update()][update] except that [updateOnlyPhase()][updateOnlyPhase]
+only update the phase itself without updating `value.data`, whereas `update()`
+updates both the phase and `value.data`.
+
+This method is useful when it is necessary to update the phase during execution
+but the callback result should not affect the data.
+
+e.g. Indicating the waiting status on the UI or notifying the phase change to
+other parts of the code, with the existing data being kept unchanged.
+
 ### AsyncPhase
 
 The value of `AsyncPhaseNotifier` is either [AsyncInitial][AsyncInitial],
@@ -240,6 +252,7 @@ Widget build(BuildContext context) {
 [AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
 [AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
 [update]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/update.html
+[updateOnlyPhase]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/updateOnlyPhase.html
 [listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
 [listenFor]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listenFor.html
 

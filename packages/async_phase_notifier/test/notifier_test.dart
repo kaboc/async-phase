@@ -111,6 +111,37 @@ void main() {
     );
   });
 
+  group('updateOnlyPhase()', () {
+    test(
+      'Phase is AsyncInitial initially and then AsyncWaiting until '
+      'updateOnlyPhase() ends',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        expect(notifier.value, isA<AsyncInitial<int>>());
+
+        final completer = Completer<void>();
+        unawaited(
+          notifier.updateOnlyPhase((_) async {
+            await pumpEventQueue();
+            completer.complete();
+          }),
+        );
+        expect(notifier.value, isA<AsyncWaiting<int>>());
+
+        await completer.future;
+        expect(notifier.value, isA<AsyncComplete<int>>());
+      },
+    );
+
+    test('Phase changes to AsyncComplete and keeps previous data', () async {
+      final notifier = AsyncPhaseNotifier(10);
+      final phase = await notifier.updateOnlyPhase((_) async => 20);
+      expect(phase, isA<AsyncComplete<int>>());
+      expect(notifier.value, isA<AsyncComplete<int>>());
+      expect(phase.data, 10);
+    });
+  });
+
   group('data getter', () {
     test(
       'data getter returns non-null value when generic type is non nullable',
