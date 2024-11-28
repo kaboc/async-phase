@@ -163,6 +163,23 @@ if (phase is AsyncError<Weather>) {
 }
 ```
 
+#### rethrowError()
+
+[AsyncError] has the [rethrowError()][rethrowError] method. It rethrows the
+error the `AsyncError` has with associated stack trace.
+
+```dart
+Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
+  return AsyncPhase.from(() {
+    final phase = await downloadFrom(uri: uri);
+    if (phase case AsyncError()) {
+      phase.rethrowError();
+    }
+    return resizeImage(phase.data, maxSize: ...);
+  });
+}
+```
+
 ### onComplete / onError
 
 `onComplete` and `onError` of [AsyncPhase.from()][from] are handy if you just
@@ -189,6 +206,7 @@ final phase = await AsyncPhase.from(
 [copyAsWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/copyAsWaiting.html
 [when]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/when.html
 [whenOrNull]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/whenOrNull.html
+[rethrowError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncError/rethrowError.html
 [isInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isInitial.html
 [isWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isWaiting.html
 [isComplete]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isComplete.html

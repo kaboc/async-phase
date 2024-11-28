@@ -224,4 +224,24 @@ final class AsyncError<T extends Object?> extends AsyncPhase<T> {
   /// The stack trace of the error that occurred in an
   /// asynchronous operation.
   StackTrace get stackTrace => _stackTrace;
+
+  /// A utility method that just wraps [Error.throwWithStackTrace].
+  ///
+  /// This is useful when it is necessary to rethrow the error
+  /// this [AsyncError] object has with associated stack trace.
+  ///
+  /// ```dart
+  /// Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
+  ///   return AsyncPhase.from(() {
+  ///     final phase = await downloadFrom(uri: uri);
+  ///     if (phase case AsyncError()) {
+  ///       phase.rethrowError();
+  ///     }
+  ///     return resizeImage(phase.data, maxSize: ...);
+  ///   });
+  /// }
+  /// ```
+  Never rethrowError() {
+    return Error.throwWithStackTrace(error, stackTrace);
+  }
 }

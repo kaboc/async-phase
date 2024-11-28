@@ -244,4 +244,26 @@ void main() {
       expect(const AsyncComplete(10).copyAsWaiting(), const AsyncWaiting(10));
     });
   });
+
+  group('rethrowError()', () {
+    test(
+      'Error thrown with rethrowError() inherits error and stackTrace '
+      'from AsyncError the method was called on',
+      () {
+        final phase =
+            AsyncError(error: Exception(), stackTrace: StackTrace.current);
+
+        Object? error;
+        StackTrace? stackTrace;
+
+        try {
+          phase.rethrowError();
+        } on Exception catch (e, s) {
+          error = e;
+          stackTrace = s;
+        }
+        expect((error, stackTrace), (phase.error, phase.stackTrace));
+      },
+    );
+  });
 }
