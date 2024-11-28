@@ -9,10 +9,27 @@ bool isNullable<T>(T value) => null is T;
 
 void main() {
   group('update()', () {
-    test('Phase is AsyncInitial when notifier is created', () {
-      final notifier = AsyncPhaseNotifier(10);
-      expect(notifier.value, isA<AsyncInitial<int>>());
-    });
+    test(
+      'Phase is AsyncInitial initially and and then AsyncWaiting until '
+      'update() ends',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        expect(notifier.value, isA<AsyncInitial<int>>());
+
+        final completer = Completer<void>();
+        unawaited(
+          notifier.update((_) async {
+            await pumpEventQueue();
+            completer.complete();
+            return 20;
+          }),
+        );
+        expect(notifier.value, isA<AsyncWaiting<int>>());
+
+        await completer.future;
+        expect(notifier.value, isA<AsyncComplete<int>>());
+      },
+    );
 
     test('Callback function is given existing data', () async {
       final notifier = AsyncPhaseNotifier(10);
@@ -39,18 +56,6 @@ void main() {
         return Future.value(data);
       });
       expect(nullable, isTrue);
-    });
-
-    test('Phase turns into AsyncWaiting immediately', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      unawaited(
-        notifier.update((_) async {
-          await pumpEventQueue();
-          return Future.value(20);
-        }),
-      );
-      expect(notifier.value.data, 10);
-      expect(notifier.value, isA<AsyncWaiting<int>>());
     });
 
     test('Result is AsyncComplete with correct data if successful', () async {
