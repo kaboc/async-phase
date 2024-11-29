@@ -225,6 +225,26 @@ void main() {
       expect(error, null);
       expect(stackTrace, null);
     });
+
+    test('Does not capture error thrown in onComplete callback', () async {
+      expect(
+        () => AsyncPhase.from(
+          () => Future.value(10),
+          onComplete: (_) => throw Exception(),
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('Does not capture error thrown in onError callback', () async {
+      expect(
+        () => AsyncPhase.from(
+          () => throw Exception('error1'),
+          onError: (_, __, ___) => throw Exception('error2'),
+        ),
+        throwsA(predicate((e) => e.toString().contains('error2'))),
+      );
+    });
   });
 
   group('Copy', () {

@@ -134,16 +134,22 @@ sealed class AsyncPhase<T extends Object?> {
     void Function(T)? onComplete,
     void Function(S?, Object, StackTrace)? onError,
   }) async {
+    AsyncPhase<T> phase;
     try {
       final data = await func();
-      onComplete?.call(data);
-      return AsyncComplete(data);
+      phase = AsyncComplete(data);
     }
     // ignore: avoid_catches_without_on_clauses
     catch (e, s) {
-      onError?.call(fallbackData, e, s);
-      return AsyncError(data: fallbackData, error: e, stackTrace: s);
+      phase = AsyncError(data: fallbackData, error: e, stackTrace: s);
     }
+
+    if (phase case AsyncError(:final error, :final stackTrace)) {
+      onError?.call(fallbackData, error, stackTrace);
+    } else if (phase case AsyncComplete(:final data)) {
+      onComplete?.call(data);
+    }
+    return phase;
   }
 
   /// A method that copy a phase to create a new phase with new data.
