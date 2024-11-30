@@ -6,15 +6,14 @@ A sealed class and its subclasses representing phases of an asynchronous operati
 
 ## About this package
 
-This package is mainly for use with [AsyncPhaseNotifier][AsyncPhaseNotifier]
-in Flutter apps, but has been made public as a separate package so that it
-can be used for pure Dart apps too.
+This package is mainly for use with [AsyncPhaseNotifier] in Flutter apps, but has
+been made public as a separate package so that it can be used for pure Dart apps too.
 
 For details on `AsyncPhaseNotifier`, see [its document][AsyncPhaseNotifier].
 
 ## AsyncPhase
 
-[AsyncPhase][AsyncPhase] is similar to `AsyncValue`, which is part of package:riverpod.
+[AsyncPhase] is similar to `AsyncValue`, which is part of package:riverpod.
 Unlike it, this `AsyncPhase` is an independent package, so you can use it without
 unnecessary dependencies, and is much simpler without surprising behaviours.
 
@@ -23,10 +22,10 @@ unnecessary dependencies, and is much simpler without surprising behaviours.
 `AsyncPhase` itself is a sealed class. Its four subclasses listed below are
 used to represent phases of an asynchronous operation.
 
-- [AsyncInitial][AsyncInitial]
-- [AsyncWaiting][AsyncWaiting]
-- [AsyncComplete][AsyncComplete]
-- [AsyncError][AsyncError]
+- [AsyncInitial]
+- [AsyncWaiting]
+- [AsyncComplete]
+- [AsyncError]
 
 ## Properties
 
@@ -53,11 +52,10 @@ For use with `AsyncPhaseNotifier`, see the document of
 Use `AsyncPhase.from()` to execute an asynchronous function and transform the result
 into either an `AsyncComplete` or an `AsyncError`.
 
-1. Use [AsyncInitial][AsyncInitial] first.
-2. Switch it to [AsyncWaiting][AsyncWaiting] when an asynchronous operation starts.
+1. Use [AsyncInitial] first.
+2. Switch it to [AsyncWaiting] when an asynchronous operation starts.
 3. Use [AsyncPhase.from()][from] to run the operation.
-4. The result of the operation is returned; either [AsyncComplete][AsyncComplete]
-   or [AsyncError][AsyncError].
+4. The result of the operation is returned; either [AsyncComplete] or [AsyncError].
 
 #### Example
 
@@ -108,8 +106,9 @@ final message = phase.when(
 
 #### Pattern matching as an alternative to when()
 
-As [AsyncPhase] is a sealed class, it is possible to use pattern matching instead
-instead of [when()][when]. Which to use is just a matter of preference.
+Since [AsyncPhase] is a sealed class, it is possible to use pattern matching
+instead of [when()][when] to handle the phases exhaustively. Which to use is
+just a matter of preference.
 
 ```dart
 final message = switch (phase) {
@@ -132,7 +131,7 @@ e.g. In the example below, the result is `null` if the current phase is `AsyncIn
 or `AsyncWaiting` because `initial` and `waiting` have been omitted.
 
 ```dart
-final message = phase.whenOrWhen(
+final message = phase.whenOrNull(
   complete: (data) => 'phase: AsyncComplete ($data)',
   error: (data, error, stackTrace) => 'phase: AsyncError ($error)',
 );
@@ -141,8 +140,7 @@ final message = phase.whenOrWhen(
 ### Type checks
 
 For checking if the current phase matches one of the four phases, you can use
-a getter; [isInitial][isInitial], [isWaiting][isWaiting], [isComplete][isComplete]
-or [isError][isError].
+a getter; [isInitial], [isWaiting], [isComplete] or [isError].
 
 ```dart
 final phase = await AsyncPhase.from(...);
@@ -152,13 +150,22 @@ if (phase.isError) {
 }
 ```
 
-Using `isError` like above does not promote the type of the phase to `AsyncError`.
-To make `error` and `stackTrace` available if it is `AsyncError`, check the type
-with the `is` operator instead.
+Using `isError` as shown above does not promote the type of the phase to `AsyncError`.
+To make `error` and `stackTrace` available, check the type with the `is` operator
+to get the flow analysis to work, or use pattern matching instead.
 
 ```dart
 if (phase is AsyncError<Weather>) {
   print(phase.error);
+  return;
+}
+```
+
+or
+
+```dart
+if (phase case AsyncError(:final error)) {
+  print(error);
   return;
 }
 ```

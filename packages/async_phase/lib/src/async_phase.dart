@@ -127,9 +127,9 @@ sealed class AsyncPhase<T extends Object?> {
   /// useful for logging.
   static Future<AsyncPhase<T>> from<T extends Object?, S extends T?>(
     Future<T> Function() func, {
-    // `S` is a subtype of `T?`, but this parameter must not be of type
-    // `T?`, in which case this method returns an `AsyncPhase<T?>` in
-    // stead of `AsyncPhase<T>` if `null` is passed in.
+    // `S` is a subtype of `T?`, but this parameter must not be of
+    // type `T?`, in which case this method returns an `AsyncPhase<T?>`
+    // in stead of `AsyncPhase<T>` if `null` is passed in.
     S? fallbackData,
     void Function(T)? onComplete,
     void Function(S?, Object, StackTrace)? onError,

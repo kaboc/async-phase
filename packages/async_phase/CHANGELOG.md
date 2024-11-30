@@ -1,3 +1,14 @@
+## 0.5.0
+
+- **Breaking**:
+    - Change return type of callback of `AsyncPhase.from()` from `FutureOr` to `Future`.
+        - This is an improvement to prevent misuse that leads to unhandled error. 
+    - Change `error` and `stackTrace` of `AsyncError` to be non-nullable.
+- Fix `AsyncComplete` having data redundantly in both `this._data` and `super.data`.
+- Fix `AsyncPhase.from()` so that resulting phase is not affected by error thrown
+  in `onComplete` or `onError` callback.
+- Add `rethrowError()` to `AsyncError`.
+
 ## 0.4.0
 
 - **Breaking**:
