@@ -33,7 +33,7 @@ those changes.
 4. The change is notified to listeners. 
 
 ```dart
-final notifier = AsyncPhaseNotifier<int>();
+final notifier = AsyncPhaseNotifier(0);
 notifier.update(() => someAsyncOperation());
 ```
 
@@ -91,7 +91,7 @@ This is not much different from `addListener()`, except for the following points
 - The listener is called asynchronously because this method uses `Stream` internally.
 
 ```dart
-final notifier = AsyncPhaseNotifier<Auth>();
+final notifier = AsyncPhaseNotifier(Auth());
 final cancel = notifier.listen((phase) { /* Some action */ });
 
 ...
@@ -114,7 +114,7 @@ Note:
   start or end of an asynchronous operation.
 
 ```dart
-final notifier = AsyncPhaseNotifier<Auth>();
+final notifier = AsyncPhaseNotifier(Auth());
 final cancel = notifier.listenFor(
   onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
   onComplete: (data) { /* e.g. Logging the result of an operation */ }, 
@@ -153,7 +153,7 @@ info of a city and notifies its listeners.
 
 ```dart
 class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
-  WeatherNotifier();
+  WeatherNotifier() : super(const Weather());
 
   final repository = WeatherRepository();
 

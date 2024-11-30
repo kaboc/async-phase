@@ -11,7 +11,7 @@ typedef RemoveListener = void Function();
 
 class AsyncPhaseNotifier<T extends Object?>
     extends ValueNotifier<AsyncPhase<T>> {
-  AsyncPhaseNotifier([T? data]) : super(AsyncInitial(data));
+  AsyncPhaseNotifier(T data) : super(AsyncInitial(data));
 
   StreamController<_Event<T>>? _eventStreamController;
   AsyncPhase<T> _prevPhase = const AsyncInitial();

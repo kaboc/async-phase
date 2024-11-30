@@ -31,9 +31,12 @@ void main() {
       },
     );
 
-    test('data is initially null when none is passed', () {
-      final notifier = AsyncPhaseNotifier();
-      expect(notifier.value.data, isNull);
+    test('Initial data affects nullability of generic type', () async {
+      final notifier1 = AsyncPhaseNotifier(10);
+      expect(notifier1, isA<AsyncPhaseNotifier<int>>());
+
+      final notifier2 = AsyncPhaseNotifier(null);
+      expect(notifier2, isNot(isA<AsyncPhaseNotifier<int>>()));
     });
 
     test('Result is AsyncComplete with correct data if successful', () async {
@@ -129,7 +132,7 @@ void main() {
     test(
       'data getter returns non-null value when generic type is non nullable',
       () {
-        final notifier1 = AsyncPhaseNotifier<int?>();
+        final notifier1 = AsyncPhaseNotifier<int?>(null);
         final notifier2 = AsyncPhaseNotifier(10);
 
         expect(isNullable(notifier1.value.data), isTrue);
@@ -186,7 +189,7 @@ void main() {
     );
 
     test('Callback is not called after subscription is cancelled', () async {
-      final notifier = AsyncPhaseNotifier<void>();
+      final notifier = AsyncPhaseNotifier(null);
       var count1 = 0;
       var count2 = 0;
 
@@ -292,7 +295,7 @@ void main() {
     });
 
     test('No callback is called after subscription is cancelled', () async {
-      final notifier = AsyncPhaseNotifier<void>();
+      final notifier = AsyncPhaseNotifier(null);
       var count1 = 0;
       var count2 = 0;
 
@@ -334,7 +337,7 @@ void main() {
 
     test('Listener is not added if all callbacks are omitted', () {
       // ignore: unused_result
-      final notifier = AsyncPhaseNotifier<void>()..listenFor();
+      final notifier = AsyncPhaseNotifier(null)..listenFor();
       expect(notifier.isListening, isFalse);
     });
   });
@@ -342,7 +345,7 @@ void main() {
   group('dispose()', () {
     test('StreamController for events is closed when notifier is disposed', () {
       // ignore: unused_result
-      final notifier = AsyncPhaseNotifier<void>()..listen((_) {});
+      final notifier = AsyncPhaseNotifier(null)..listen((_) {});
       expect(notifier.isListening, isTrue);
       expect(notifier.isClosed, isFalse);
 
@@ -351,7 +354,7 @@ void main() {
     });
 
     test('Using notifier after dispose() throws', () {
-      final notifier = AsyncPhaseNotifier<void>()..dispose();
+      final notifier = AsyncPhaseNotifier(null)..dispose();
       expect(
         notifier.listenFor,
         throwsA(predicate((e) => e.toString().contains('dispose'))),

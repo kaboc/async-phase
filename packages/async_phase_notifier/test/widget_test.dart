@@ -112,7 +112,7 @@ void main() {
     testWidgets(
       'Callback is not called again when widget is rebuilt',
       (tester) async {
-        final notifier = AsyncPhaseNotifier<int>();
+        final notifier = AsyncPhaseNotifier(null);
         await tester.pumpWidget(createWidget(notifier));
         await tester.pumpAndSettle();
 
@@ -137,7 +137,7 @@ void main() {
     );
 
     testWidgets('Listener is removed if widget is discarded', (tester) async {
-      final notifier = AsyncPhaseNotifier<int>();
+      final notifier = AsyncPhaseNotifier(null);
       await tester.pumpWidget(createWidget(notifier));
       await tester.pumpAndSettle();
       expect(notifier.isListening, isTrue);

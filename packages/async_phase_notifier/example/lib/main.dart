@@ -8,7 +8,7 @@ import 'package:async_phase_notifier_example/theme.dart';
 import 'package:async_phase_notifier_example/widgets.dart';
 
 class FactNotifier extends AsyncPhaseNotifier<Fact> {
-  FactNotifier() {
+  FactNotifier() : super(const Fact()) {
     fetch();
   }
 
