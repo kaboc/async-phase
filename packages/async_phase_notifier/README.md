@@ -34,7 +34,7 @@ those changes.
 
 ```dart
 final notifier = AsyncPhaseNotifier<int>();
-notifier.update((data) => someAsyncOperation());
+notifier.update(() => someAsyncOperation());
 ```
 
 ### updateOnlyPhase()
@@ -158,7 +158,7 @@ class WeatherNotifier extends AsyncPhaseNotifier<Weather> {
   final repository = WeatherRepository();
 
   void fetch() {
-    update((weather) => repository.fetchWeather(Cities.tokyo));
+    update(() => repository.fetchWeather(Cities.tokyo));
   }
 }
 ```

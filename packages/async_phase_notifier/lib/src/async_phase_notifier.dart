@@ -46,7 +46,7 @@ class AsyncPhaseNotifier<T extends Object?>
     'Use update instead. '
     'This feature was deprecated after v0.4.0.',
   )
-  Future<AsyncPhase<T>> runAsync(Future<T> Function(T?) func) async {
+  Future<AsyncPhase<T>> runAsync(Future<T> Function() func) async {
     return update(func);
   }
 
@@ -57,11 +57,11 @@ class AsyncPhaseNotifier<T extends Object?>
   /// and to [AsyncComplete] or [AsyncError] according to success or
   /// failure when the callback ends.
   /// {@endtemplate}
-  Future<AsyncPhase<T>> update(Future<T> Function(T?) func) async {
+  Future<AsyncPhase<T>> update(Future<T> Function() func) async {
     value = value.copyAsWaiting();
 
     final phase = await AsyncPhase.from(
-      () => func(data),
+      func,
       // Avoids using data as of this moment as fallback because
       // it becomes stale if `value.data` is updated externally
       // while the callback is executed.
@@ -89,10 +89,10 @@ class AsyncPhaseNotifier<T extends Object?>
   /// e.g. Indicating the waiting status on the UI or notifying the phase
   /// change to other parts of the code, with the existing data being kept
   /// unchanged.
-  Future<AsyncPhase<T>> updateOnlyPhase(Future<void> Function(T?) func) async {
-    final phase = await update((data) async {
-      await func(data);
-      return value.data as T;
+  Future<AsyncPhase<T>> updateOnlyPhase(Future<void> Function() func) async {
+    final phase = await update(() async {
+      await func();
+      return data;
     });
     value = phase;
     return value;
