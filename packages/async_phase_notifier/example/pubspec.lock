@@ -13,17 +13,17 @@ packages:
     dependency: transitive
     description:
       name: async_phase
-      sha256: "5a61617d2c0898f1f657a0c58210c2e4f874ea12866920daea1ad5f8fe28afce"
+      sha256: bb6bf39d2501cf82a51334a32af1e4fb8f85c81da2a98916f67c5750d08c33a2
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.0"
   async_phase_notifier:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.4.3"
+    version: "0.5.0"
   characters:
     dependency: transitive
     description:
@@ -57,10 +57,10 @@ packages:
     dependency: "direct main"
     description:
       name: grab
-      sha256: f3e2045dc9d6cd1f0d26a091120eb0f97c191d6f58d859dc931be50e0dfa0213
+      sha256: "6469f388e52e3306af252bd432ab6acfb8d543d600bfb41de587758108b78f93"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   http:
     dependency: "direct main"
     description:

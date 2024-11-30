@@ -1,3 +1,45 @@
+## 0.5.0
+
+- **Breaking**:
+    - Change parameter of `AsyncPhaseNotifier` constructor to be no longer optional.
+    - Change callback of `runAsync()` to no longer receive current data.
+    - Change return type of callback of `runAsync()` from `FutureOr` to `Future`.
+        - This is an improvement to prevent misuse that leads to unhandled error.
+    - Deprecate `runAsync()` in favour of new `update()`.
+    ```dart
+    // Before
+    final notifier = AsyncPhaseNotifier<int>();
+    // After
+    final notifier = AsyncPhaseNotifier<int>(0);
+    
+    // Before
+    class MyNotifier extends AsyncPhaseNotifier<int> {
+      MyNotifier();
+    }
+    // After
+    class MyNotifier extends AsyncPhaseNotifier<int> {
+      MyNotifier() : super(0);
+    }
+    
+    // Before
+    await runAsync((data) => yourFunc(data));
+    // After
+    await update(() => yourFunc(data)); // `data` here is a new getter for `value.data`.
+    ```
+- Upgrade async_phase to 0.5.0.
+    - The return type of callback of `AsyncPhase.from()` is now `Future` instead
+      of `FutureOr`. 
+    - `error` and `stackTrace` of `AsyncError` is now non-nullable.
+    - See the [change log](https://pub.dev/packages/async_phase/changelog#050)
+      of package:async_phase for details and non-breaking changes.
+- Add `update()` to `AsyncPhaseNotifier` as a replacement of deprecated `runAsync()`.
+- Add `updateOnlyPhase()` to `AsyncPhaseNotifier`,
+- Add type-safe `data` getter for `value.data` to `AsyncPhaseNotifier`. 
+- Fix `runAsync()`.
+    - Resulting `AsyncError` had stale data if fallback data was not provided and
+      `value.data` was updated while the callback was executed.
+- Some minor improvements.
+
 ## 0.4.3
 
 - Upgrade async_phase to 0.4.0.

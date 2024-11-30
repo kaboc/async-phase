@@ -1,4 +1,5 @@
-import 'dart:async';
+import 'dart:async' show StreamController, StreamSink;
+
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 

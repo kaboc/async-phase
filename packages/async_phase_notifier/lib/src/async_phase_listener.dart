@@ -1,5 +1,3 @@
-// ignore_for_file: always_put_required_named_parameters_first
-
 import 'package:flutter/widgets.dart';
 
 import 'async_phase_notifier.dart';
@@ -7,7 +5,9 @@ import 'async_phase_notifier.dart';
 class AsyncPhaseListener<T> extends StatefulWidget {
   const AsyncPhaseListener({
     super.key,
+    // ignore: always_put_required_named_parameters_first
     required this.notifier,
+    // ignore: always_put_required_named_parameters_first
     required this.child,
     this.onWaiting,
     this.onComplete,

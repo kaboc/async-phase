@@ -53,7 +53,7 @@ other parts of the code, with the existing data being kept unchanged.
 
 The value of `AsyncPhaseNotifier` is either [AsyncInitial][AsyncInitial],
 [AsyncWaiting][AsyncWaiting], [AsyncComplete][AsyncComplete] or [AsyncError][AsyncError].
-They are subtypes of `AsyncPhase`.
+They are subtypes of [AsyncPhase].
 
 `AsyncPhase` provides the [when()][when] and [whenOrNull()][whenOrNull] methods,
 which are useful for choosing an action based on the current phase, like returning
