@@ -160,11 +160,8 @@ sealed class AsyncPhase<T extends Object?> {
       initial: (data) => AsyncInitial(converter(data)),
       waiting: (data) => AsyncWaiting(converter(data)),
       complete: (data) => AsyncComplete(converter(data)),
-      error: (data, error, stackTrace) => AsyncError(
-        data: converter(data),
-        error: error,
-        stackTrace: stackTrace,
-      ),
+      error: (data, e, s) =>
+          AsyncError(data: converter(data), error: e, stackTrace: s),
     );
   }
 
@@ -173,13 +170,12 @@ sealed class AsyncPhase<T extends Object?> {
   /// The returned phase has the same type as that of the original phase
   /// this method was called on.
   AsyncPhase<T> copyWith(T newData) {
-    return switch (this) {
-      AsyncInitial() => AsyncInitial(newData),
-      AsyncWaiting() => AsyncWaiting(newData),
-      AsyncComplete() => AsyncComplete(newData),
-      AsyncError(:final error, :final stackTrace) =>
-        AsyncError(data: newData, error: error, stackTrace: stackTrace),
-    };
+    return when(
+      initial: (_) => AsyncInitial(newData),
+      waiting: (_) => AsyncWaiting(newData),
+      complete: (_) => AsyncComplete(newData),
+      error: (_, e, s) => AsyncError(data: newData, error: e, stackTrace: s),
+    );
   }
 
   /// A method that creates an [AsyncWaiting] object based on the

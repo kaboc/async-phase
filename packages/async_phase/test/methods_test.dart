@@ -248,7 +248,7 @@ void main() {
   });
 
   group('convert()', () {
-    test('initial', () {
+    test('AsyncInitial', () {
       expect(
         const AsyncInitial<int?>().convert((d) => '$d'),
         const AsyncInitial('null'),
@@ -259,7 +259,7 @@ void main() {
       );
     });
 
-    test('waiting', () {
+    test('AsyncWaiting', () {
       expect(
         const AsyncWaiting<int?>().convert((d) => '$d'),
         const AsyncWaiting('null'),
@@ -270,7 +270,7 @@ void main() {
       );
     });
 
-    test('complete', () {
+    test('AsyncComplete', () {
       expect(
         const AsyncComplete<int?>(null).convert((d) => '$d'),
         const AsyncComplete('null'),
@@ -285,7 +285,7 @@ void main() {
       );
     });
 
-    test('error', () {
+    test('AsyncError', () {
       const e = 'error';
       final s = StackTrace.current;
 

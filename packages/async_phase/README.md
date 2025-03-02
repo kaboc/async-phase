@@ -87,6 +87,23 @@ without losing the previous data.
 asynchronous operation results in failure. If it is not specified, the `data` field
 of the resulting `AsyncError` is set to null.
 
+#### onComplete / onError
+
+`onComplete` and `onError` of [AsyncPhase.from()][from] are handy if you just
+want to do something depending on whether an operation was successful.
+
+```dart
+final phase = await AsyncPhase.from(
+  () => someOperation(),
+  onComplete: (data) {
+    // Called when the operation completes successfully.
+  },
+  onError: (data, error, stackTrace) {
+    // Called when the operation fails.
+  },
+);
+```
+
 ### when()
 
 The [when()][when] method is useful for returning something that corresponds to the
@@ -185,23 +202,6 @@ Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
     return resizeImage(phase.data, maxSize: ...);
   });
 }
-```
-
-### onComplete / onError
-
-`onComplete` and `onError` of [AsyncPhase.from()][from] are handy if you just
-want to do something depending on whether an operation was successful.
-
-```dart
-final phase = await AsyncPhase.from(
-  () => someOperation(),
-  onComplete: (data) {
-    // Called when the operation completes successfully.
-  },
-  onError: (data, error, stackTrace) {
-    // Called when the operation fails.
-  },
-);
 ```
 
 ### convert()
