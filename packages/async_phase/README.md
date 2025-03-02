@@ -204,12 +204,24 @@ final phase = await AsyncPhase.from(
 );
 ```
 
+### convert()
+
+The [convert()][convert] method is useful if you already have a phase and want
+to create a new phase of the same [AsyncPhase] subtype with a different generic
+type based on the original phase.
+
+```dart
+final phase = await fetchData(); // AsyncPhase<Map<String, Object?>>
+final newPhase = phase.convert(User.fromJson); // AsyncPhase<User>
+```
+
 [AsyncPhase]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase-class.html
 [AsyncInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncInitial-class.html
 [AsyncWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncWaiting-class.html
 [AsyncComplete]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncComplete-class.html
 [AsyncError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncError-class.html
 [from]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/from.html
+[convert]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/convert.html
 [copyAsWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/copyAsWaiting.html
 [when]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/when.html
 [whenOrNull]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/whenOrNull.html
