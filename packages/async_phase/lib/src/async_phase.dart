@@ -77,20 +77,20 @@ sealed class AsyncPhase<T extends Object?> {
   ///
   /// If only some of the properties is needed, use [whenOrNull].
   U when<U>({
-    required U Function(T?) waiting,
+    required U Function(T) waiting,
     required U Function(T) complete,
-    required U Function(T?, Object, StackTrace) error,
-    U Function(T?)? initial,
+    required U Function(T, Object, StackTrace) error,
+    U Function(T)? initial,
   }) {
     switch (this) {
       case AsyncInitial(:final data):
-        return initial == null ? waiting(data) : initial(data);
+        return initial == null ? waiting(data as T) : initial(data as T);
       case AsyncWaiting(:final data):
-        return waiting(data);
+        return waiting(data as T);
       case AsyncComplete(:final data):
         return complete(data);
       case AsyncError(:final data, error: final e, stackTrace: final s):
-        return error(data, e, s);
+        return error(data as T, e, s);
     }
   }
 
@@ -102,10 +102,10 @@ sealed class AsyncPhase<T extends Object?> {
   /// optional. It returns `null` if the callback corresponding to
   /// the current phase has not been provided,
   U? whenOrNull<U>({
-    U Function(T?)? initial,
-    U Function(T?)? waiting,
+    U Function(T)? initial,
+    U Function(T)? waiting,
     U Function(T)? complete,
-    U Function(T?, Object, StackTrace)? error,
+    U Function(T, Object, StackTrace)? error,
   }) {
     return when(
       initial: initial,
@@ -155,7 +155,7 @@ sealed class AsyncPhase<T extends Object?> {
   /// A method that creates a new object of the same [AsyncPhase] subtype
   /// with a different generic type based on the phase that this method is
   /// called on.
-  AsyncPhase<U> convert<U extends Object?>(U Function(T?) converter) {
+  AsyncPhase<U> convert<U extends Object?>(U Function(T) converter) {
     return when(
       initial: (data) => AsyncInitial(converter(data)),
       waiting: (data) => AsyncWaiting(converter(data)),

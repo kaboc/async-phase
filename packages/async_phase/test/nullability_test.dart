@@ -38,73 +38,222 @@ void main() {
 
   group('Nullability of when() / whenOrNull()', () {
     test(
-      '`complete` of when() is given a nullable if generic type is nullable',
+      'Nullability of callbacks of when() depends on the generic type',
       () {
-        // It is tested in another file that whenOrNull() works similarly to
-        // when(), so it is safe here to use whenOrNull() instead of when().
-        final result = const AsyncComplete<int?>(10).whenOrNull(
+        final result1 = const AsyncInitial<int>(10).when(
+          initial: (data) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+          waiting: (_) => null,
+          complete: (_) => null,
+          error: (_, __, ___) => null,
+        );
+        expect(result1, 10);
+
+        final result2 = const AsyncInitial<int?>(10).when(
+          initial: (data) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+          waiting: (_) => null,
+          complete: (_) => null,
+          error: (_, __, ___) => null,
+        );
+        expect(result2, 10);
+
+        final result3 = const AsyncWaiting<int>(10).when(
+          waiting: (data) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+          initial: (_) => null,
+          complete: (_) => null,
+          error: (_, __, ___) => null,
+        );
+        expect(result3, 10);
+
+        final result4 = const AsyncWaiting<int?>(10).when(
+          waiting: (data) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+          initial: (_) => null,
+          complete: (_) => null,
+          error: (_, __, ___) => null,
+        );
+        expect(result4, 10);
+
+        final result5 = const AsyncComplete<int>(10).when(
+          complete: (data) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+          initial: (_) => null,
+          waiting: (_) => null,
+          error: (_, __, ___) => null,
+        );
+        expect(result5, 10);
+
+        final result6 = const AsyncComplete<int?>(10).when(
           complete: (data) {
             expect(isNullable(data), isTrue);
             return data;
           },
+          initial: (_) => null,
+          waiting: (_) => null,
+          error: (_, __, ___) => null,
         );
-        expect(result, 10);
+        expect(result6, 10);
+
+        final result7 = const AsyncError<int>(data: 10, error: 20).when(
+          error: (data, _, __) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+          initial: (_) => null,
+          waiting: (_) => null,
+          complete: (_) => null,
+        );
+        expect(result7, 10);
+
+        final result8 = const AsyncError<int?>(data: 10, error: 20).when(
+          error: (data, _, __) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+          initial: (_) => null,
+          waiting: (_) => null,
+          complete: (_) => null,
+        );
+        expect(result8, 10);
       },
     );
 
-    test('`complete` of when() is given null if the value is null', () {
-      var called = false;
-      final result = const AsyncComplete<int?>(null).whenOrNull(
-        complete: (data) {
-          called = true;
-          expect(data, isNull);
-          return data;
-        },
-      );
-      expect(called, isTrue);
-      expect(result, isNull);
-    });
-
     test(
-      '`complete` of when() is given a non-null if generic type is non-null',
+      'Nullability of callbacks of whenOrNull() depends on the generic type',
       () {
-        final result = const AsyncComplete<int>(10).whenOrNull(
+        final result1 = const AsyncInitial<int>(10).whenOrNull(
+          initial: (data) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+        );
+        expect(result1, 10);
+
+        final result2 = const AsyncInitial<int?>(10).whenOrNull(
+          initial: (data) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+        );
+        expect(result2, 10);
+
+        final result3 = const AsyncWaiting<int>(10).whenOrNull(
+          waiting: (data) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+        );
+        expect(result3, 10);
+
+        final result4 = const AsyncWaiting<int?>(10).whenOrNull(
+          waiting: (data) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+        );
+        expect(result4, 10);
+
+        final result5 = const AsyncComplete<int>(10).whenOrNull(
           complete: (data) {
             expect(isNullable(data), isFalse);
             return data;
           },
         );
-        expect(result, 10);
+        expect(result5, 10);
+
+        final result6 = const AsyncComplete<int?>(10).whenOrNull(
+          complete: (data) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+        );
+        expect(result6, 10);
+
+        final result7 = const AsyncError<int>(data: 10, error: 20).whenOrNull(
+          error: (data, _, __) {
+            expect(isNullable(data), isFalse);
+            return data;
+          },
+        );
+        expect(result7, 10);
+
+        final result8 = const AsyncError<int?>(data: 10, error: 20).whenOrNull(
+          error: (data, _, __) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+        );
+        expect(result8, 10);
       },
     );
 
-    test('callbacks of when() except `complete` is given a nullable', () {
-      final result1 = const AsyncInitial<int>(10).whenOrNull(
+    test('callbacks of when() can return null', () {
+      var called1 = false;
+      final result1 = const AsyncInitial(10).when(
         initial: (data) {
-          expect(isNullable(data), isTrue);
-          return data;
+          called1 = true;
+          return null;
         },
+        waiting: (_) => null,
+        complete: (_) => null,
+        error: (_, __, ___) => null,
       );
-      expect(result1, 10);
+      expect(called1, isTrue);
+      expect(result1, isNull);
 
-      final result2 = const AsyncWaiting<int>(10).whenOrNull(
+      var called2 = false;
+      final result2 = const AsyncWaiting(10).when(
         waiting: (data) {
-          expect(isNullable(data), isTrue);
-          return data;
+          called2 = true;
+          return null;
         },
+        initial: (_) => null,
+        complete: (_) => null,
+        error: (_, __, ___) => null,
       );
-      expect(result2, 10);
+      expect(called2, isTrue);
+      expect(result2, isNull);
 
-      final result3 = const AsyncError<int>(data: 10, error: 20).whenOrNull(
-        error: (data, _, __) {
-          expect(isNullable(data), isTrue);
-          return data;
+      var called3 = false;
+      final result3 = const AsyncComplete(10).when(
+        complete: (data) {
+          called3 = true;
+          return null;
         },
+        initial: (_) => null,
+        waiting: (_) => null,
+        error: (_, __, ___) => null,
       );
-      expect(result3, 10);
+      expect(called3, isTrue);
+      expect(result3, isNull);
+
+      var called4 = false;
+      final result4 = const AsyncError(data: 10, error: 20).when(
+        error: (data, _, __) {
+          called4 = true;
+          return null;
+        },
+        initial: (_) => null,
+        waiting: (_) => null,
+        complete: (_) => null,
+      );
+      expect(called4, isTrue);
+      expect(result4, isNull);
     });
 
-    test('callbacks of when() can return null', () {
+    test('callbacks of whenOrNull() can return null', () {
       var called1 = false;
       final result1 = const AsyncInitial(10).whenOrNull(
         initial: (data) {
