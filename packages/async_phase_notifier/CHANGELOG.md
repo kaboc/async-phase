@@ -1,3 +1,7 @@
+## 0.5.1
+
+- Update async_phase to 0.5.1.
+
 ## 0.5.0
 
 - **Breaking**:
