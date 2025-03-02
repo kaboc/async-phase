@@ -36,9 +36,10 @@ void main() {
     );
   });
 
-  group('Nullability of when() / whenOrNull()', () {
+  group('Nullability of when()', () {
     test(
-      'Nullability of callbacks of when() depends on the generic type',
+      'data param of callbacks other than `error` in when() follows the '
+      'nullability of generic type',
       () {
         final result1 = const AsyncInitial<int>(10).when(
           initial: (data) {
@@ -105,33 +106,38 @@ void main() {
           error: (_, __, ___) => null,
         );
         expect(result6, 10);
-
-        final result7 = const AsyncError<int>(data: 10, error: 20).when(
-          error: (data, _, __) {
-            expect(isNullable(data), isFalse);
-            return data;
-          },
-          initial: (_) => null,
-          waiting: (_) => null,
-          complete: (_) => null,
-        );
-        expect(result7, 10);
-
-        final result8 = const AsyncError<int?>(data: 10, error: 20).when(
-          error: (data, _, __) {
-            expect(isNullable(data), isTrue);
-            return data;
-          },
-          initial: (_) => null,
-          waiting: (_) => null,
-          complete: (_) => null,
-        );
-        expect(result8, 10);
       },
     );
 
+    test('data param of the error callback of when() is always nullable', () {
+      final result1 = const AsyncError<int>(data: 10, error: 20).when(
+        error: (data, _, __) {
+          expect(isNullable(data), isTrue);
+          return data;
+        },
+        initial: (_) => null,
+        waiting: (_) => null,
+        complete: (_) => null,
+      );
+      expect(result1, 10);
+
+      final result2 = const AsyncError<int?>(data: 10, error: 20).when(
+        error: (data, _, __) {
+          expect(isNullable(data), isTrue);
+          return data;
+        },
+        initial: (_) => null,
+        waiting: (_) => null,
+        complete: (_) => null,
+      );
+      expect(result2, 10);
+    });
+  });
+
+  group('Nullability of whenOrNull()', () {
     test(
-      'Nullability of callbacks of whenOrNull() depends on the generic type',
+      'data param of callbacks other than `error` in whenOrNull() follows '
+      'the nullability of generic type',
       () {
         final result1 = const AsyncInitial<int>(10).whenOrNull(
           initial: (data) {
@@ -180,22 +186,27 @@ void main() {
           },
         );
         expect(result6, 10);
+      },
+    );
 
-        final result7 = const AsyncError<int>(data: 10, error: 20).whenOrNull(
-          error: (data, _, __) {
-            expect(isNullable(data), isFalse);
-            return data;
-          },
-        );
-        expect(result7, 10);
-
-        final result8 = const AsyncError<int?>(data: 10, error: 20).whenOrNull(
+    test(
+      'data param of the error callback of whenOrNull() is always nullable',
+      () {
+        final result1 = const AsyncError<int>(data: 10, error: 20).whenOrNull(
           error: (data, _, __) {
             expect(isNullable(data), isTrue);
             return data;
           },
         );
-        expect(result8, 10);
+        expect(result1, 10);
+
+        final result2 = const AsyncError<int?>(data: 10, error: 20).whenOrNull(
+          error: (data, _, __) {
+            expect(isNullable(data), isTrue);
+            return data;
+          },
+        );
+        expect(result2, 10);
       },
     );
 
@@ -318,6 +329,49 @@ void main() {
           fallbackData: null,
         );
         expect(phase, isA<AsyncComplete<int>>());
+      },
+    );
+  });
+
+  group('Nullability related to null data in non-nullable AsyncError', () {
+    test(
+      'Using when() does not throw when the generic type of an AsyncPhase '
+      'object is non-nullable but its data is null',
+      () async {
+        final phase = await AsyncPhase.from<int, int>(() => throw Exception());
+        expect(
+          phase.when(
+            error: (data, e, s) => 10,
+            initial: (_) => 10,
+            waiting: (_) => 10,
+            complete: (_) => 10,
+          ),
+          isNot(throwsA(anything)),
+        );
+      },
+    );
+
+    test(
+      'Using whenOrNull() does not throw when the generic type of an '
+      'AsyncPhase object is non-nullable but its data is null',
+      () async {
+        final phase = await AsyncPhase.from<int, int>(() => throw Exception());
+        expect(
+          phase.whenOrNull(error: (data, e, s) => 10),
+          isNot(throwsA(anything)),
+        );
+      },
+    );
+
+    test(
+      'Using convert() does not throw when the generic type of an AsyncPhase '
+      'object is non-nullable but its data is null',
+      () async {
+        final phase = await AsyncPhase.from<int, int>(() => throw Exception());
+        expect(
+          phase.whenOrNull(error: (data, e, s) => 10),
+          isNot(throwsA(anything)),
+        );
       },
     );
   });

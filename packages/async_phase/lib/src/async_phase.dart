@@ -79,7 +79,10 @@ sealed class AsyncPhase<T extends Object?> {
   U when<U>({
     required U Function(T) waiting,
     required U Function(T) complete,
-    required U Function(T, Object, StackTrace) error,
+    // The first parameter needs to be nullable because `data` is `null`
+    // after an error occurs in the callback of `AsyncPhase.from()` where
+    // the fallback data is null.
+    required U Function(T?, Object, StackTrace) error,
     U Function(T)? initial,
   }) {
     switch (this) {
@@ -90,7 +93,7 @@ sealed class AsyncPhase<T extends Object?> {
       case AsyncComplete(:final data):
         return complete(data);
       case AsyncError(:final data, error: final e, stackTrace: final s):
-        return error(data as T, e, s);
+        return error(data, e, s);
     }
   }
 
@@ -105,7 +108,7 @@ sealed class AsyncPhase<T extends Object?> {
     U Function(T)? initial,
     U Function(T)? waiting,
     U Function(T)? complete,
-    U Function(T, Object, StackTrace)? error,
+    U Function(T?, Object, StackTrace)? error,
   }) {
     return when(
       initial: initial,
@@ -155,7 +158,7 @@ sealed class AsyncPhase<T extends Object?> {
   /// A method that creates a new object of the same [AsyncPhase] subtype
   /// with a different generic type based on the phase that this method is
   /// called on.
-  AsyncPhase<U> convert<U extends Object?>(U Function(T) converter) {
+  AsyncPhase<U> convert<U>(U Function(T?) converter) {
     return when(
       initial: (data) => AsyncInitial(converter(data)),
       waiting: (data) => AsyncWaiting(converter(data)),
