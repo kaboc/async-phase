@@ -13,17 +13,17 @@ packages:
     dependency: transitive
     description:
       name: async_phase
-      sha256: f54e3b9a8dba103b95fca87620134833d4369d382eba653d58c6b5bbbc49c070
+      sha256: e8a4274a3ba4190560b964a706ebc35033f3c041452aa43b7de0b5666cac71ac
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.5.2"
   async_phase_notifier:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.5.1"
+    version: "0.5.2"
   characters:
     dependency: transitive
     description:

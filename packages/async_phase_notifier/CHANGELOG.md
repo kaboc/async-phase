@@ -1,3 +1,7 @@
+## 0.5.2
+
+- Update async_phase to 0.5.2.
+
 ## 0.5.1
 
 - Update async_phase to 0.5.1.
