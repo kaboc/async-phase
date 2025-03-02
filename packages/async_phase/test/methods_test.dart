@@ -247,6 +247,59 @@ void main() {
     });
   });
 
+  group('convert()', () {
+    test('initial', () {
+      expect(
+        const AsyncInitial<int?>().convert((d) => '$d'),
+        const AsyncInitial('null'),
+      );
+      expect(
+        const AsyncInitial(10).convert((d) => '$d'),
+        const AsyncInitial('10'),
+      );
+    });
+
+    test('waiting', () {
+      expect(
+        const AsyncWaiting<int?>().convert((d) => '$d'),
+        const AsyncWaiting('null'),
+      );
+      expect(
+        const AsyncWaiting(10).convert((d) => '$d'),
+        const AsyncWaiting('10'),
+      );
+    });
+
+    test('complete', () {
+      expect(
+        const AsyncComplete<int?>(null).convert((d) => '$d'),
+        const AsyncComplete('null'),
+      );
+      expect(
+        const AsyncComplete(10).convert((d) => '$d'),
+        const AsyncComplete('10'),
+      );
+      expect(
+        const AsyncComplete(10).convert((d) => null),
+        const AsyncComplete(null),
+      );
+    });
+
+    test('error', () {
+      const e = 'error';
+      final s = StackTrace.current;
+
+      expect(
+        AsyncError<int?>(error: e, stackTrace: s).convert((d) => '$d'),
+        AsyncError(data: 'null', error: e, stackTrace: s),
+      );
+      expect(
+        AsyncError(data: 10, error: e, stackTrace: s).convert((d) => '$d'),
+        AsyncError(data: '10', error: e, stackTrace: s),
+      );
+    });
+  });
+
   group('Copy', () {
     test('copyWith()', () {
       expect(const AsyncInitial(10).copyWith(20), const AsyncInitial(20));

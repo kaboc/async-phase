@@ -152,6 +152,22 @@ sealed class AsyncPhase<T extends Object?> {
     return phase;
   }
 
+  /// A method that creates a new object of the same [AsyncPhase] subtype
+  /// with a different generic type based on the phase that this method is
+  /// called on.
+  AsyncPhase<U> convert<U extends Object?>(U Function(T?) converter) {
+    return when(
+      initial: (data) => AsyncInitial(converter(data)),
+      waiting: (data) => AsyncWaiting(converter(data)),
+      complete: (data) => AsyncComplete(converter(data)),
+      error: (data, error, stackTrace) => AsyncError(
+        data: converter(data),
+        error: error,
+        stackTrace: stackTrace,
+      ),
+    );
+  }
+
   /// A method that copy a phase to create a new phase with new data.
   ///
   /// The returned phase has the same type as that of the original phase
