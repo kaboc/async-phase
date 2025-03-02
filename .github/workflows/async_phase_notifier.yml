@@ -24,6 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.10.0
       - name: Install dependencies
         run: flutter pub get
       - name: Check format
