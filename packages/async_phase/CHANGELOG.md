@@ -1,3 +1,10 @@
+## 0.5.2
+
+- Improve `when()` and `whenOrNull()` so that the `data` parameter of each
+  callback (except for the `error` callback) follows the nullability of the
+  generic type.
+- Minor refactorings.
+
 ## 0.5.1
 
 - Add `convert()`.
