@@ -91,12 +91,10 @@ class AsyncPhaseNotifier<T extends Object?>
   /// change to other parts of the code, with the existing data being kept
   /// unchanged.
   Future<AsyncPhase<T>> updateOnlyPhase(Future<void> Function() func) async {
-    final phase = await update(() async {
+    return update(() async {
       await func();
       return data;
     });
-    value = phase;
-    return value;
   }
 
   @useResult
