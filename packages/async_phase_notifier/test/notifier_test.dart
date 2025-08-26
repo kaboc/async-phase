@@ -407,5 +407,25 @@ void main() {
         throwsA(predicate((e) => e.toString().contains('dispose'))),
       );
     });
+
+    test(
+      'Disposing notifier during update() does not throw but leaves the '
+      'phase as AsyncWaiting with original data unchanged',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+
+        unawaited(
+          Future<void>.delayed(Duration.zero, notifier.dispose),
+        );
+        final phase = await notifier.update(
+          () => Future.delayed(
+            const Duration(milliseconds: 1),
+            () => Future.value(20),
+          ),
+        );
+
+        expect(phase, const AsyncWaiting(10));
+      },
+    );
   });
 }

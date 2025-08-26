@@ -16,6 +16,7 @@ class AsyncPhaseNotifier<T extends Object?>
 
   StreamController<_Event<T>>? _eventStreamController;
   AsyncPhase<T> _prevPhase = const AsyncInitial();
+  bool _isDisposed = false;
 
   StreamSink<_Event<T>>? get _sink => _eventStreamController?.sink;
 
@@ -29,6 +30,7 @@ class AsyncPhaseNotifier<T extends Object?>
   @override
   void dispose() {
     _eventStreamController?.close();
+    _isDisposed = true;
     super.dispose();
   }
 
@@ -69,10 +71,12 @@ class AsyncPhaseNotifier<T extends Object?>
       fallbackData: null,
     );
 
-    if (phase is AsyncError) {
-      value = phase.copyWith(data);
-    } else {
-      value = phase;
+    if (!_isDisposed) {
+      if (phase is AsyncError) {
+        value = phase.copyWith(data);
+      } else {
+        value = phase;
+      }
     }
     return value;
   }
