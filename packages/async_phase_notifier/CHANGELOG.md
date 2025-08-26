@@ -1,3 +1,10 @@
+## 0.6.0
+
+- Remove deprecated `runAsync()`.
+- Avoid the error that occurred when `update()` ended after `AsyncPhaseNotifier` was disposed.
+- Refactor `update()` and remove unnecessary reassignment of new phase to `value`.
+- Refactor and improve tests.
+
 ## 0.5.2
 
 - Update async_phase to 0.5.2.
