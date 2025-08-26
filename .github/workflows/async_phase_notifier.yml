@@ -5,6 +5,8 @@ on:
     paths:
       - "packages/async_phase_notifier/**"
       - ".github/workflows/async_phase_notifier.yaml"
+    tags:
+      - '*'
   pull_request:
     branches: [main]
     paths:
