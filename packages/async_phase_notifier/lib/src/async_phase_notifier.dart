@@ -45,14 +45,6 @@ class AsyncPhaseNotifier<T extends Object?>
     _prevPhase = newValue;
   }
 
-  @Deprecated(
-    'Use update instead. '
-    'This feature was deprecated after v0.4.0.',
-  )
-  Future<AsyncPhase<T>> runAsync(Future<T> Function() func) async {
-    return update(func);
-  }
-
   /// Runs the provided asynchronous function and updates the phase.
   ///
   /// {@template AsyncPhaseNotifier.update}
