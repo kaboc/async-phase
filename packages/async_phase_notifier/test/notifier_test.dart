@@ -126,6 +126,19 @@ void main() {
       expect(notifier.value, isA<AsyncComplete<int>>());
       expect(phase.data, 10);
     });
+
+    test(
+      'Phase changes to AsyncError on error and keeps previous data',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final phase = await notifier.updateOnlyPhase(() => throw Exception());
+        expect(phase, isA<AsyncError<int>>());
+        expect(notifier.value, isA<AsyncError<int>>());
+        expect(phase.data, 10);
+      },
+    );
   });
 
   group('data getter', () {
