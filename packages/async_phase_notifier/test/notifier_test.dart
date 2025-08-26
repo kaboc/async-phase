@@ -8,12 +8,26 @@ import 'package:async_phase_notifier/async_phase_notifier.dart';
 bool isNullable<T>(T value) => null is T;
 
 void main() {
+  group('Generic type', () {
+    test('Initial data affects nullability of generic type', () async {
+      final notifier1 = AsyncPhaseNotifier(10);
+      final notifier2 = AsyncPhaseNotifier(null);
+      addTearDown(notifier1.dispose);
+      addTearDown(notifier2.dispose);
+
+      expect(notifier1, isA<AsyncPhaseNotifier<int>>());
+      expect(notifier2, isNot(isA<AsyncPhaseNotifier<int>>()));
+    });
+  });
+
   group('update()', () {
     test(
       'Phase is AsyncInitial initially and and then AsyncWaiting until '
       'update() ends',
       () async {
         final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
         expect(notifier.value, isA<AsyncInitial<int>>());
 
         final completer = Completer<void>();
@@ -31,16 +45,10 @@ void main() {
       },
     );
 
-    test('Initial data affects nullability of generic type', () async {
-      final notifier1 = AsyncPhaseNotifier(10);
-      expect(notifier1, isA<AsyncPhaseNotifier<int>>());
-
-      final notifier2 = AsyncPhaseNotifier(null);
-      expect(notifier2, isNot(isA<AsyncPhaseNotifier<int>>()));
-    });
-
     test('Result is AsyncComplete with correct data if successful', () async {
       final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
       final phase = await notifier.update(() => Future.value(20));
       expect(phase, isA<AsyncComplete<int>>());
       expect(notifier.value, isA<AsyncComplete<int>>());
@@ -49,12 +57,15 @@ void main() {
 
     test('Result is AsyncError with previous data if not successful', () async {
       final notifier1 = AsyncPhaseNotifier(10);
+      final notifier2 = AsyncPhaseNotifier<int?>(10);
+      addTearDown(notifier1.dispose);
+      addTearDown(notifier2.dispose);
+
       final phase1 = await notifier1.update(() => throw Exception());
       expect(phase1, isA<AsyncError<int>>());
       expect(notifier1.value, isA<AsyncError<int>>());
       expect(phase1.data, 10);
 
-      final notifier2 = AsyncPhaseNotifier<int?>(10);
       final phase2 = await notifier2.update(() => throw Exception());
       expect(phase2, isNot(isA<AsyncError<int>>()));
       expect(notifier2.value, isNot(isA<AsyncError<int>>()));
@@ -63,6 +74,8 @@ void main() {
 
     test('AsyncError has error info', () async {
       final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
       final exception = Exception();
       final phase =
           await notifier.update(() => throw exception) as AsyncError<int>;
@@ -74,8 +87,10 @@ void main() {
       'Resulting AsyncError has latest value in `data` if `value.data` '
       'is updated externally while callback is executed',
       () async {
-        final called = <String>[];
         final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final called = <String>[];
 
         await Future.wait([
           notifier.update(() async {
@@ -103,6 +118,8 @@ void main() {
       'updateOnlyPhase() ends',
       () async {
         final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
         expect(notifier.value, isA<AsyncInitial<int>>());
 
         final completer = Completer<void>();
@@ -121,6 +138,8 @@ void main() {
 
     test('Phase changes to AsyncComplete and keeps previous data', () async {
       final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
       final phase = await notifier.updateOnlyPhase(() async => 20);
       expect(phase, isA<AsyncComplete<int>>());
       expect(notifier.value, isA<AsyncComplete<int>>());
@@ -147,6 +166,8 @@ void main() {
       () {
         final notifier1 = AsyncPhaseNotifier<int?>(null);
         final notifier2 = AsyncPhaseNotifier(10);
+        addTearDown(notifier1.dispose);
+        addTearDown(notifier2.dispose);
 
         expect(isNullable(notifier1.value.data), isTrue);
         expect(isNullable(notifier2.value.data), isTrue);
@@ -162,6 +183,8 @@ void main() {
       'Callback is called with phase when phase or its data changes',
       () async {
         final notifier = AsyncPhaseNotifier('abc');
+        addTearDown(notifier.dispose);
+
         final phases = <AsyncPhase<String>>[];
 
         final cancel = notifier.listen(phases.add);
@@ -203,6 +226,8 @@ void main() {
 
     test('Callback is not called after subscription is cancelled', () async {
       final notifier = AsyncPhaseNotifier(null);
+      addTearDown(notifier.dispose);
+
       var count1 = 0;
       var count2 = 0;
 
@@ -241,6 +266,8 @@ void main() {
       'is called also when phase changes _from_ AsyncWaiting',
       () async {
         final notifier = AsyncPhaseNotifier('abc');
+        addTearDown(notifier.dispose);
+
         final phases = <AsyncPhase<String>>[];
 
         final cancel = notifier.listenFor(
@@ -288,6 +315,8 @@ void main() {
 
     test('onError is called with error and stack trace', () async {
       final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
       final exception = Exception();
 
       Object? error;
@@ -309,6 +338,8 @@ void main() {
 
     test('No callback is called after subscription is cancelled', () async {
       final notifier = AsyncPhaseNotifier(null);
+      addTearDown(notifier.dispose);
+
       var count1 = 0;
       var count2 = 0;
 
@@ -349,8 +380,11 @@ void main() {
     });
 
     test('Listener is not added if all callbacks are omitted', () {
+      final notifier = AsyncPhaseNotifier(null);
+      addTearDown(notifier.dispose);
+
       // ignore: unused_result
-      final notifier = AsyncPhaseNotifier(null)..listenFor();
+      notifier.listenFor();
       expect(notifier.isListening, isFalse);
     });
   });
