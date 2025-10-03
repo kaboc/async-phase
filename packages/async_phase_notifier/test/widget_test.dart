@@ -110,6 +110,53 @@ void main() {
     );
 
     testWidgets(
+      'Listener is removed from old notifier and added to new one '
+      'when notifier is switched',
+      (tester) async {
+        final notifier1 = AsyncPhaseNotifier(10);
+        final notifier2 = AsyncPhaseNotifier(20);
+        var notifier = notifier1;
+        int? value;
+        void Function(void Function())? setStateFunc;
+
+        await tester.pumpWidget(
+          StatefulBuilder(
+            builder: (context, setState) {
+              setStateFunc = setState;
+              return MyWidget(
+                notifier: notifier,
+                onWaiting: (waiting) {},
+                onComplete: (data) => value = data,
+                onError: (e, s) {},
+                onBuild: () => buildCount++,
+              );
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        notifier1.value = const AsyncComplete(11);
+        notifier2.value = const AsyncComplete(21);
+        await tester.pump();
+        expect(notifier1.isListening, isTrue);
+        expect(notifier2.isListening, isFalse);
+        expect(buildCount, 1);
+        expect(value, 11);
+
+        setStateFunc!(() => notifier = notifier2);
+        await tester.pump();
+
+        notifier2.value = const AsyncComplete(22);
+        notifier1.value = const AsyncComplete(12);
+        await tester.pump();
+        expect(notifier1.isListening, isFalse);
+        expect(notifier2.isListening, isTrue);
+        expect(buildCount, 2);
+        expect(value, 22);
+      },
+    );
+
+    testWidgets(
       'Callback is not called again when widget is rebuilt',
       (tester) async {
         final notifier = AsyncPhaseNotifier(null);

@@ -31,17 +31,30 @@ class _AsyncPhaseListenerState<T> extends State<AsyncPhaseListener<T>> {
   @override
   void initState() {
     super.initState();
-    _removeListener = widget.notifier.listenFor(
-      onWaiting: widget.onWaiting,
-      onComplete: widget.onComplete,
-      onError: widget.onError,
-    );
+    _updateListener();
+  }
+
+  @override
+  void didUpdateWidget(AsyncPhaseListener<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.notifier != oldWidget.notifier) {
+      _updateListener();
+    }
   }
 
   @override
   void dispose() {
     _removeListener?.call();
     super.dispose();
+  }
+
+  void _updateListener() {
+    _removeListener?.call();
+    _removeListener = widget.notifier.listenFor(
+      onWaiting: widget.onWaiting,
+      onComplete: widget.onComplete,
+      onError: widget.onError,
+    );
   }
 
   @override
