@@ -1,3 +1,7 @@
+## 0.6.1
+
+- Add support for replacing notifier in `AsyncPhaseListener`.
+
 ## 0.6.0
 
 - Remove deprecated `runAsync()`.

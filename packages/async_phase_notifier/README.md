@@ -2,8 +2,8 @@
 [![async_phase_notifier CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml)
 [![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
-A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the initial /
-waiting / complete / error phases of an asynchronous operation.
+A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the
+phases of an asynchronous operation: initial, waiting, complete, and error.
 
 `AsyncPhaseNotifier` + `AsyncPhase` is similar to `AsyncNotifier` + `AsyncValue` of Riverpod.
 
@@ -40,7 +40,7 @@ notifier.update(() => someAsyncOperation());
 ### updateOnlyPhase()
 
 This is the same as [update()][update] except that [updateOnlyPhase()][updateOnlyPhase]
-only update the phase itself without updating `value.data`, whereas `update()`
+only updates the phase itself without updating `value.data`, whereas `update()`
 updates both the phase and `value.data`.
 
 This method is useful when it is necessary to update the phase during execution
@@ -75,7 +75,7 @@ child: phase.when(
 
 `data` is a getter for `value.data`. The former is handy and more type-safe since
 the return type is non-nullable if the generic type `T` of `AsyncPhaseNotifier<T>`
-is non-nullable, whereas tha latter is always nullable, often requiring a null
+is non-nullable, whereas the latter is always nullable, often requiring a null
 check or a non-null assertion.
 
 ### Listening for phase changes
@@ -142,9 +142,12 @@ child: AsyncPhaseListener(
 )
 ```
 
-Please note that a listener is added per each `AsyncPhaseListener`, not per
-notifier. If this widget is used at various places for one certain notifier,
-a single notification causes each of them to run its callback function. 
+Please note that a listener is added for each `AsyncPhaseListener` widget, not
+per notifier. If this widget is used in multiple places for the same notifier,
+a single notification will trigger the callback function in each of those widgets.
+
+Please also note that changes to callbacks (e.g. `onComplete`) will only take
+effect when the widget is provided with a new `key`.
 
 ## Examples
 
