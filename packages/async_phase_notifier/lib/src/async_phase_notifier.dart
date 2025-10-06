@@ -75,8 +75,8 @@ class AsyncPhaseNotifier<T extends Object?>
 
     final phase = await AsyncPhase.from(
       func,
-      // Avoids using data as of this moment as fallback because
-      // it becomes stale if `value.data` is updated externally
+      // Avoids providing data as of this moment as fallback data
+      // because it becomes stale if `value.data` is updated externally
       // while the callback is executed.
       fallbackData: null,
     );

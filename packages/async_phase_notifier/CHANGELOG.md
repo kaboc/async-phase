@@ -1,3 +1,8 @@
+## 0.7.0
+
+- Bump async_phase version to 0.7.0.
+- Add `onWaiting`, `onComplete` and `onError` callbacks to `update()` and `updateOnlyPhase()`.
+
 ## 0.6.1
 
 - Add support for replacing notifier in `AsyncPhaseListener`.

@@ -34,7 +34,7 @@ those changes.
 
 ```dart
 final notifier = AsyncPhaseNotifier(0);
-notifier.update(() => someAsyncOperation());
+await notifier.update(() => someAsyncOperation());
 ```
 
 Optionally, you can pass a callback function that takes the result of the operation
