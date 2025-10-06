@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:async_phase_notifier/async_phase_notifier.dart';
 
-class MyWidget<T extends Object?> extends StatefulWidget {
-  const MyWidget({
+class TestApp<T extends Object?> extends StatefulWidget {
+  const TestApp({
     required this.notifier,
     required this.onWaiting,
     required this.onComplete,
@@ -23,10 +23,10 @@ class MyWidget<T extends Object?> extends StatefulWidget {
   final VoidCallback? onBuild;
 
   @override
-  State<MyWidget<T>> createState() => _MyWidgetState<T>();
+  State<TestApp<T>> createState() => _TestAppState<T>();
 }
 
-class _MyWidgetState<T> extends State<MyWidget<T>> {
+class _TestAppState<T> extends State<TestApp<T>> {
   @override
   Widget build(BuildContext context) {
     widget.onBuild?.call();
@@ -67,7 +67,7 @@ void main() {
   });
 
   Widget createWidget<T extends Object?>(AsyncPhaseNotifier<T> notifier) {
-    return MyWidget(
+    return TestApp(
       notifier: notifier,
       onWaiting: (w) => waiting = w,
       onComplete: (d) => data = d,
@@ -85,6 +85,8 @@ void main() {
       'Appropriate callback is called when phase changes',
       (tester) async {
         final notifier = AsyncPhaseNotifier<int?>(10);
+        addTearDown(notifier.dispose);
+
         await tester.pumpWidget(createWidget(notifier));
         await tester.pumpAndSettle();
 
@@ -115,6 +117,9 @@ void main() {
       (tester) async {
         final notifier1 = AsyncPhaseNotifier(10);
         final notifier2 = AsyncPhaseNotifier(20);
+        addTearDown(notifier1.dispose);
+        addTearDown(notifier2.dispose);
+
         var notifier = notifier1;
         int? value;
         void Function(void Function())? setStateFunc;
@@ -123,7 +128,7 @@ void main() {
           StatefulBuilder(
             builder: (context, setState) {
               setStateFunc = setState;
-              return MyWidget(
+              return TestApp(
                 notifier: notifier,
                 onWaiting: (waiting) {},
                 onComplete: (data) => value = data,
@@ -160,6 +165,8 @@ void main() {
       'Callback is not called again when widget is rebuilt',
       (tester) async {
         final notifier = AsyncPhaseNotifier(null);
+        addTearDown(notifier.dispose);
+
         await tester.pumpWidget(createWidget(notifier));
         await tester.pumpAndSettle();
 
@@ -185,6 +192,8 @@ void main() {
 
     testWidgets('Listener is removed if widget is discarded', (tester) async {
       final notifier = AsyncPhaseNotifier(null);
+      addTearDown(notifier.dispose);
+
       await tester.pumpWidget(createWidget(notifier));
       await tester.pumpAndSettle();
       expect(notifier.isListening, isTrue);
