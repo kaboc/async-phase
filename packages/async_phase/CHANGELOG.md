@@ -1,3 +1,8 @@
+## 0.6.0
+
+- Add `rethrowIfError()` to `AsyncPhase`.
+- Add note about errors occurring in `onComplete` and `onError` callbacks.
+
 ## 0.5.2
 
 - Improve `when()` and `whenOrNull()` so that the `data` parameter of each
@@ -14,6 +19,7 @@
 - **Breaking**:
     - Change return type of callback of `AsyncPhase.from()` from `FutureOr` to `Future`.
         - This is an improvement to prevent misuse that leads to unhandled error. 
+    - Make `error` of `AsyncError` required.
     - Change `error` and `stackTrace` of `AsyncError` to be non-nullable.
 - Fix `AsyncComplete` having data redundantly in both `this._data` and `super.data`.
 - Fix `AsyncPhase.from()` so that resulting phase is not affected by error thrown

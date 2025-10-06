@@ -118,16 +118,13 @@ sealed class AsyncPhase<T extends Object?> {
     );
   }
 
-  /// A method that runs an asynchronous function and returns
-  /// either [AsyncComplete] with the function result as [data]
-  /// or [AsyncError] with the error information, depending on
-  /// whether or not the function completed successfully.
+  /// A method that runs an asynchronous function and returns either
+  /// [AsyncComplete] with the function result as [data] or [AsyncError]
+  /// with the error information, depending on whether or not the function
+  /// completed successfully.
   ///
-  /// If the asynchronous function resulted in an error,
-  /// the [fallbackData] value is used as the [data] of [AsyncError].
-  ///
-  /// The [onError] callback is called on error. This may be
-  /// useful for logging.
+  /// If the asynchronous function resulted in an error, the [fallbackData]
+  /// value is used as the [data] of [AsyncError].
   ///
   /// The [onComplete] and [onError] callbacks are called when the
   /// asynchronous operation completes successfully or fails, respectively.
