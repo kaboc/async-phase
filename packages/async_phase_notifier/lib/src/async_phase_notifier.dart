@@ -52,8 +52,26 @@ class AsyncPhaseNotifier<T extends Object?>
   /// and to [AsyncComplete] or [AsyncError] according to success or
   /// failure when the callback ends.
   /// {@endtemplate}
-  Future<AsyncPhase<T>> update(Future<T> Function() func) async {
+  ///
+  /// {@template AsyncPhaseNotifier.update.2}
+  /// The [onWaiting], [onComplete], and [onError] callbacks are called
+  /// when the asynchronous operation starts, completes successfully,
+  /// or fails, respectively. However, note that errors occurring in
+  /// those callbacks are not automatically handled.
+  ///
+  /// Also note that the `onWaiting` callback is called both when the
+  /// phase changes to and from `AsyncWaiting`. A boolean parameter
+  /// indicates the direction of this transition.
+  /// {@endtemplate}
+  Future<AsyncPhase<T>> update(
+    Future<T> Function() func, {
+    // ignore: avoid_positional_boolean_parameters
+    void Function(bool)? onWaiting,
+    void Function(T)? onComplete,
+    void Function(Object, StackTrace)? onError,
+  }) async {
     value = value.copyAsWaiting();
+    onWaiting?.call(true);
 
     final phase = await AsyncPhase.from(
       func,
@@ -63,11 +81,15 @@ class AsyncPhaseNotifier<T extends Object?>
       fallbackData: null,
     );
 
+    onWaiting?.call(false);
+
     if (!_isDisposed) {
-      if (phase is AsyncError) {
+      if (phase case AsyncError(:final error, :final stackTrace)) {
         value = phase.copyWith(data);
+        onError?.call(error, stackTrace);
       } else {
         value = phase;
+        onComplete?.call(data);
       }
     }
     return value;
@@ -86,11 +108,24 @@ class AsyncPhaseNotifier<T extends Object?>
   /// e.g. Indicating the waiting status on the UI or notifying the phase
   /// change to other parts of the code, with the existing data being kept
   /// unchanged.
-  Future<AsyncPhase<T>> updateOnlyPhase(Future<void> Function() func) async {
-    return update(() async {
-      await func();
-      return data;
-    });
+  ///
+  /// {@macro AsyncPhaseNotifier.update.2}
+  Future<AsyncPhase<T>> updateOnlyPhase(
+    Future<void> Function() func, {
+    // ignore: avoid_positional_boolean_parameters
+    void Function(bool)? onWaiting,
+    void Function(T)? onComplete,
+    void Function(Object, StackTrace)? onError,
+  }) async {
+    return update(
+      () async {
+        await func();
+        return data;
+      },
+      onWaiting: onWaiting,
+      onComplete: onComplete,
+      onError: onError,
+    );
   }
 
   @useResult

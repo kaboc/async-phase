@@ -110,6 +110,28 @@ void main() {
         expect(notifier.value.data, 20);
       },
     );
+
+    test('Callbacks are called appropriately', () async {
+      final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
+      final called = <Object?>[];
+      final error = Exception();
+
+      await notifier.update(
+        () async => 20,
+        onWaiting: called.add,
+        onComplete: called.add,
+        onError: (e, _) => called.add(e),
+      );
+      await notifier.update(
+        () => throw error,
+        onWaiting: called.add,
+        onComplete: called.add,
+        onError: (e, _) => called.add(e),
+      );
+      expect(called, [true, false, 20, true, false, error]);
+    });
   });
 
   group('updateOnlyPhase()', () {
@@ -158,6 +180,30 @@ void main() {
         expect(phase.data, 10);
       },
     );
+
+    test('Callbacks are called appropriately', () async {
+      final notifier = AsyncPhaseNotifier(10);
+      addTearDown(notifier.dispose);
+
+      final called = <Object?>[];
+      final error = Exception();
+
+      await notifier.updateOnlyPhase(
+        () async => 20,
+        onWaiting: called.add,
+        onComplete: called.add,
+        onError: (e, _) => called.add(e),
+      );
+      await notifier.updateOnlyPhase(
+        () => throw error,
+        onWaiting: called.add,
+        onComplete: called.add,
+        onError: (e, _) => called.add(e),
+      );
+
+      // Unlike update(), the data is not updated on complete.
+      expect(called, [true, false, 10, true, false, error]);
+    });
   });
 
   group('data getter', () {

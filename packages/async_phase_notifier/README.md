@@ -37,6 +37,20 @@ final notifier = AsyncPhaseNotifier(0);
 notifier.update(() => someAsyncOperation());
 ```
 
+Optionally, you can pass a callback function that takes the result of the operation
+as a parameter. The `onError` callback is especially useful for logging errors.
+(But note that errors occurring in those callback functions are not automatically
+handled.)
+
+```dart
+await notifier.update(
+  () => someAsyncOperation(),
+  onWaiting: (isWaiting) => ...,
+  onComplete: (data) => ...,
+  onError: (e, s) => Logger.reportError(e, s),
+);
+```
+
 ### updateOnlyPhase()
 
 This is the same as [update()][update] except that [updateOnlyPhase()][updateOnlyPhase]
