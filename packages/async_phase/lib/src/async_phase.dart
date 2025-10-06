@@ -191,6 +191,25 @@ sealed class AsyncPhase<T extends Object?> {
   AsyncWaiting<T> copyAsWaiting() {
     return AsyncWaiting(data);
   }
+
+  /// A method that rethrows the error if this [AsyncPhase] instance is
+  /// of type [AsyncError].
+  ///
+  /// This calls [AsyncError.rethrowError] only when appropriate. It returns
+  /// normally (i.e., does nothing) if the phase is not an [AsyncError].
+  ///
+  /// ```dart
+  /// Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
+  ///   return AsyncPhase.from(() {
+  ///     final phase = await downloadFrom(uri: uri);
+  ///     phase.rethrowIfError();
+  ///     return resizeImage(phase.data, maxSize: ...);
+  ///   });
+  /// }
+  /// ```
+  void rethrowIfError() {
+    // no-op
+  }
 }
 
 /// A subclass of [AsyncPhase] representing the phase where
@@ -262,7 +281,18 @@ final class AsyncError<T extends Object?> extends AsyncPhase<T> {
   ///   });
   /// }
   /// ```
+  ///
+  /// See also:
+  ///
+  ///  * [AsyncPhase.rethrowIfError], a method that calls
+  ///    [AsyncError.rethrowError] only when the phase is an [AsyncError],
+  ///    and does nothing otherwise.
   Never rethrowError() {
     return Error.throwWithStackTrace(error, stackTrace);
+  }
+
+  @override
+  Never rethrowIfError() {
+    return rethrowError();
   }
 }

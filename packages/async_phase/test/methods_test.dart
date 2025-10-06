@@ -339,4 +339,35 @@ void main() {
       },
     );
   });
+
+  group('rethrowIfError()', () {
+    test(
+      'Error is thrown when the phase is an AsyncError, and nothing '
+      'happens otherwise',
+      () {
+        AsyncPhase phase =
+            AsyncError(error: Exception(), stackTrace: StackTrace.current);
+        var completed = false;
+
+        try {
+          phase.rethrowIfError();
+          completed = true;
+        } on Exception {
+          // no-op
+        }
+        expect(completed, isFalse);
+
+        phase = const AsyncComplete(null);
+        completed = false;
+
+        try {
+          phase.rethrowIfError();
+          completed = true;
+        } on Exception {
+          // no-op
+        }
+        expect(completed, isTrue);
+      },
+    );
+  });
 }

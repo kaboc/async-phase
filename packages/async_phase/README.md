@@ -187,7 +187,7 @@ if (phase case AsyncError(:final error)) {
 }
 ```
 
-#### rethrowError()
+#### rethrowError() / rethrowIfError()
 
 [AsyncError] has the [rethrowError()][rethrowError] method. It rethrows the
 error the `AsyncError` has with associated stack trace.
@@ -196,9 +196,24 @@ error the `AsyncError` has with associated stack trace.
 Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
   return AsyncPhase.from(() {
     final phase = await downloadFrom(uri: uri);
-    if (phase case AsyncError()) {
+    if (phase case AsyncError(:final error)) {
+      Logger.reportError(error);
       phase.rethrowError();
     }
+    return resizeImage(phase.data, maxSize: ...);
+  });
+}
+```
+
+The [rethrowIfError()][rethrowIfError] method, on the other hand, is available
+in all phases. It rethrows the error if the phase is an [AsyncError], and does
+nothing otherwise.
+
+```dart
+Future<AsyncPhase<Uint8List>> fetchImage({required Uri uri}) async {
+  return AsyncPhase.from(() {
+    final phase = await downloadFrom(uri: uri);
+    phase.rethrowIfError();
     return resizeImage(phase.data, maxSize: ...);
   });
 }
@@ -226,6 +241,7 @@ final newPhase = phase.convert(User.fromJson); // AsyncPhase<User>
 [when]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/when.html
 [whenOrNull]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/whenOrNull.html
 [rethrowError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncError/rethrowError.html
+[rethrowIfError]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncError/rethrowIfError.html
 [isInitial]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isInitial.html
 [isWaiting]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isWaiting.html
 [isComplete]: https://pub.dev/documentation/async_phase/latest/async_phase/AsyncPhase/isComplete.html
