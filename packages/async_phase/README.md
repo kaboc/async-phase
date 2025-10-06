@@ -89,8 +89,10 @@ of the resulting `AsyncError` is set to null.
 
 #### onComplete / onError
 
-`onComplete` and `onError` of [AsyncPhase.from()][from] are handy if you just
-want to do something depending on whether an operation was successful.
+The `onComplete` and `onError` callbacks of [AsyncPhase.from()][from] are handy
+if you want to do something depending on whether the asynchronous operation was
+successful. (But note that errors occurring in those callback functions are not
+automatically handled.)
 
 ```dart
 final phase = await AsyncPhase.from(

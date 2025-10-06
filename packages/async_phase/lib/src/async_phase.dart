@@ -128,6 +128,12 @@ sealed class AsyncPhase<T extends Object?> {
   ///
   /// The [onError] callback is called on error. This may be
   /// useful for logging.
+  ///
+  /// The [onComplete] and [onError] callbacks are called when the
+  /// asynchronous operation completes successfully or fails, respectively.
+  /// The [onError] callback may be especially useful for logging purposes.
+  /// However, note that errors occurring in those callbacks are not
+  /// automatically handled.
   static Future<AsyncPhase<T>> from<T extends Object?, S extends T?>(
     Future<T> Function() func, {
     // `S` is a subtype of `T?`, but this parameter must not be of
