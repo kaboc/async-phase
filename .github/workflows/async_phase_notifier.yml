@@ -3,15 +3,15 @@ name: async_phase_notifier CI
 on:
   push:
     paths:
-      - "packages/async_phase_notifier/**"
-      - ".github/workflows/async_phase_notifier.yaml"
+      - 'packages/async_phase_notifier/**'
+      - '.github/workflows/async_phase_notifier.yaml'
     tags:
       - '*'
   pull_request:
     branches: [main]
     paths:
-      - "packages/async_phase_notifier/**"
-      - ".github/workflows/async_phase_notifier.yaml"
+      - 'packages/async_phase_notifier/**'
+      - '.github/workflows/async_phase_notifier.yaml'
   workflow_dispatch:
 
 jobs:
