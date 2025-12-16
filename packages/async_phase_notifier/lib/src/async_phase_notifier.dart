@@ -66,9 +66,9 @@ class AsyncPhaseNotifier<T extends Object?>
   Future<AsyncPhase<T>> update(
     Future<T> Function() func, {
     // ignore: avoid_positional_boolean_parameters
-    void Function(bool)? onWaiting,
-    void Function(T)? onComplete,
-    void Function(Object, StackTrace)? onError,
+    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onComplete,
+    void Function(Object e, StackTrace s)? onError,
   }) async {
     value = value.copyAsWaiting();
     onWaiting?.call(true);
@@ -113,9 +113,9 @@ class AsyncPhaseNotifier<T extends Object?>
   Future<AsyncPhase<T>> updateOnlyPhase(
     Future<void> Function() func, {
     // ignore: avoid_positional_boolean_parameters
-    void Function(bool)? onWaiting,
-    void Function(T)? onComplete,
-    void Function(Object, StackTrace)? onError,
+    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onComplete,
+    void Function(Object e, StackTrace s)? onError,
   }) async {
     return update(
       () async {
@@ -146,9 +146,9 @@ class AsyncPhaseNotifier<T extends Object?>
   @useResult
   RemoveListener listenFor({
     // ignore: avoid_positional_boolean_parameters
-    void Function(bool)? onWaiting,
-    void Function(T)? onComplete,
-    void Function(Object, StackTrace)? onError,
+    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onComplete,
+    void Function(Object e, StackTrace s)? onError,
   }) {
     // ignore: prefer_asserts_with_message
     assert(ChangeNotifier.debugAssertNotDisposed(this));

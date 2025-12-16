@@ -77,13 +77,13 @@ sealed class AsyncPhase<T extends Object?> {
   ///
   /// If only some of the properties is needed, use [whenOrNull].
   U when<U>({
-    required U Function(T) waiting,
-    required U Function(T) complete,
+    required U Function(T data) waiting,
+    required U Function(T data) complete,
     // The first parameter needs to be nullable because `data` is `null`
     // after an error occurs in the callback of `AsyncPhase.from()` where
     // the fallback data is null.
-    required U Function(T?, Object, StackTrace) error,
-    U Function(T)? initial,
+    required U Function(T? data, Object e, StackTrace s) error,
+    U Function(T data)? initial,
   }) {
     switch (this) {
       case AsyncInitial(:final data):
@@ -105,10 +105,10 @@ sealed class AsyncPhase<T extends Object?> {
   /// optional. It returns `null` if the callback corresponding to
   /// the current phase has not been provided,
   U? whenOrNull<U>({
-    U Function(T)? initial,
-    U Function(T)? waiting,
-    U Function(T)? complete,
-    U Function(T?, Object, StackTrace)? error,
+    U Function(T data)? initial,
+    U Function(T data)? waiting,
+    U Function(T data)? complete,
+    U Function(T? data, Object e, StackTrace s)? error,
   }) {
     return when(
       initial: initial,
@@ -137,8 +137,8 @@ sealed class AsyncPhase<T extends Object?> {
     // type `T?`, in which case this method returns an `AsyncPhase<T?>`
     // in stead of `AsyncPhase<T>` if `null` is passed in.
     S? fallbackData,
-    void Function(T)? onComplete,
-    void Function(S?, Object, StackTrace)? onError,
+    void Function(T data)? onComplete,
+    void Function(S? data, Object e, StackTrace s)? onError,
   }) async {
     AsyncPhase<T> phase;
     try {
@@ -161,7 +161,7 @@ sealed class AsyncPhase<T extends Object?> {
   /// A method that creates a new object of the same [AsyncPhase] subtype
   /// with a different generic type based on the phase that this method is
   /// called on.
-  AsyncPhase<U> convert<U>(U Function(T?) converter) {
+  AsyncPhase<U> convert<U>(U Function(T? data) converter) {
     return when(
       initial: (data) => AsyncInitial(converter(data)),
       waiting: (data) => AsyncWaiting(converter(data)),
