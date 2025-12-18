@@ -102,12 +102,14 @@ void main() {
         expect(data, 10);
         expect(error, isNull);
 
-        notifier.value = const AsyncError(data: 20, error: 'error');
+        final e = Exception();
+        final s = StackTrace.current;
+        notifier.value = AsyncError(data: 20, error: e, stackTrace: s);
         await tester.pump();
         expect(waiting, isFalse);
         expect(data, 10);
-        expect(error, 'error');
-        expect(stackTrace, StackTrace.empty);
+        expect(error, e);
+        expect(stackTrace, s);
       },
     );
 
