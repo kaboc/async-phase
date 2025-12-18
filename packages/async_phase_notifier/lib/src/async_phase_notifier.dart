@@ -103,7 +103,7 @@ class AsyncPhaseNotifier<T extends Object?>
   /// `value.data`.
   ///
   /// This method is useful when it is necessary to update the phase during
-  /// execution but the callback result should not affect the data.
+  /// execution but the function result should not affect the data.
   ///
   /// e.g. Indicating the waiting status on the UI or notifying the phase
   /// change to other parts of the code, with the existing data being kept

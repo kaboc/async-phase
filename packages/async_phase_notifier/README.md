@@ -2,22 +2,56 @@
 [![async_phase_notifier CI](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml/badge.svg)](https://github.com/kaboc/async-phase/actions/workflows/async_phase_notifier.yml)
 [![codecov](https://codecov.io/gh/kaboc/async-phase/branch/main/graph/badge.svg?token=JKEGKLL8W2)](https://codecov.io/gh/kaboc/async-phase)
 
-A variant of `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the
-phases of an asynchronous operation: initial, waiting, complete, and error.
+A `ValueNotifier` that has [AsyncPhase][AsyncPhase] representing the phases of
+an asynchronous operation: initial, waiting, complete, and error.
 
-`AsyncPhaseNotifier` + `AsyncPhase` is similar to `AsyncNotifier` + `AsyncValue` of Riverpod.
-
-Unlike AsyncNotifier and AsyncValue, which are tied to package:riverpod,
-`AsyncPhaseNotifier` and `AsyncPhase` have no such binding. The notifier can be
-used as just a handy variant of `ValueNotifier` with `AsyncPhase` as its value
-and convenient methods for manipulating the phases.
+[AsyncPhaseNotifier] can be used as just a handy variant of `ValueNotifier` with
+`AsyncPhase` as its value and convenient methods for manipulating the phases.
 
 ## Sample apps
 
 - [Useless Facts](https://github.com/kaboc/async-phase/tree/main/packages/async_phase_notifier/example) - simple
 - [pub.dev explorer](https://github.com/kaboc/pubdev-explorer) - advanced
 
-## Usage
+## Basic Concept: AsyncPhase
+
+This package is built on top of async_phase.
+
+AsyncPhase is a type that represents the current status of an asynchronous operation.
+It consists of the following four states:
+
+* **AsyncInitial**:
+    * The state before the operation has started.
+* **AsyncWaiting**:
+    * The state where the operation is in progress. It can optionally hold the
+      previous data.
+* **AsyncComplete**:
+    * The state where the operation finished successfully. It contains the
+      resulting data.
+* **AsyncError*:
+    * The state where the operation failed. It contains an error and a stack
+      trace, and can also hold the previous data.
+
+By using `AsyncPhaseNotifier`, you can easily manage these transitions and reflect
+them in your UI.
+
+`AsyncPhase` provides the [when()][when] and [whenOrNull()][whenOrNull] methods,
+which are useful for choosing an action based on the current phase, like returning
+an appropriate widget.
+
+```dart
+child: phase.when(
+  initial: (data) => Text('phase: AsyncInitial($data)'), // Optional
+  waiting: (data) => Text('phase: AsyncWaiting($data)'),
+  complete: (data) => Text('phase: AsyncComplete($data)'),
+  error: (data, error, stackTrace) => Text('phase: AsyncError($data, $error)'),
+)
+```
+
+`async_phase` is a separate package, included in this package. See
+[its document][AsyncPhase] for details not covered here.
+
+## Usage: AsyncPhaseNotifier
 
 ### update()
 
@@ -68,28 +102,6 @@ await notifier.update(
 
 For more technical details and behavior regarding callbacks, please refer to the
 [updateType()][updateType] documentation.
-
-### AsyncPhase
-
-The value of `AsyncPhaseNotifier` is either [AsyncInitial][AsyncInitial],
-[AsyncWaiting][AsyncWaiting], [AsyncComplete][AsyncComplete] or [AsyncError][AsyncError].
-They are subtypes of [AsyncPhase].
-
-`AsyncPhase` provides the [when()][when] and [whenOrNull()][whenOrNull] methods,
-which are useful for choosing an action based on the current phase, like returning
-an appropriate widget.
-
-```dart
-child: phase.when(
-  initial: (data) => Text('phase: AsyncInitial($data)'), // Optional
-  waiting: (data) => Text('phase: AsyncWaiting($data)'),
-  complete: (data) => Text('phase: AsyncComplete($data)'),
-  error: (data, error, stackTrace) => Text('phase: AsyncError($data, $error)'),
-)
-```
-
-`async_phase` is a separate package, included in this package. See
-[its document][AsyncPhase] for details not covered here.
 
 ### value.data vs data
 

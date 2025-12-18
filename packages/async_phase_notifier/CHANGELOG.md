@@ -1,3 +1,26 @@
+## 0.7.1
+
+- Improve method signatures for better auto-completion of callback parameters.
+- Add `updateType()` to `AsyncPhaseNotifier` for more flexible phase control.
+- Deprecate `updateOnlyPhase()` in favour of `updateType()`.
+- Bump async_phase version to 0.7.0.
+
+#### Migration Guide: updateOnlyPhase() to updateType()
+
+* Return value required:
+    * The function in `updateType()` must return a value. (Add `return` or use
+      an arrow function `=>`).
+* Automatic Phase Mapping:
+    * If the function returns an `AsyncPhase`, the notifier's `value` reflects
+      that specific phase.
+* Simplified Error Handling:
+    * If you call a method that returns an `AsyncPhase` (e.g. from a repository)
+      and it results in an `AsyncError`, you can now simply return that phase to
+      apply the error state to the notifier, without needing to call `rethrowError()`.
+* Simplified `onComplete`:
+    * The `onComplete` callback no longer receives the result data, as the data
+      remains unchanged.
+
 ## 0.7.0
 
 - Bump async_phase version to 0.7.0.
