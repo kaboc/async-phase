@@ -1,3 +1,8 @@
+## 0.6.1
+
+- Improve method signatures for better auto-completion of callback parameters.
+- Improve documentation.
+
 ## 0.6.0
 
 - Add `rethrowIfError()` to `AsyncPhase`.
