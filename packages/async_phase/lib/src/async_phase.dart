@@ -158,9 +158,9 @@ sealed class AsyncPhase<T extends Object?> {
     return phase;
   }
 
-  /// A method that creates a new object of the same [AsyncPhase] subtype
-  /// with a different generic type based on the phase that this method is
-  /// called on.
+  /// A method that creates a new instance of the same [AsyncPhase] subtype
+  /// with a different generic type based on the value returned by the
+  /// converter.
   AsyncPhase<U> convert<U>(U Function(T? data) converter) {
     return when(
       initial: (data) => AsyncInitial(converter(data)),
@@ -171,10 +171,8 @@ sealed class AsyncPhase<T extends Object?> {
     );
   }
 
-  /// A method that copy a phase to create a new phase with new data.
-  ///
-  /// The returned phase has the same type as that of the original phase
-  /// this method was called on.
+  /// A method that copies a phase to create a new instance of the same
+  /// [AsyncPhase] subtype with the provided data.
   AsyncPhase<T> copyWith(T newData) {
     return when(
       initial: (_) => AsyncInitial(newData),
@@ -184,13 +182,8 @@ sealed class AsyncPhase<T extends Object?> {
     );
   }
 
-  /// A method that creates an [AsyncWaiting] object based on the
-  /// phase that this method is called on.
-  ///
-  /// The phase is converted to a new [AsyncWaiting] object with
-  /// the same [data] as that of the original phase, and the object
-  /// is returned. This is handy for switching the phase to
-  /// `AsyncWaiting` without losing the previous data.
+  /// A method that creates a new [AsyncWaiting] instance with the existing
+  /// [data].
   AsyncWaiting<T> copyAsWaiting() {
     return AsyncWaiting(data);
   }
