@@ -47,11 +47,9 @@ class AsyncPhaseNotifier<T extends Object?>
 
   /// Runs the provided asynchronous function and updates the phase.
   ///
-  /// {@template AsyncPhaseNotifier.update}
   /// The phase is updated to [AsyncWaiting] when the callback starts,
   /// and to [AsyncComplete] or [AsyncError] according to success or
   /// failure when the callback ends.
-  /// {@endtemplate}
   ///
   /// {@template AsyncPhaseNotifier.update.callbacks}
   /// The [onWaiting], [onComplete], and [onError] callbacks are called
@@ -97,7 +95,9 @@ class AsyncPhaseNotifier<T extends Object?>
 
   /// Runs the provided asynchronous function and only updates the phase.
   ///
-  /// {@macro AsyncPhaseNotifier.update}
+  /// The phase is updated to [AsyncWaiting] when the function starts,
+  /// and to [AsyncComplete] or [AsyncError] according to success or
+  /// failure when the function ends.
   ///
   /// This is the same as [update] except that this method does not update
   /// `value.data`.
@@ -110,6 +110,10 @@ class AsyncPhaseNotifier<T extends Object?>
   /// unchanged.
   ///
   /// {@macro AsyncPhaseNotifier.update.callbacks}
+  @Deprecated(
+    'Use updateType instead. '
+    'This feature was deprecated after v0.7.1.',
+  )
   // coverage:ignore-line
   Future<AsyncPhase<T>> updateOnlyPhase(
     Future<void> Function() func, {
