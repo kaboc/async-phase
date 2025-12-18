@@ -53,7 +53,7 @@ class AsyncPhaseNotifier<T extends Object?>
   /// failure when the callback ends.
   /// {@endtemplate}
   ///
-  /// {@template AsyncPhaseNotifier.update.2}
+  /// {@template AsyncPhaseNotifier.update.callbacks}
   /// The [onWaiting], [onComplete], and [onError] callbacks are called
   /// when the asynchronous operation starts, completes successfully,
   /// or fails, respectively. However, note that errors occurring in
@@ -109,7 +109,8 @@ class AsyncPhaseNotifier<T extends Object?>
   /// change to other parts of the code, with the existing data being kept
   /// unchanged.
   ///
-  /// {@macro AsyncPhaseNotifier.update.2}
+  /// {@macro AsyncPhaseNotifier.update.callbacks}
+  // coverage:ignore-line
   Future<AsyncPhase<T>> updateOnlyPhase(
     Future<void> Function() func, {
     // ignore: avoid_positional_boolean_parameters
@@ -126,6 +127,122 @@ class AsyncPhaseNotifier<T extends Object?>
       onComplete: onComplete,
       onError: onError,
     );
+  }
+
+  /// Updates the phase type while preserving the current [data].
+  ///
+  /// Transitions to [AsyncWaiting] at the start of the function,
+  /// then transitions to the appropriate phase when the function finishes.
+  ///
+  /// ## Use cases
+  ///
+  /// * Running an asynchronous operation where the result data is not needed,
+  ///   but tracking the phase (e.g., showing/hiding a loading indicator) is
+  ///   necessary.
+  /// * Using `AsyncPhaseNotifier` to implement a command-like approach,
+  ///   as discussed in the official Flutter [architecture guide](https://docs.flutter.dev/app-architecture/design-patterns/command).
+  ///     * Steps:
+  ///         1. Create `AsyncPhaseNotifier` instances within a view model to
+  ///            represent specific actions.
+  ///         2. Use `updateType()` within a view model method to execute the
+  ///            operation associated with that action.
+  ///         3. Listen to the `AsyncPhaseNotifier` [value] in the UI to
+  ///            reflect the current phase.
+  ///     * While this doesn't follow the formal Command pattern, it serves
+  ///       the same purpose of decoupling UI and business logic. This method
+  ///       simplifies the implementation of this approach.
+  ///
+  /// ## Details
+  ///
+  /// * **Flexible return type**: The callback `func` can return any type
+  ///   (`Object?`), not just [T].
+  /// * **Phase-aware result**: If the function returns an [AsyncPhase],
+  ///   the notifier's [value] is updated to match that specific phase.
+  ///   * Example: If the notifier is `AsyncPhaseNotifier<int>` and the
+  ///     function returns `AsyncError<String>`, the [value] becomes
+  ///     `AsyncError<int>`, preserving the existing data but adopting
+  ///     the error state.
+  ///   * This allows the final phase to be [AsyncInitial] or [AsyncWaiting]
+  ///     if returned by the function, giving you full control over the
+  ///     resulting phase.
+  /// * **Simplified callbacks**: The `onComplete` callback takes no
+  ///   parameters since the [data] remains unchanged.
+  ///
+  /// ```dart
+  /// final notifier = AsyncPhaseNotifier(123);
+  ///
+  /// // Returns a normal value (non-AsyncPhase)
+  /// var phase = await notifier.updateType(() async => 'abc');
+  /// expect(phase.data, 123);
+  /// expect(phase, isA<AsyncComplete<int>>());
+  ///
+  /// // Throws an error
+  /// phase = await notifier.updateType(() => throw Exception());
+  /// expect(phase.data, 123);
+  /// expect(phase, isA<AsyncError<int>>());
+  ///
+  /// // Returns an AsyncPhase (AsyncComplete)
+  /// phase = await notifier.updateType(() async => AsyncComplete('abc'));
+  /// expect(phase.data, 123);
+  /// expect(phase, isA<AsyncComplete<int>>());
+  ///
+  /// // Returns an AsyncPhase (AsyncError)
+  /// phase = await notifier.updateType(() async => AsyncError(error: ..));
+  /// expect(phase.data, 123);
+  /// expect(phase, isA<AsyncError<int>>());
+  /// ```
+  ///
+  /// ## Callbacks upon phase changes
+  ///
+  /// {@macro AsyncPhaseNotifier.update.callbacks}
+  ///
+  /// If the function returns an [AsyncPhase], the subsequent callbacks are
+  /// triggered based on that resulting phase:
+  ///
+  /// * **AsyncWaiting**:
+  ///   * The `onWaiting` callback is **not** called at the conclusion of this
+  ///     method because the phase remains [AsyncWaiting], which was already
+  ///     set at the start of the operation.
+  /// * **AsyncComplete**:
+  ///   * The `onComplete` callback is called.
+  /// * **AsyncError**:
+  ///   * The `onError` callback is called. This occurs whether the function
+  ///     explicitly returned an [AsyncError] or threw an exception.
+  Future<AsyncPhase<T>> updateType(
+    Future<Object?> Function() func, {
+    // ignore: avoid_positional_boolean_parameters
+    void Function(bool isWaiting)? onWaiting,
+    void Function()? onComplete,
+    void Function(Object e, StackTrace s)? onError,
+  }) async {
+    value = value.copyAsWaiting();
+    onWaiting?.call(true);
+
+    AsyncPhase<Object?> phase;
+    try {
+      phase = func is Future<AsyncPhase> Function()
+          ? await func()
+          : await AsyncPhase.from(func);
+    }
+    // ignore: avoid_catches_without_on_clauses
+    catch (e, s) {
+      phase = AsyncError(error: e, stackTrace: s);
+    }
+
+    if (!_isDisposed) {
+      value = phase.convert((_) => data);
+
+      if (!phase.isWaiting) {
+        onWaiting?.call(false);
+
+        if (phase case AsyncError(:final error, :final stackTrace)) {
+          onError?.call(error, stackTrace);
+        } else {
+          onComplete?.call();
+        }
+      }
+    }
+    return value;
   }
 
   @useResult

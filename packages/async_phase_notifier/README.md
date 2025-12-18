@@ -51,17 +51,23 @@ await notifier.update(
 );
 ```
 
-### updateOnlyPhase()
+### updateType()
 
-This is the same as [update()][update] except that [updateOnlyPhase()][updateOnlyPhase]
-only updates the phase itself without updating `value.data`, whereas `update()`
-updates both the phase and `value.data`.
+`updateType()` is used to update the phase type while preserving the existing `value.data`.
 
-This method is useful when it is necessary to update the phase during execution
-but the callback result should not affect the data.
+* **Preserves Existing Data**:
+    * The callback result can be of any type and does not affect the notifier's current data.
+* **Direct Phase Mapping**:
+    * If the callback returns an `AsyncPhase`, the notifier adopts that specific phase.
+      This is ideal when calling repository methods that already return `AsyncPhase`
+      (e.g., returning `AsyncError` will transition the notifier to an error state
+      without needing to manually throw an exception).
+* **Flexible Implementation**:
+    * Perfect for implementing [command][command]-like approaches where UI logic
+      and business logic are decoupled.
 
-e.g. Indicating the waiting status on the UI or notifying the phase change to
-other parts of the code, with the existing data being kept unchanged.
+For more technical details and behavior regarding callbacks, please refer to the
+[updateType()][updateType] documentation.
 
 ### AsyncPhase
 
@@ -269,7 +275,8 @@ Widget build(BuildContext context) {
 [AsyncPhaseNotifier]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier-class.html
 [AsyncPhaseListener]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseListener-class.html
 [update]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/update.html
-[updateOnlyPhase]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/updateOnlyPhase.html
+[updateType]: https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/updateType.html
+[command]: https://docs.flutter.dev/app-architecture/design-patterns/command
 [listen]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listen.html
 [listenFor]:https://pub.dev/documentation/async_phase_notifier/latest/async_phase_notifier/AsyncPhaseNotifier/listenFor.html
 

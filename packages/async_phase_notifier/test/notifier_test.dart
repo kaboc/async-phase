@@ -124,7 +124,7 @@ void main() {
     });
   });
 
-  group('updateOnlyPhase()', () {
+  group('updateType()', () {
     test(
       'Phase changes correctly as the function runs, and data is not affected',
       () async {
@@ -138,8 +138,9 @@ void main() {
 
         var completer = Completer<void>();
         unawaited(
-          notifier.updateOnlyPhase(() async {
+          notifier.updateType(() async {
             completer.complete();
+            return 20;
           }),
         );
         expect(notifier.value, const AsyncWaiting(10));
@@ -149,7 +150,7 @@ void main() {
 
         completer = Completer<void>();
         unawaited(
-          notifier.updateOnlyPhase(() async {
+          notifier.updateType(() async {
             completer.complete();
             Error.throwWithStackTrace(e, s);
           }),
@@ -159,8 +160,69 @@ void main() {
         await pumpEventQueue();
         expect(notifier.value, AsyncError(data: 10, error: e, stackTrace: s));
 
+        completer = Completer<void>();
+        unawaited(
+          notifier.updateType(() async {
+            completer.complete();
+            return const AsyncWaiting(20);
+          }),
+        );
+        expect(notifier.value, const AsyncWaiting(10));
+        await completer.future;
+        await pumpEventQueue();
+        expect(notifier.value, const AsyncWaiting(10));
 
+        completer = Completer<void>();
+        unawaited(
+          notifier.updateType(() async {
+            completer.complete();
+            return const AsyncComplete(20);
+          }),
+        );
+        expect(notifier.value, const AsyncWaiting(10));
+        await completer.future;
+        await pumpEventQueue();
+        expect(notifier.value, const AsyncComplete(10));
 
+        completer = Completer<void>();
+        unawaited(
+          notifier.updateType(() async {
+            completer.complete();
+            return AsyncError(data: 20, error: e, stackTrace: s);
+          }),
+        );
+        expect(notifier.value, const AsyncWaiting(10));
+        await completer.future;
+        await pumpEventQueue();
+        expect(notifier.value, AsyncError(data: 10, error: e, stackTrace: s));
+      },
+    );
+
+    test(
+      'Resulting AsyncPhase has latest value in `data` if it was updated '
+      'externally during execution of callback',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final called = <int>[];
+
+        final results = await Future.wait([
+          notifier.updateType(() async {
+            called.add(1);
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            called.add(2);
+            return 20;
+          }),
+          notifier.update(() async {
+            called.add(3);
+            return 30;
+          }),
+        ]);
+
+        expect(called, [1, 3, 2]);
+        expect(results.first, const AsyncComplete(30));
+        expect(notifier.value, const AsyncComplete(30));
       },
     );
 
@@ -171,20 +233,46 @@ void main() {
       final error = Exception();
       final called = <Object?>[];
 
-      await notifier.updateOnlyPhase(
+      await notifier.updateType(
         () async => 20,
         onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: (data) => called.add('complete: $data'),
+        onComplete: () => called.add('complete: ${notifier.data}'),
         onError: (e, _) => called.add('error: $e'),
       );
-      await notifier.updateOnlyPhase(
+      await notifier.updateType(
         () => throw error,
         onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: (data) => called.add('complete: $data'),
+        onComplete: () => called.add('complete: ${notifier.data}'),
+        onError: (e, _) => called.add('error: $e'),
+      );
+      await notifier.updateType(
+        () async => const AsyncWaiting(20),
+        // No callback is called at the end.
+        onWaiting: (waiting) => called.add('waiting: $waiting'),
+        onComplete: () => called.add('complete: ${notifier.data}'),
+        onError: (e, _) => called.add('error: $e'),
+      );
+      await notifier.updateType(
+        () async => const AsyncComplete(20),
+        onWaiting: (waiting) => called.add('waiting: $waiting'),
+        onComplete: () => called.add('complete: ${notifier.data}'),
+        onError: (e, _) => called.add('error: $e'),
+      );
+      await notifier.updateType(
+        () async => AsyncError(error: error),
+        onWaiting: (waiting) => called.add('waiting: $waiting'),
+        onComplete: () => called.add('complete: ${notifier.data}'),
         onError: (e, _) => called.add('error: $e'),
       );
 
       expect(called, [
+        'waiting: true',
+        'waiting: false',
+        'complete: 10',
+        'waiting: true',
+        'waiting: false',
+        'error: $error',
+        'waiting: true',
         'waiting: true',
         'waiting: false',
         'complete: 10',
