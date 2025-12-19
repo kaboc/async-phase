@@ -21,7 +21,7 @@
   <meta name="description" content="An example app of async_phase_notifier.">
 
   <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="AsyncPhaseNotifier Demo">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
@@ -32,30 +32,21 @@
   <title>AsyncPhaseNotifier Demo</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-
   <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
+    {{flutter_js}}
+    {{flutter_build_config}}
+
+    _flutter.loader.load({
+      onEntrypointLoaded: async function(engineInitializer) {
+        const appRunner = await engineInitializer.initializeEngine();
+
+        document.getElementById('loading').remove();
+        await appRunner.runApp();
+      }
+    });
   </script>
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer></script>
 </head>
 <body>
   <div id="loading"><div></div><div></div></div>
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: async function(engineInitializer) {
-          const appRunner = await engineInitializer.initializeEngine();
-          appRunner.runApp();
-          document.getElementById('loading').remove();
-        }
-      });
-    });
-  </script>
 </body>
 </html>

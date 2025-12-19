@@ -51,13 +51,13 @@ class FactView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 16.0,
       children: [
         Text(
           fact.text,
           style: const TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 16.0),
         Text(fact.sourceUrl),
       ],
     );

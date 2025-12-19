@@ -1,11 +1,11 @@
 name: async_phase_example
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.6.2
 
 dependencies:
   async_phase:
     path: ../
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^5.1.1

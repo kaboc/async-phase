@@ -71,6 +71,8 @@ class AsyncPhaseNotifier<T extends Object?>
       // Avoids providing data as of this moment as fallback data
       // because it becomes stale if `value.data` is updated externally
       // while the callback is executed.
+      //
+      // ignore: avoid_redundant_argument_values
       fallbackData: null,
     );
 

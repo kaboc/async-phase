@@ -5,6 +5,11 @@ abstract final class AppTheme {
   static ThemeData get data {
     return ThemeData.from(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown),
+    ).copyWith(
+      appBarTheme: AppBarTheme(
+        color: Colors.brown.shade400,
+        foregroundColor: Colors.white,
+      ),
     );
   }
 }

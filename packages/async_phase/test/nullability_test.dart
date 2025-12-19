@@ -326,6 +326,7 @@ void main() {
 
         final phase = await AsyncPhase.from(
           () => Future.value(10),
+          // ignore: avoid_redundant_argument_values
           fallbackData: null,
         );
         expect(phase, isA<AsyncComplete<int>>());
