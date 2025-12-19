@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 import 'package:async_phase/async_phase.dart';
 
-enum _EventType { start, end, success, error }
+enum _EventType { start, success, error }
 
 typedef _Event<T> = ({_EventType type, AsyncPhase<T> phase});
 typedef RemoveListener = void Function();
@@ -56,20 +56,15 @@ class AsyncPhaseNotifier<T extends Object?>
   /// when the asynchronous operation starts, completes successfully,
   /// or fails, respectively. However, note that errors occurring in
   /// those callbacks are not automatically handled.
-  ///
-  /// Also note that the `onWaiting` callback is called both when the
-  /// phase changes to and from `AsyncWaiting`. A boolean parameter
-  /// indicates the direction of this transition.
   /// {@endtemplate}
   Future<AsyncPhase<T>> update(
     Future<T> Function() func, {
-    // ignore: avoid_positional_boolean_parameters
-    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onWaiting,
     void Function(T data)? onComplete,
     void Function(Object e, StackTrace s)? onError,
   }) async {
     value = value.copyAsWaiting();
-    onWaiting?.call(true);
+    onWaiting?.call(data);
 
     final phase = await AsyncPhase.from(
       func,
@@ -78,8 +73,6 @@ class AsyncPhaseNotifier<T extends Object?>
       // while the callback is executed.
       fallbackData: null,
     );
-
-    onWaiting?.call(false);
 
     if (!_isDisposed) {
       if (phase case AsyncError(:final error, :final stackTrace)) {
@@ -118,7 +111,7 @@ class AsyncPhaseNotifier<T extends Object?>
   Future<AsyncPhase<T>> updateOnlyPhase(
     Future<void> Function() func, {
     // ignore: avoid_positional_boolean_parameters
-    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onWaiting,
     void Function(T data)? onComplete,
     void Function(Object e, StackTrace s)? onError,
   }) async {
@@ -218,13 +211,12 @@ class AsyncPhaseNotifier<T extends Object?>
   /// > reflect the latest changes.
   Future<AsyncPhase<T>> updateType(
     Future<Object?> Function() func, {
-    // ignore: avoid_positional_boolean_parameters
-    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onWaiting,
     void Function(T data)? onComplete,
     void Function(Object e, StackTrace s)? onError,
   }) async {
     value = value.copyAsWaiting();
-    onWaiting?.call(true);
+    onWaiting?.call(data);
 
     AsyncPhase<Object?> phase;
     try {
@@ -241,8 +233,6 @@ class AsyncPhaseNotifier<T extends Object?>
       value = phase.convert((_) => data);
 
       if (!phase.isWaiting) {
-        onWaiting?.call(false);
-
         if (phase case AsyncError(:final error, :final stackTrace)) {
           onError?.call(error, stackTrace);
         } else {
@@ -260,9 +250,7 @@ class AsyncPhaseNotifier<T extends Object?>
 
     _eventStreamController ??= StreamController<_Event<T>>.broadcast();
     final subscription = _eventStreamController?.stream.listen((event) {
-      if (event.type != _EventType.end) {
-        listener(event.phase);
-      }
+      listener(event.phase);
     });
 
     return () => subscription?.cancel();
@@ -270,8 +258,7 @@ class AsyncPhaseNotifier<T extends Object?>
 
   @useResult
   RemoveListener listenFor({
-    // ignore: avoid_positional_boolean_parameters
-    void Function(bool isWaiting)? onWaiting,
+    void Function(T data)? onWaiting,
     void Function(T data)? onComplete,
     void Function(Object e, StackTrace s)? onError,
   }) {
@@ -286,9 +273,8 @@ class AsyncPhaseNotifier<T extends Object?>
     final subscription = _eventStreamController?.stream.listen((event) {
       switch (event.type) {
         case _EventType.start:
-          onWaiting?.call(true);
-        case _EventType.end:
-          onWaiting?.call(false);
+          final phase = event.phase as AsyncWaiting<T>;
+          onWaiting?.call(phase.data as T);
         case _EventType.success:
           final phase = event.phase as AsyncComplete<T>;
           onComplete?.call(phase.data);
@@ -305,10 +291,6 @@ class AsyncPhaseNotifier<T extends Object?>
     required AsyncPhase<T> prevPhase,
     required AsyncPhase<T> newPhase,
   }) {
-    if (prevPhase.isWaiting && !newPhase.isWaiting) {
-      _sink?.add((type: _EventType.end, phase: newPhase));
-    }
-
     switch (newPhase) {
       case AsyncInitial():
         break;

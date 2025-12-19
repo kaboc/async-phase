@@ -73,25 +73,19 @@ void main() {
 
       await notifier1.update(
         () async => 20,
-        onWaiting: (waiting) => called1.add('waiting: $waiting'),
+        onWaiting: (data) => called1.add('waiting: $data'),
         onComplete: (data) => called1.add('complete: $data'),
         onError: (e, _) => called1.add('error: $e'),
       );
-      expect(
-        called1,
-        ['waiting: true', 'waiting: false', 'complete: 20'],
-      );
+      expect(called1, ['waiting: 10', 'complete: 20']);
 
       await notifier2.update(
         () => throw error,
-        onWaiting: (waiting) => called2.add('waiting: $waiting'),
+        onWaiting: (data) => called2.add('waiting: $data'),
         onComplete: (data) => called2.add('complete: $data'),
         onError: (e, _) => called2.add('error: $e'),
       );
-      expect(
-        called2,
-        ['waiting: true', 'waiting: false', 'error: $error'],
-      );
+      expect(called2, ['waiting: 10', 'error: $error']);
     });
 
     test(
@@ -251,45 +245,45 @@ void main() {
 
       await notifier1.updateType(
         () async => 20,
-        onWaiting: (waiting) => called1.add('waiting: $waiting'),
+        onWaiting: (data) => called1.add('waiting: $data'),
         onComplete: (data) => called1.add('complete: $data'),
         onError: (e, _) => called1.add('error: $e'),
       );
-      expect(called1, ['waiting: true', 'waiting: false', 'complete: 10']);
+      expect(called1, ['waiting: 10', 'complete: 10']);
 
       await notifier2.updateType(
         () => throw error,
-        onWaiting: (waiting) => called2.add('waiting: $waiting'),
+        onWaiting: (data) => called2.add('waiting: $data'),
         onComplete: (data) => called2.add('complete: $data'),
         onError: (e, _) => called2.add('error: $e'),
       );
-      expect(called2, ['waiting: true', 'waiting: false', 'error: $error']);
+      expect(called2, ['waiting: 10', 'error: $error']);
 
       await notifier3.updateType(
         () async => const AsyncWaiting(20),
         // No callback should be called at the end
         // because both phase type and data won't change.
-        onWaiting: (waiting) => called3.add('waiting: $waiting'),
+        onWaiting: (data) => called3.add('waiting: $data'),
         onComplete: (data) => called3.add('complete: $data'),
         onError: (e, _) => called3.add('error: $e'),
       );
-      expect(called3, ['waiting: true']);
+      expect(called3, ['waiting: 10']);
 
       await notifier4.updateType(
         () async => const AsyncComplete(20),
-        onWaiting: (waiting) => called4.add('waiting: $waiting'),
+        onWaiting: (data) => called4.add('waiting: $data'),
         onComplete: (data) => called4.add('complete: $data'),
         onError: (e, _) => called4.add('error: $e'),
       );
-      expect(called4, ['waiting: true', 'waiting: false', 'complete: 10']);
+      expect(called4, ['waiting: 10', 'complete: 10']);
 
       await notifier5.updateType(
         () async => AsyncError(error: error),
-        onWaiting: (waiting) => called5.add('waiting: $waiting'),
+        onWaiting: (data) => called5.add('waiting: $data'),
         onComplete: (data) => called5.add('complete: $data'),
         onError: (e, _) => called5.add('error: $e'),
       );
-      expect(called5, ['waiting: true', 'waiting: false', 'error: $error']);
+      expect(called5, ['waiting: 10', 'error: $error']);
     });
 
     test(
@@ -435,7 +429,7 @@ void main() {
         final phases = <AsyncPhase<String>>[];
 
         final cancel = notifier.listenFor(
-          onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
+          onWaiting: (data) => phases.add(AsyncWaiting(data)),
           onComplete: (data) => phases.add(AsyncComplete(data)),
           onError: (e, _) => phases.add(AsyncError(data: '', error: e)),
         );
@@ -463,14 +457,12 @@ void main() {
           const [
             AsyncComplete('a'),
             AsyncComplete('b'),
-            AsyncWaiting('true'),
-            AsyncWaiting('true'),
-            AsyncWaiting('false'),
+            AsyncWaiting('b'),
+            AsyncWaiting('c'),
             AsyncComplete('c'),
             AsyncError(data: '', error: 'err'),
             AsyncError(data: '', error: 'err'),
-            AsyncWaiting('true'),
-            AsyncWaiting('false'),
+            AsyncWaiting('d'),
             AsyncError(data: '', error: 'err'),
           ],
         );
@@ -537,7 +529,7 @@ void main() {
         ..value = const AsyncError(error: '');
       await pumpEventQueue();
       expect(count1, isZero);
-      expect(count2, 4);
+      expect(count2, 3);
 
       expect(notifier.isListening, isTrue);
       cancel2();

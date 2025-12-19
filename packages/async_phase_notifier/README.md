@@ -141,15 +141,12 @@ Note:
 
 - All callbacks are optional.
     - Listener is not added if no callback function is passed.
-- The `onWaiting` callback is called when the phase has changed to `AsyncWaiting` and
-  also from `AsyncWaiting`. A boolean value is passed to the callback to indicate the
-  start or end of an asynchronous operation.
 
 ```dart
 final notifier = AsyncPhaseNotifier(Auth());
 final cancel = notifier.listenFor(
-  onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
-  onComplete: (data) { /* e.g. Logging the result of an operation */ }, 
+  onWaiting: () { /* e.g. Start loading indicator */ },
+  onComplete: (data) { /* e.g. Stop loading indicator */ },
   onError: (e, s) { /* e.g. Showing an error dialog */ },
 );
 
@@ -167,8 +164,8 @@ listen for phase changes.
 ```dart
 child: AsyncPhaseListener(
   notifier: notifier,
-  onWaiting: (isWaiting) { /* e.g. Toggling an indicator */ },
-  onComplete: (data) { /* e.g. Logging the result of an operation */ },
+  onWaiting: () { /* e.g. Start loading indicator */ },
+  onComplete: (data) { /* e.g. Stop loading indicator */ },
   onError: (e, s) { /* e.g. Showing an error dialog */ },
   child: ...,
 )

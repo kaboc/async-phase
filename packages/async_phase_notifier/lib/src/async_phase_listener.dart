@@ -16,8 +16,7 @@ class AsyncPhaseListener<T> extends StatefulWidget {
 
   final AsyncPhaseNotifier<T> notifier;
   final Widget child;
-  // ignore: avoid_positional_boolean_parameters
-  final void Function(bool isWaiting)? onWaiting;
+  final void Function(T data)? onWaiting;
   final void Function(T data)? onComplete;
   final void Function(Object e, StackTrace s)? onError;
 

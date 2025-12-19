@@ -16,8 +16,7 @@ class TestApp<T extends Object?> extends StatefulWidget {
   });
 
   final AsyncPhaseNotifier<T> notifier;
-  // ignore: avoid_positional_boolean_parameters
-  final void Function(bool)? onWaiting;
+  final void Function(T)? onWaiting;
   final void Function(T)? onComplete;
   final void Function(Object?, StackTrace?) onError;
   final VoidCallback? onBuild;
@@ -50,26 +49,28 @@ class _TestAppState<T> extends State<TestApp<T>> {
 
 void main() {
   Object? data;
-  bool? waiting;
+  Object? waiting;
   Object? error;
   StackTrace? stackTrace;
 
   var errorCount = 0;
   var buildCount = 0;
 
-  tearDown(() {
+  void reset() {
     data = null;
-    waiting = false;
+    waiting = null;
     error = null;
     stackTrace = null;
     errorCount = 0;
     buildCount = 0;
-  });
+  }
+
+  tearDown(reset);
 
   Widget createWidget<T extends Object?>(AsyncPhaseNotifier<T> notifier) {
     return TestApp(
       notifier: notifier,
-      onWaiting: (w) => waiting = w,
+      onWaiting: (d) => waiting = d,
       onComplete: (d) => data = d,
       onError: (e, s) {
         error = e;
@@ -92,22 +93,26 @@ void main() {
 
         notifier.value = AsyncWaiting(notifier.value.data);
         await tester.pump();
-        expect(waiting, isTrue);
+        expect(waiting, 10);
         expect(data, isNull);
         expect(error, isNull);
 
+        reset();
+
         notifier.value = AsyncComplete(notifier.value.data);
         await tester.pump();
-        expect(waiting, isFalse);
+        expect(waiting, isNull);
         expect(data, 10);
         expect(error, isNull);
+
+        reset();
 
         final e = Exception();
         final s = StackTrace.current;
         notifier.value = AsyncError(data: 20, error: e, stackTrace: s);
         await tester.pump();
-        expect(waiting, isFalse);
-        expect(data, 10);
+        expect(waiting, isNull);
+        expect(data, isNull);
         expect(error, e);
         expect(stackTrace, s);
       },
@@ -132,7 +137,7 @@ void main() {
               setStateFunc = setState;
               return TestApp(
                 notifier: notifier,
-                onWaiting: (waiting) {},
+                onWaiting: (data) {},
                 onComplete: (data) => value = data,
                 onError: (e, s) {},
                 onBuild: () => buildCount++,
