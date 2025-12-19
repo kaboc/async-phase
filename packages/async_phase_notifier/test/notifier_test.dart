@@ -61,9 +61,42 @@ void main() {
       },
     );
 
+    test('Callbacks are called with correct values in correct order', () async {
+      final notifier1 = AsyncPhaseNotifier(10);
+      final notifier2 = AsyncPhaseNotifier(10);
+      addTearDown(notifier1.dispose);
+      addTearDown(notifier2.dispose);
+
+      final error = Exception();
+      final called1 = <Object?>[];
+      final called2 = <Object?>[];
+
+      await notifier1.update(
+        () async => 20,
+        onWaiting: (waiting) => called1.add('waiting: $waiting'),
+        onComplete: (data) => called1.add('complete: $data'),
+        onError: (e, _) => called1.add('error: $e'),
+      );
+      expect(
+        called1,
+        ['waiting: true', 'waiting: false', 'complete: 20'],
+      );
+
+      await notifier2.update(
+        () => throw error,
+        onWaiting: (waiting) => called2.add('waiting: $waiting'),
+        onComplete: (data) => called2.add('complete: $data'),
+        onError: (e, _) => called2.add('error: $e'),
+      );
+      expect(
+        called2,
+        ['waiting: true', 'waiting: false', 'error: $error'],
+      );
+    });
+
     test(
-      'Resulting AsyncError has latest  value in `data` if it was updated '
-      'externally during execution of callback',
+      'If another operation modifies data while update() is running, '
+      'resulting AsyncError reflects the change',
       () async {
         final notifier = AsyncPhaseNotifier(10);
         addTearDown(notifier.dispose);
@@ -90,38 +123,6 @@ void main() {
         expect(notifier.value, AsyncError(data: 20, error: e, stackTrace: s));
       },
     );
-
-    test('Callbacks are called with correct values in correct order', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      addTearDown(notifier.dispose);
-
-      final called = <Object?>[];
-      final error = Exception();
-
-      await notifier.update(
-        () async => 20,
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: (data) => called.add('complete: $data'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      await notifier.update(
-        () => throw error,
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: (data) => called.add('complete: $data'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      expect(
-        called,
-        [
-          'waiting: true',
-          'waiting: false',
-          'complete: 20',
-          'waiting: true',
-          'waiting: false',
-          'error: $error',
-        ],
-      );
-    });
   });
 
   group('updateType()', () {
@@ -198,9 +199,71 @@ void main() {
       },
     );
 
+    test('Callbacks are called with correct values in correct order', () async {
+      final notifier1 = AsyncPhaseNotifier(10);
+      final notifier2 = AsyncPhaseNotifier(10);
+      final notifier3 = AsyncPhaseNotifier(10);
+      final notifier4 = AsyncPhaseNotifier(10);
+      final notifier5 = AsyncPhaseNotifier(10);
+      addTearDown(notifier1.dispose);
+      addTearDown(notifier2.dispose);
+      addTearDown(notifier3.dispose);
+      addTearDown(notifier4.dispose);
+      addTearDown(notifier5.dispose);
+
+      final error = Exception();
+      final called1 = <Object?>[];
+      final called2 = <Object?>[];
+      final called3 = <Object?>[];
+      final called4 = <Object?>[];
+      final called5 = <Object?>[];
+
+      await notifier1.updateType(
+        () async => 20,
+        onWaiting: (waiting) => called1.add('waiting: $waiting'),
+        onComplete: () => called1.add('complete: ${notifier1.data}'),
+        onError: (e, _) => called1.add('error: $e'),
+      );
+      expect(called1, ['waiting: true', 'waiting: false', 'complete: 10']);
+
+      await notifier2.updateType(
+        () => throw error,
+        onWaiting: (waiting) => called2.add('waiting: $waiting'),
+        onComplete: () => called2.add('complete: ${notifier2.data}'),
+        onError: (e, _) => called2.add('error: $e'),
+      );
+      expect(called2, ['waiting: true', 'waiting: false', 'error: $error']);
+
+      await notifier3.updateType(
+        () async => const AsyncWaiting(20),
+        // No callback should be called at the end
+        // because both phase type and data won't change.
+        onWaiting: (waiting) => called3.add('waiting: $waiting'),
+        onComplete: () => called3.add('complete: ${notifier3.data}'),
+        onError: (e, _) => called3.add('error: $e'),
+      );
+      expect(called3, ['waiting: true']);
+
+      await notifier4.updateType(
+        () async => const AsyncComplete(20),
+        onWaiting: (waiting) => called4.add('waiting: $waiting'),
+        onComplete: () => called4.add('complete: ${notifier4.data}'),
+        onError: (e, _) => called4.add('error: $e'),
+      );
+      expect(called4, ['waiting: true', 'waiting: false', 'complete: 10']);
+
+      await notifier5.updateType(
+        () async => AsyncError(error: error),
+        onWaiting: (waiting) => called5.add('waiting: $waiting'),
+        onComplete: () => called5.add('complete: ${notifier5.data}'),
+        onError: (e, _) => called5.add('error: $e'),
+      );
+      expect(called5, ['waiting: true', 'waiting: false', 'error: $error']);
+    });
+
     test(
-      'Resulting AsyncPhase has latest value in `data` if it was updated '
-      'externally during execution of callback',
+      'If another operation modifies data while updateType() is running, '
+      'resulting AsyncPhase reflects the change',
       () async {
         final notifier = AsyncPhaseNotifier(10);
         addTearDown(notifier.dispose);
@@ -225,62 +288,6 @@ void main() {
         expect(notifier.value, const AsyncComplete(30));
       },
     );
-
-    test('Callbacks are called with correct values in correct order', () async {
-      final notifier = AsyncPhaseNotifier(10);
-      addTearDown(notifier.dispose);
-
-      final error = Exception();
-      final called = <Object?>[];
-
-      await notifier.updateType(
-        () async => 20,
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: () => called.add('complete: ${notifier.data}'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      await notifier.updateType(
-        () => throw error,
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: () => called.add('complete: ${notifier.data}'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      await notifier.updateType(
-        () async => const AsyncWaiting(20),
-        // No callback is called at the end.
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: () => called.add('complete: ${notifier.data}'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      await notifier.updateType(
-        () async => const AsyncComplete(20),
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: () => called.add('complete: ${notifier.data}'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-      await notifier.updateType(
-        () async => AsyncError(error: error),
-        onWaiting: (waiting) => called.add('waiting: $waiting'),
-        onComplete: () => called.add('complete: ${notifier.data}'),
-        onError: (e, _) => called.add('error: $e'),
-      );
-
-      expect(called, [
-        'waiting: true',
-        'waiting: false',
-        'complete: 10',
-        'waiting: true',
-        'waiting: false',
-        'error: $error',
-        'waiting: true',
-        'waiting: true',
-        'waiting: false',
-        'complete: 10',
-        'waiting: true',
-        'waiting: false',
-        'error: $error',
-      ]);
-    });
   });
 
   group('data getter', () {
@@ -395,7 +402,7 @@ void main() {
 
         final cancel = notifier.listenFor(
           onWaiting: (waiting) => phases.add(AsyncWaiting('$waiting')),
-          onComplete: (v) => phases.add(AsyncComplete(v)),
+          onComplete: (data) => phases.add(AsyncComplete(data)),
           onError: (e, _) => phases.add(AsyncError(data: '', error: e)),
         );
         addTearDown(cancel);
