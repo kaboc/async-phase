@@ -6,6 +6,8 @@ repository: https://github.com/kaboc/async-phase
 environment:
   sdk: ^3.6.2
 
+resolution: workspace
+
 dependencies:
   meta: ^1.15.0
 

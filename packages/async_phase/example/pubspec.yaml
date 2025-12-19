@@ -3,6 +3,8 @@ name: async_phase_example
 environment:
   sdk: ^3.6.2
 
+resolution: workspace
+
 dependencies:
   async_phase:
     path: ../

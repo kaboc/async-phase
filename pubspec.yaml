@@ -1,0 +1,11 @@
+name: _
+publish_to: none
+
+environment:
+  sdk: ^3.6.2
+
+workspace:
+  - packages/async_phase
+  - packages/async_phase/example
+  - packages/async_phase_notifier
+  - packages/async_phase_notifier/example
