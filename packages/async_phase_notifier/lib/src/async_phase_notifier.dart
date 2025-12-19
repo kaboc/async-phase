@@ -86,46 +86,6 @@ class AsyncPhaseNotifier<T extends Object?>
     return value;
   }
 
-  /// Runs the provided asynchronous function and only updates the phase.
-  ///
-  /// The phase is updated to [AsyncWaiting] when the function starts,
-  /// and to [AsyncComplete] or [AsyncError] according to success or
-  /// failure when the function ends.
-  ///
-  /// This is the same as [update] except that this method does not update
-  /// `value.data`.
-  ///
-  /// This method is useful when it is necessary to update the phase during
-  /// execution but the function result should not affect the data.
-  ///
-  /// e.g. Indicating the waiting status on the UI or notifying the phase
-  /// change to other parts of the code, with the existing data being kept
-  /// unchanged.
-  ///
-  /// {@macro AsyncPhaseNotifier.update.callbacks}
-  @Deprecated(
-    'Use updateType instead. '
-    'This feature was deprecated after v0.7.1.',
-  )
-  // coverage:ignore-line
-  Future<AsyncPhase<T>> updateOnlyPhase(
-    Future<void> Function() func, {
-    // ignore: avoid_positional_boolean_parameters
-    void Function(T data)? onWaiting,
-    void Function(T data)? onComplete,
-    void Function(Object e, StackTrace s)? onError,
-  }) async {
-    return update(
-      () async {
-        await func();
-        return data;
-      },
-      onWaiting: onWaiting,
-      onComplete: onComplete,
-      onError: onError,
-    );
-  }
-
   /// Updates the phase type while preserving the current [data].
   ///
   /// Transitions to [AsyncWaiting] at the start of the function,
