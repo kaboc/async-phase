@@ -123,6 +123,37 @@ void main() {
         expect(notifier.value, AsyncError(data: 20, error: e, stackTrace: s));
       },
     );
+
+    test(
+      'Even if another operation modifies data while update() is running, '
+      'resulting AsyncComplete and onComplete callback reflect own result',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final called = <int>[];
+
+        final results = await Future.wait([
+          notifier.update(
+            () async {
+              called.add(1);
+              await Future<void>.delayed(const Duration(milliseconds: 20));
+              called.add(2);
+              return 20;
+            },
+            onComplete: called.add,
+          ),
+          notifier.update(() async {
+            called.add(3);
+            return 30;
+          }),
+        ]);
+
+        expect(called, [1, 3, 2, 20]);
+        expect(results.first, const AsyncComplete(20));
+        expect(notifier.value, const AsyncComplete(20));
+      },
+    );
   });
 
   group('updateType()', () {
@@ -221,7 +252,7 @@ void main() {
       await notifier1.updateType(
         () async => 20,
         onWaiting: (waiting) => called1.add('waiting: $waiting'),
-        onComplete: () => called1.add('complete: ${notifier1.data}'),
+        onComplete: (data) => called1.add('complete: $data'),
         onError: (e, _) => called1.add('error: $e'),
       );
       expect(called1, ['waiting: true', 'waiting: false', 'complete: 10']);
@@ -229,7 +260,7 @@ void main() {
       await notifier2.updateType(
         () => throw error,
         onWaiting: (waiting) => called2.add('waiting: $waiting'),
-        onComplete: () => called2.add('complete: ${notifier2.data}'),
+        onComplete: (data) => called2.add('complete: $data'),
         onError: (e, _) => called2.add('error: $e'),
       );
       expect(called2, ['waiting: true', 'waiting: false', 'error: $error']);
@@ -239,7 +270,7 @@ void main() {
         // No callback should be called at the end
         // because both phase type and data won't change.
         onWaiting: (waiting) => called3.add('waiting: $waiting'),
-        onComplete: () => called3.add('complete: ${notifier3.data}'),
+        onComplete: (data) => called3.add('complete: $data'),
         onError: (e, _) => called3.add('error: $e'),
       );
       expect(called3, ['waiting: true']);
@@ -247,7 +278,7 @@ void main() {
       await notifier4.updateType(
         () async => const AsyncComplete(20),
         onWaiting: (waiting) => called4.add('waiting: $waiting'),
-        onComplete: () => called4.add('complete: ${notifier4.data}'),
+        onComplete: (data) => called4.add('complete: $data'),
         onError: (e, _) => called4.add('error: $e'),
       );
       expect(called4, ['waiting: true', 'waiting: false', 'complete: 10']);
@@ -255,7 +286,7 @@ void main() {
       await notifier5.updateType(
         () async => AsyncError(error: error),
         onWaiting: (waiting) => called5.add('waiting: $waiting'),
-        onComplete: () => called5.add('complete: ${notifier5.data}'),
+        onComplete: (data) => called5.add('complete: $data'),
         onError: (e, _) => called5.add('error: $e'),
       );
       expect(called5, ['waiting: true', 'waiting: false', 'error: $error']);
@@ -263,7 +294,7 @@ void main() {
 
     test(
       'If another operation modifies data while updateType() is running, '
-      'resulting AsyncPhase reflects the change',
+      'resulting AsyncPhase and onComplete callback reflect the change',
       () async {
         final notifier = AsyncPhaseNotifier(10);
         addTearDown(notifier.dispose);
@@ -271,19 +302,22 @@ void main() {
         final called = <int>[];
 
         final results = await Future.wait([
-          notifier.updateType(() async {
-            called.add(1);
-            await Future<void>.delayed(const Duration(milliseconds: 20));
-            called.add(2);
-            return 20;
-          }),
+          notifier.updateType(
+            () async {
+              called.add(1);
+              await Future<void>.delayed(const Duration(milliseconds: 20));
+              called.add(2);
+              return 20;
+            },
+            onComplete: called.add,
+          ),
           notifier.update(() async {
             called.add(3);
             return 30;
           }),
         ]);
 
-        expect(called, [1, 3, 2]);
+        expect(called, [1, 3, 2, 30]);
         expect(results.first, const AsyncComplete(30));
         expect(notifier.value, const AsyncComplete(30));
       },

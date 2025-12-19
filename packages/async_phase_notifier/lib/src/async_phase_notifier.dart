@@ -169,8 +169,6 @@ class AsyncPhaseNotifier<T extends Object?>
   ///   * This allows the final phase to be [AsyncInitial] or [AsyncWaiting]
   ///     if returned by the function, giving you full control over the
   ///     resulting phase.
-  /// * **Simplified callbacks**: The `onComplete` callback takes no
-  ///   parameters since the [data] remains unchanged.
   ///
   /// ```dart
   /// final notifier = AsyncPhaseNotifier(123);
@@ -212,11 +210,17 @@ class AsyncPhaseNotifier<T extends Object?>
   /// * **AsyncError**:
   ///   * The `onError` callback is called. This occurs whether the function
   ///     explicitly returned an [AsyncError] or threw an exception.
+  ///
+  /// > [!NOTE]
+  /// > The `onComplete` callback receives the current value of [data], not
+  /// > the return value of the asynchronous operation. If [data] is modified
+  /// > by other operations while this method is running, `onComplete` will
+  /// > reflect the latest changes.
   Future<AsyncPhase<T>> updateType(
     Future<Object?> Function() func, {
     // ignore: avoid_positional_boolean_parameters
     void Function(bool isWaiting)? onWaiting,
-    void Function()? onComplete,
+    void Function(T data)? onComplete,
     void Function(Object e, StackTrace s)? onError,
   }) async {
     value = value.copyAsWaiting();
@@ -242,7 +246,7 @@ class AsyncPhaseNotifier<T extends Object?>
         if (phase case AsyncError(:final error, :final stackTrace)) {
           onError?.call(error, stackTrace);
         } else {
-          onComplete?.call();
+          onComplete?.call(data);
         }
       }
     }
