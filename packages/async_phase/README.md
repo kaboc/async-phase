@@ -4,22 +4,9 @@
 
 A sealed class and its subclasses representing phases of an asynchronous operation.
 
-## About this package
-
-This package is mainly for use with [AsyncPhaseNotifier] in Flutter apps, but has
-been made public as a separate package so that it can be used for pure Dart apps too.
-
-For details on `AsyncPhaseNotifier`, see [its document][AsyncPhaseNotifier].
-
-## AsyncPhase
-
-[AsyncPhase] is similar to `AsyncValue`, which is part of package:riverpod.
-Unlike it, this `AsyncPhase` is an independent package, so you can use it without
-unnecessary dependencies, and is much simpler without surprising behaviours.
-
 ## Subclasses (Phases)
 
-`AsyncPhase` itself is a sealed class. Its four subclasses listed below are
+[AsyncPhase] itself is a sealed class. Its four subclasses listed below are
 used to represent phases of an asynchronous operation.
 
 - [AsyncInitial]
@@ -27,7 +14,7 @@ used to represent phases of an asynchronous operation.
 - [AsyncComplete]
 - [AsyncError]
 
-## Properties
+### Properties
 
 - **data**
     - The result of an asynchronous operation.
@@ -42,10 +29,12 @@ used to represent phases of an asynchronous operation.
 
 ## Usage
 
-This section explains usages without `AsyncPhaseNotifier`.
+This section covers usage in pure Dart.
 
-For use with `AsyncPhaseNotifier`, see the document of
-[async_phase_notifier][AsyncPhaseNotifier].
+> [!TIP]
+> For Flutter apps, this package is best used alongside [AsyncPhaseNotifier].
+> Please refer to the [async_phase_notifier][AsyncPhaseNotifier] documentation
+> for more information.
 
 ### AsyncPhase.from()
 
@@ -80,12 +69,12 @@ class WeatherForecast {
 }
 ```
 
-[copyAsWaiting()][copyAsWaiting] is a handy method to switch the phase to `AsyncWaiting`
-without losing the previous data.
+The [copyAsWaiting()][copyAsWaiting] method is a handy method to switch the
+phase to `AsyncWaiting` without losing the previous data.
 
-`fallbackData` is an argument for specifying the data that should be used when the
-asynchronous operation results in failure. If it is not specified, the `data` field
-of the resulting `AsyncError` is set to null.
+The `fallbackData` parameter specifies the data that should be used when the
+asynchronous operation results in failure. If it is not specified, the `data`
+field of the resulting `AsyncError` is set to null.
 
 #### onComplete / onError
 
@@ -140,8 +129,8 @@ final message = switch (phase) {
 
 ### whenOrNull()
 
-[when()][when] requires all parameters except for `initial`. If you need only some
-of them, use [whenOrNull()][whenOrNull] instead.
+The [when()][when] method requires all parameters except for `initial`. If you
+need only some of them, use [whenOrNull()][whenOrNull] instead.
 
 Please note that `null` is returned as the name suggests if the current phase
 does not match any of the specified parameter.

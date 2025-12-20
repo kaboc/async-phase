@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart';
 
-/// The base class for the classes that represent phases of
-/// an asynchronous operation.
+/// A sealed base for representing the phases of an asynchronous operation.
 @immutable
 sealed class AsyncPhase<T extends Object?> {
   // ignore: public_member_api_docs

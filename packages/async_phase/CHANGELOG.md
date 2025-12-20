@@ -1,3 +1,7 @@
+## 0.6.2
+
+- Update the minimum Dart SDK version to 3.6.2.
+
 ## 0.6.1
 
 - Improve method signatures for better auto-completion of callback parameters.
