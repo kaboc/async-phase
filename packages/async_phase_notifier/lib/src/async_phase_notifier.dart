@@ -144,7 +144,7 @@ class AsyncPhaseNotifier<T extends Object?>
   /// expect(phase, isA<AsyncComplete<int>>());
   ///
   /// // Returns an AsyncPhase (AsyncError)
-  /// phase = await notifier.updateType(() async => AsyncError(error: ..));
+  /// phase = await notifier.updateType(() async => AsyncError(error: ...));
   /// expect(phase.data, 123);
   /// expect(phase, isA<AsyncError<int>>());
   /// ```

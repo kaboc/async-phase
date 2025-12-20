@@ -15,10 +15,10 @@ an asynchronous operation: initial, waiting, complete, and error.
 
 ## Basic Concept: AsyncPhase
 
-This package is built on top of async_phase.
+This package is built on top of [async_phase][AsyncPhase].
 
-AsyncPhase is a type that represents the current status of an asynchronous operation.
-It consists of the following four states:
+`AsyncPhase` is a type that represents the current status of an asynchronous
+operation. It consists of the following four states:
 
 * **AsyncInitial**:
     * The state before the operation has started.
@@ -28,7 +28,7 @@ It consists of the following four states:
 * **AsyncComplete**:
     * The state where the operation finished successfully. It contains the
       resulting data.
-* **AsyncError*:
+* **AsyncError**:
     * The state where the operation failed. It contains an error and a stack
       trace, and can also hold the previous data.
 
@@ -61,10 +61,10 @@ according to the phase of the asynchronous operation, and notifies the listeners
 those changes.
 
 1. The value of the notifier is switched to `AsyncWaiting` when the operation starts.
-2. The change is notified to listeners. 
+2. The change is notified to listeners.
 3. The value is switched to either `AsyncComplete` or `AsyncError` depending on the
    result.
-4. The change is notified to listeners. 
+4. The change is notified to listeners.
 
 ```dart
 final notifier = AsyncPhaseNotifier(0);
@@ -73,21 +73,23 @@ await notifier.update(() => someAsyncOperation());
 
 Optionally, you can pass a callback function that takes the result of the operation
 as a parameter. The `onError` callback is especially useful for logging errors.
-(But note that errors occurring in those callback functions are not automatically
-handled.)
 
 ```dart
 await notifier.update(
   () => someAsyncOperation(),
-  onWaiting: (isWaiting) => ...,
+  onWaiting: (data) => ...,
   onComplete: (data) => ...,
   onError: (e, s) => Logger.reportError(e, s),
 );
 ```
 
+> [!CAUTION]
+> Errors occurring in those callback functions are not automatically handled.
+
 ### updateType()
 
-`updateType()` is used to update the phase type while preserving the existing `value.data`.
+The `updateType()` method is used to update the phase type while preserving
+the existing `value.data`.
 
 * **Preserves Existing Data**:
     * The callback result can be of any type and does not affect the notifier's current data.
@@ -105,10 +107,10 @@ For more technical details and behavior regarding callbacks, please refer to the
 
 ### value.data vs data
 
-`data` is a getter for `value.data`. The former is handy and more type-safe since
-the return type is non-nullable if the generic type `T` of `AsyncPhaseNotifier<T>`
-is non-nullable, whereas the latter is always nullable, often requiring a null
-check or a non-null assertion.
+The `data` getter returns `value.data`. Using `data` is handier and more
+type-safe since the return type is non-nullable if the generic type `T` of
+`AsyncPhaseNotifier<T>` is non-nullable, whereas `value.data` is always nullable,
+often requiring a null check or a non-null assertion.
 
 ### Listening for phase changes
 
@@ -137,15 +139,10 @@ cancel();
 With [listenFor()][listenFor], you can trigger some action in one of the callbacks
 relevant to the latest phase when the phase or its data changes.
 
-Note:
-
-- All callbacks are optional.
-    - Listener is not added if no callback function is passed.
-
 ```dart
 final notifier = AsyncPhaseNotifier(Auth());
 final cancel = notifier.listenFor(
-  onWaiting: () { /* e.g. Start loading indicator */ },
+  onWaiting: (data) { /* e.g. Start loading indicator */ },
   onComplete: (data) { /* e.g. Stop loading indicator */ },
   onError: (e, s) { /* e.g. Showing an error dialog */ },
 );
@@ -156,6 +153,9 @@ final cancel = notifier.listenFor(
 cancel();
 ```
 
+> [!NOTE]
+> All callbacks are optional. Listener is not added if no callback function is passed.
+
 #### AsyncPhaseListener
 
 It is also possible to use the [AsyncPhaseListener][AsyncPhaseListener] widget to
@@ -164,19 +164,21 @@ listen for phase changes.
 ```dart
 child: AsyncPhaseListener(
   notifier: notifier,
-  onWaiting: () { /* e.g. Start loading indicator */ },
+  onWaiting: (data) { /* e.g. Start loading indicator */ },
   onComplete: (data) { /* e.g. Stop loading indicator */ },
   onError: (e, s) { /* e.g. Showing an error dialog */ },
   child: ...,
 )
 ```
 
-Please note that a listener is added for each `AsyncPhaseListener` widget, not
-per notifier. If this widget is used in multiple places for the same notifier,
-a single notification will trigger the callback function in each of those widgets.
+> [!CAUTION]
+> A listener is added for each `AsyncPhaseListener` widget, not per notifier.
+> If this widget is used in multiple places for the same notifier, a single
+> notification will trigger the callback function in each of those widgets.
 
-Please also note that changes to callbacks (e.g. `onComplete`) will only take
-effect when the widget is provided with a new `key`.
+> [!CAUTION]
+> Changes to callbacks (e.g. `onComplete`) will only take effect when the widget
+> is provided with a new `key` or a new `notifier`.
 
 ## Examples
 
@@ -213,7 +215,7 @@ Widget build(BuildContext context) {
   return ValueListenableBuilder<AsyncPhase<Weather>>(
     valueListenable: notifier,
     builder: (context, phase, _) {
-      // Shows a progress indicator while fetching and
+      // Shows a loading indicator while fetching and
       // either the result or an error when finished.
       return phase.when(
         waiting: (weather) => const CircularProgressIndicator(),
@@ -221,7 +223,7 @@ Widget build(BuildContext context) {
         error: (weather, e, s) => Text('$e'),
       );
     },
-  ); 
+  );
 }
 ```
 
@@ -259,7 +261,7 @@ Widget build(BuildContext context) {
 void main() {
   runApp(
     const Grab(child: App()),
-  ); 
+  );
 }
 ```
 

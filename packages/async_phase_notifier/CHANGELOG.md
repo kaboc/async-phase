@@ -1,3 +1,15 @@
+## 0.8.0
+
+- Bump async_phase version to 0.6.2.
+- Update the minimum Dart SDK version to 3.6.2.
+- **Breaking**:
+    - Remove deprecated `updateOnlyPhase()` from `AsyncPhaseNotifier`.
+    - Standardize callbacks for consistency across all methods:
+        - `onComplete` in `updateType()` now receives data, matching other methods.
+        - `onWaiting` now triggers **only on start** and receives data.
+            - Previously, its trigger timing (start/end) and parameter type (bool)
+              were inconsistent among methods.
+
 ## 0.7.1
 
 - Improve method signatures for better auto-completion of callback parameters.
