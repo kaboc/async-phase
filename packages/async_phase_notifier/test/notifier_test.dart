@@ -42,6 +42,7 @@ void main() {
             return 20;
           }),
         );
+        // AsyncWaiting carries over data from the previous phase.
         expect(notifier1.value, const AsyncWaiting(10));
         await completer.future;
         await pumpEventQueue();
@@ -57,6 +58,7 @@ void main() {
         expect(notifier2.value, const AsyncWaiting(10));
         await completer.future;
         await pumpEventQueue();
+        // Data from the previous phase is preserved even on error.
         expect(notifier2.value, AsyncError(data: 10, error: e, stackTrace: s));
       },
     );
@@ -220,6 +222,7 @@ void main() {
         expect(notifier.value, const AsyncWaiting(10));
         await completer.future;
         await pumpEventQueue();
+        // Data from the previous phase is preserved even on error.
         expect(notifier.value, AsyncError(data: 10, error: e, stackTrace: s));
       },
     );
@@ -382,7 +385,61 @@ void main() {
       },
     );
 
-    test('Callback is not called after subscription is cancelled', () async {
+    test(
+      'When phase is updated by update(), data is preserved in AsyncWaiting '
+      'and AsyncError passed to listener',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final phases = <AsyncPhase<int>>[];
+        final cancel = notifier.listen(phases.add);
+        addTearDown(cancel);
+
+        final e = Exception();
+        final s = StackTrace.current;
+
+        await notifier.update(() => Error.throwWithStackTrace(e, s));
+        await pumpEventQueue();
+
+        expect(
+          phases,
+          [
+            const AsyncWaiting(10),
+            AsyncError(data: 10, error: e, stackTrace: s),
+          ],
+        );
+      },
+    );
+
+    test(
+      'When generic type is nullable, listener receives phase containing '
+      'null without throwing.',
+      () async {
+        final notifier = AsyncPhaseNotifier<int?>(10);
+        addTearDown(notifier.dispose);
+
+        final phases = <AsyncPhase<int?>>[];
+        final cancel = notifier.listen(phases.add);
+        addTearDown(cancel);
+
+        await notifier.update(() async => null);
+        await notifier.update(() async => 20);
+        await pumpEventQueue();
+
+        expect(
+          phases,
+          const [
+            AsyncWaiting<int?>(10),
+            AsyncComplete<int?>(null),
+            AsyncWaiting<int?>(null),
+            AsyncComplete<int?>(20),
+          ],
+        );
+      },
+    );
+
+    test('Listener is not called after subscription is cancelled', () async {
       final notifier = AsyncPhaseNotifier(null);
       addTearDown(notifier.dispose);
 
@@ -409,10 +466,11 @@ void main() {
         ..value = const AsyncComplete(null)
         ..value = const AsyncError(error: 'err');
       await pumpEventQueue();
+
       expect(count1, isZero);
       expect(count2, 3);
-
       expect(notifier.isListening, isTrue);
+
       cancel2();
       expect(notifier.isListening, isFalse);
     });
@@ -426,12 +484,12 @@ void main() {
         final notifier = AsyncPhaseNotifier('a');
         addTearDown(notifier.dispose);
 
-        final phases = <AsyncPhase<String>>[];
+        final results = <String>[];
 
         final cancel = notifier.listenFor(
-          onWaiting: (data) => phases.add(AsyncWaiting(data)),
-          onComplete: (data) => phases.add(AsyncComplete(data)),
-          onError: (e, _) => phases.add(AsyncError(data: '', error: e)),
+          onWaiting: (data) => results.add('waiting: $data'),
+          onComplete: (data) => results.add('complete: $data'),
+          onError: (e, _) => results.add('error: $e'),
         );
         addTearDown(cancel);
 
@@ -453,19 +511,40 @@ void main() {
         await pumpEventQueue();
 
         expect(
-          phases,
+          results,
           const [
-            AsyncComplete('a'),
-            AsyncComplete('b'),
-            AsyncWaiting('b'),
-            AsyncWaiting('c'),
-            AsyncComplete('c'),
-            AsyncError(data: '', error: 'err'),
-            AsyncError(data: '', error: 'err'),
-            AsyncWaiting('d'),
-            AsyncError(data: '', error: 'err'),
+            'complete: a',
+            'complete: b',
+            'waiting: b',
+            'waiting: c',
+            'complete: c',
+            'error: err',
+            'error: err',
+            'waiting: d',
+            'error: err',
           ],
         );
+      },
+    );
+
+    test(
+      'When phase is updated by update(), onWaiting receives data from '
+      'previous phase',
+      () async {
+        final notifier = AsyncPhaseNotifier(10);
+        addTearDown(notifier.dispose);
+
+        final results = <String>[];
+        final cancel = notifier.listenFor(
+          onWaiting: (data) => results.add('waiting: $data'),
+          onComplete: (data) => results.add('complete: $data'),
+        );
+        addTearDown(cancel);
+
+        await notifier.update(() async => 20);
+        await pumpEventQueue();
+
+        expect(results, ['waiting: 10', 'complete: 20']);
       },
     );
 
@@ -492,6 +571,30 @@ void main() {
       expect(error, e);
       expect(stackTrace, s);
     });
+
+    test(
+      'When generic type is nullable, callbacks receive null without throwing.',
+      () async {
+        final notifier = AsyncPhaseNotifier<int?>(10);
+        addTearDown(notifier.dispose);
+
+        final results = <String>[];
+        final cancel = notifier.listenFor(
+          onWaiting: (data) => results.add('waiting: $data'),
+          onComplete: (data) => results.add('complete: $data'),
+        );
+        addTearDown(cancel);
+
+        await notifier.update(() async => null);
+        await notifier.update(() async => 20);
+        await pumpEventQueue();
+
+        expect(
+          results,
+          ['waiting: 10', 'complete: null', 'waiting: null', 'complete: 20'],
+        );
+      },
+    );
 
     test('No callback is called after subscription is cancelled', () async {
       final notifier = AsyncPhaseNotifier(null);
@@ -528,10 +631,11 @@ void main() {
         ..value = const AsyncComplete(null)
         ..value = const AsyncError(error: '');
       await pumpEventQueue();
+
       expect(count1, isZero);
       expect(count2, 3);
-
       expect(notifier.isListening, isTrue);
+
       cancel2();
       expect(notifier.isListening, isFalse);
     });
