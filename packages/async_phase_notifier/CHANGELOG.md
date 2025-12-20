@@ -3,7 +3,7 @@
 - Improve method signatures for better auto-completion of callback parameters.
 - Add `updateType()` to `AsyncPhaseNotifier` for more flexible phase control.
 - Deprecate `updateOnlyPhase()` in favour of `updateType()`.
-- Bump async_phase version to 0.7.0.
+- Bump async_phase version to 0.6.1.
 
 #### Migration Guide: updateOnlyPhase() to updateType()
 
@@ -23,7 +23,7 @@
 
 ## 0.7.0
 
-- Bump async_phase version to 0.7.0.
+- Bump async_phase version to 0.6.0.
 - Add `onWaiting`, `onComplete` and `onError` callbacks to `update()` and `updateOnlyPhase()`.
 
 ## 0.6.1
